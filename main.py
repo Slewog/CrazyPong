@@ -25,15 +25,21 @@ class Pong:
 
         # sprite group setup
         self.all_sprites = pg.sprite.Group()
-        self.player_sprites = pg.sprite.Group()
 
         # Objects and Player.
-        self.player_left = Player('left', self.SCREEN_W, self.SCREEN_H, [self.all_sprites, self.player_sprites])
-        self.player_right = Player('right', self.SCREEN_W, self.SCREEN_H, [self.all_sprites, self.player_sprites])
-        self.ball = Ball(self.SCREEN_W, self.SCREEN_H, self.all_sprites, self.player_sprites)
+        self.player_left = Player('left', self.SCREEN_W, self.SCREEN_H, self.all_sprites)
+        self.player_right = Player('right', self.SCREEN_W, self.SCREEN_H, self.all_sprites)
+        self.ball = Ball(self.SCREEN_W, self.SCREEN_H, self.all_sprites, self.player_left, self.player_right)
 
     def load_assets(self) -> None:
         pass
+
+    def quit(self):
+        for sprite in [self.ball, self.player_left, self.player_right]:
+            sprite.kill()
+        
+        pg.quit()
+        sys.exit()
 
     def update(self) -> None:
         # Delta time.
@@ -60,8 +66,7 @@ class Pong:
             # Event loop.
             for event in pg.event.get():
                 if event.type == pg.QUIT:
-                    pg.quit()
-                    sys.exit()
+                    self.quit()
 
             # Update the game.
             self.update()
