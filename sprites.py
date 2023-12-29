@@ -1,9 +1,78 @@
 import pygame as pg
 from random import choice
 
-from settings import BallSettings
+from settings import BallSettings, PlayerSettings
 
 WHITE = pg.Color('white')
+
+
+class Player(pg.sprite.Sprite):
+    VELOCITY = PlayerSettings.VELOCITY
+    WALL_OFFSET = PlayerSettings.WALL_OFFSET
+
+    def __init__(self, side:str, screen_w:int, screen_h:int, groups:pg.sprite.Group) -> None:
+        super().__init__(groups)
+
+        # Screen info for collisions.
+        self.screen_w = screen_w
+        self.screen_h = screen_h
+        
+        self.direction = pg.math.Vector2()
+        self.side = side
+        self.score = int(0)
+
+        if self.side == 'left':
+            self.default_pos = (10, self.screen_h//2)
+        else:
+            self.default_pos = (self.screen_w - PlayerSettings.WIDTH - 10, self.screen_h//2)
+
+        # Create the paddle (player).
+        self.image = pg.Surface((PlayerSettings.WIDTH, PlayerSettings.HEIGHT))
+        self.image.fill(WHITE)
+
+        self.rect = self.image.get_rect(midleft=self.default_pos)
+        self.pos = pg.math.Vector2(self.rect.topleft)
+        self.old_rect = self.rect.copy()
+
+    def check_input(self) -> None:
+        keys = pg.key.get_pressed()
+
+        if self.side == 'left':
+            if keys[pg.K_z]:
+                self.direction.y = -1
+            elif keys[pg.K_s]:
+                self.direction.y = 1
+            else:
+                self.direction.y = 0
+
+        if self.side == 'right':
+            if keys[pg.K_UP]:
+                self.direction.y = -1
+            elif keys[pg.K_DOWN]:
+                self.direction.y = 1
+            else:
+                self.direction.y = 0
+
+    def update(self, dt:float) -> None:
+        # Old rect.
+        self.old_rect = self.rect.copy()
+
+        self.check_input()
+
+        # Position.
+        if self.direction.y != 0:
+            self.pos.y += self.direction.y * self.VELOCITY * dt
+            self.rect.y = round(self.pos.y)
+        
+        # Collisions with wall bottom.
+        if self.rect.bottom > self.screen_h - self.WALL_OFFSET:
+            self.rect.bottom = self.screen_h - self.WALL_OFFSET
+            self.pos.y = self.rect.y
+        
+        # Collisions with wall top.
+        if self.rect.top < self.WALL_OFFSET:
+            self.rect.top = self.WALL_OFFSET
+            self.pos.y = self.rect.y
 
 
 class Ball(pg.sprite.Sprite):
@@ -65,7 +134,7 @@ class Ball(pg.sprite.Sprite):
                 self.direction.x *= -1
 
     def sprite_collision(self, direction:str) -> None:
-        pass
+        overlap_sprites = []
 
     def collisions(self, direction:str):
         self.sprite_collision(direction)
