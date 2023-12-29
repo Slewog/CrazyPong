@@ -4,3 +4,8 @@ class GameSettings:
 
     USE_FPS = bool(False)
     FPS = int(60)
+
+
+class BallSettings:
+    RADIUS = int(16)
+    VELOCITY = int(300)
