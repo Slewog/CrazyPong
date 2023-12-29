@@ -1,11 +1,13 @@
 import pygame as pg
+from random import choice
+
 from settings import BallSettings
 
 WHITE = pg.Color('white')
 
+
 class Ball(pg.sprite.Sprite):
-    RADIUS = BallSettings.RADIUS
-    VELOCITY = int(300)
+    VEL_MULTIPLIER = BallSettings.VEL_MULTIPLIER
 
     def __init__(self, screen_w:int, screen_h:int, group:pg.sprite.Group) -> None:
         super().__init__(group)
@@ -14,16 +16,19 @@ class Ball(pg.sprite.Sprite):
         self.screen_w = screen_w
         self.screen_h = screen_h
 
-        self.direction = pg.math.Vector2(0, 0)
+        # Movement setup.
+        self.vel_x = BallSettings.MAX_VELOCITY
+        self.vel_y = self.vel_x -1 
+        self.direction = pg.math.Vector2(0, 0) # choice((1, -1))
         self.default_pos = (screen_w //2, screen_h // 2)
 
         # Get ball size.
-        width = self.RADIUS * 2
+        width = BallSettings.RADIUS * 2
         size = (width, width)
 
-        # Create the ball.
+        # Create the ball surface.
         self.rect_image = pg.Surface(size, pg.SRCALPHA)
-        pg.draw.rect(self.rect_image, (255, 255, 255), (0, 0, *size), border_radius=self.RADIUS)
+        pg.draw.rect(self.rect_image, (255, 255, 255), (0, 0, *size), border_radius=width//2)
         self.image = pg.Surface(size)
         self.image.fill(WHITE)
         self.image = self.image.convert_alpha()
@@ -34,6 +39,8 @@ class Ball(pg.sprite.Sprite):
         self.pos = pg.math.Vector2(self.rect.topleft)
         self.old_rect = self.rect.copy()
 
+        self.active = False
+    
     def display_collisions(self, direction:str) -> None:
         if direction == 'vertical':
             if self.rect.top < 0:
@@ -63,6 +70,9 @@ class Ball(pg.sprite.Sprite):
     def collisions(self, direction:str):
         self.sprite_collision(direction)
         self.display_collisions(direction)
+
+    def calcule_speed(self, vel:int, dt:float) -> float:
+        return (vel * 65) * dt
     
     def update(self, dt:float) -> None:
         # Check delta time.
@@ -76,11 +86,11 @@ class Ball(pg.sprite.Sprite):
             self.direction = self.direction.normalize()
 
         if self.direction.x != 0:
-            self.pos.x += self.direction.x * self.VELOCITY * dt
+            self.pos.x += self.direction.x * self.calcule_speed(self.vel_x, dt)
             self.rect.x = round(self.pos.x)
             self.collisions('horizontal')
 
         if self.direction.y != 0:
-            self.pos.y += self.direction.y * self.VELOCITY * dt
+            self.pos.y += self.direction.y * self.calcule_speed(self.vel_y - 1, dt)
             self.rect.y = round(self.pos.y)
             self.collisions('vertical')
