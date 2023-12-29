@@ -35,7 +35,9 @@ class Pong:
         pass
 
     def quit(self):
-        for sprite in [self.ball, self.player_left, self.player_right]:
+        sprites:list[pg.sprite.Sprite] = [self.ball, self.player_left, self.player_right]
+        
+        for sprite in sprites:
             sprite.kill()
         
         pg.quit()

@@ -137,7 +137,7 @@ class Ball(pg.sprite.Sprite):
     def display_collisions(self, direction:str) -> None:
         if direction == 'vertical':
             if self.rect.top < 0 and self.last_wall != 'top':
-                self.rect.top = 0
+                self.rect.top = int(0)
                 self.pos.y = self.rect.y
                 self.direction.y *= -1
                 self.last_wall = str("top")
