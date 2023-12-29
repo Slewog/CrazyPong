@@ -4,6 +4,7 @@ from time import time
 
 from settings import GameSettings
 from locales import Locales
+from sprites import Ball
 
 
 class Pong:
@@ -23,6 +24,10 @@ class Pong:
 
         # sprite group setup
         self.all_sprites = pg.sprite.Group()
+        self.player_sprites = pg.sprite.Group()
+
+        # Objects and Player.
+        self.ball = Ball(self.SCREEN_W, self.SCREEN_H, self.all_sprites)
 
     def load_assets(self) -> None:
         pass
@@ -31,6 +36,8 @@ class Pong:
         # Delta time.
         self.dt = time() - self.prev_dt
         self.prev_dt = time()
+
+        self.all_sprites.update(self.dt)
 
     def render(self) -> None:
         # Draw the background.
@@ -52,6 +59,7 @@ class Pong:
                 if event.type == pg.QUIT:
                     pg.quit()
                     sys.exit()
+
             # Update the game.
             self.update()
 
