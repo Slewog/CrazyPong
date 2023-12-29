@@ -4,7 +4,7 @@ from time import time
 
 from settings import GameSettings
 from locales import Locales
-from sprites import Ball
+from sprites import Ball, Player
 
 
 class Pong:
@@ -28,6 +28,8 @@ class Pong:
         self.player_sprites = pg.sprite.Group()
 
         # Objects and Player.
+        self.player_left = Player('left', self.SCREEN_W, self.SCREEN_H, [self.all_sprites, self.player_sprites])
+        self.player_right = Player('right', self.SCREEN_W, self.SCREEN_H, [self.all_sprites, self.player_sprites])
         self.ball = Ball(self.SCREEN_W, self.SCREEN_H, self.all_sprites)
 
     def load_assets(self) -> None:
