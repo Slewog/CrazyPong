@@ -12,6 +12,7 @@ class Pong:
     USE_FPS = GameSettings.USE_FPS
     SCREEN_H = GameSettings.SCREEN_H
     SCREEN_W = GameSettings.SCREEN_W
+    MAX_SCORE = GameSettings.MAX_SCORE
 
     def __init__(self) -> None:
         # Setup.
