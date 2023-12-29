@@ -78,12 +78,13 @@ class Player(pg.sprite.Sprite):
 class Ball(pg.sprite.Sprite):
     VEL_MULTIPLIER = BallSettings.VEL_MULTIPLIER
 
-    def __init__(self, screen_w:int, screen_h:int, group:pg.sprite.Group) -> None:
+    def __init__(self, screen_w:int, screen_h:int, group:pg.sprite.Group, players:list[Player]) -> None:
         super().__init__(group)
 
-        # Screen info for collisions.
+        # Screen info and players for collisions.
         self.screen_w = screen_w
         self.screen_h = screen_h
+        self.players = players
 
         # Movement setup.
         self.vel_x = BallSettings.MAX_VELOCITY
@@ -133,11 +134,34 @@ class Ball(pg.sprite.Sprite):
                 self.pos.x = self.rect.x
                 self.direction.x *= -1
 
-    def sprite_collision(self, direction:str) -> None:
-        overlap_sprites = []
-
     def collisions(self, direction:str):
-        self.sprite_collision(direction)
+        overlap_sprites:list[pg.sprite.Sprite] = pg.sprite.spritecollide(self, self.players, False)
+
+        if overlap_sprites:
+            if direction == 'horizontal':
+                for sprite in overlap_sprites:
+                    if self.rect.right >= sprite.rect.left and self.old_rect.right <= sprite.old_rect.left:
+                        self.rect.right = sprite.rect.left - 1
+                        self.pos.x = self.rect.x
+                        self.direction.x *= -1
+                    
+                    if self.rect.left <= sprite.rect.right and self.old_rect.left >= sprite.old_rect.right:
+                        self.rect.left = sprite.rect.right + 1
+                        self.pos.x = self.rect.x
+                        self.direction.x *= -1
+            
+            if direction == 'vertical':
+                for sprite in overlap_sprites:
+                    if self.rect.bottom >= sprite.rect.top and self.old_rect.bottom <= sprite.old_rect.top:
+                        self.rect.bottom = sprite.rect.top - 1
+                        self.pos.y = self.rect.y
+                        self.direction.y *= -1
+                    
+                    if self.rect.top <= sprite.rect.bottom and self.old_rect.top >= sprite.old_rect.bottom:
+                        self.rect.top = sprite.rect.bottom + 1
+                        self.pos.y = self.rect.y
+                        self.direction.y *= -1
+    
         self.display_collisions(direction)
 
     def calcule_speed(self, vel:int, dt:float) -> float:
