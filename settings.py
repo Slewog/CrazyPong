@@ -1,7 +1,7 @@
 class GameSettings:
     SCREEN_W = int(1280)
-    SCREEN_H = int(720)
-    USE_FPS = bool(True)
+    SCREEN_H = int(960)
+    USE_FPS = bool(False)
     FPS = int(60)
     MAX_SCORE = int(5)
 
