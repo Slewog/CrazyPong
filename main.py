@@ -16,20 +16,23 @@ class Pong:
 
     def __init__(self) -> None:
         # Setup.
-        # pg.mixer.pre_init(22050, -16, 2, 1024)
         pg.init()
 
         self.clock = pg.time.Clock()
+        self.font = pg.font.SysFont('comicsans', 50)
+        self.color = pg.Color('white')
         self.display_surf = pg.display.set_mode((self.SCREEN_W, self.SCREEN_H))
         pg.display.set_caption(Locales.game_name)
+
+        self.winned = False
 
         # sprite group setup
         self.all_sprites = pg.sprite.Group()
 
         # Objects and Player.
-        self.player_left = Player('left', self.SCREEN_W, self.SCREEN_H, self.all_sprites)
-        self.player_right = Player('right', self.SCREEN_W, self.SCREEN_H, self.all_sprites)
-        self.ball = Ball(self.SCREEN_W, self.SCREEN_H, self.all_sprites, self.player_left, self.player_right)
+        self.player_left = Player('left', self.SCREEN_W, self.SCREEN_H, self.all_sprites, self.font, self.color)
+        self.player_right = Player('right', self.SCREEN_W, self.SCREEN_H, self.all_sprites, self.font, self.color)
+        self.ball = Ball(self.SCREEN_W, self.SCREEN_H, self.color, self.all_sprites, self.player_left, self.player_right)
 
     def load_assets(self) -> None:
         pass
@@ -48,7 +51,8 @@ class Pong:
         self.dt = time() - self.prev_dt
         self.prev_dt = time()
 
-        self.all_sprites.update(self.dt)
+        if not self.winned:
+            self.all_sprites.update(self.dt)
 
     def render(self) -> None:
         # Draw the background.
@@ -57,8 +61,8 @@ class Pong:
         self.all_sprites.draw(self.display_surf)
 
         # Update the window.
-        pg.display.update()
-        # pg.display.flip()
+        # pg.display.update()
+        pg.display.flip()
 
     def run(self) -> None:
         self.load_assets()
