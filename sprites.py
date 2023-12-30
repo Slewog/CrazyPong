@@ -3,25 +3,27 @@ from random import choice
 
 from settings import BallSettings, PlayerSettings
 
-WHITE = pg.Color('white')
-
 
 class Player(pg.sprite.Sprite):
     VELOCITY = PlayerSettings.VELOCITY
     WALL_OFFSET = PlayerSettings.WALL_OFFSET
+    SCORE_Y_POS = PlayerSettings.SCORE_Y_POS
 
-    def __init__(self, side:str, screen_w:int, screen_h:int, group:pg.sprite.Group) -> None:
+    def __init__(self, side:str, screen_w:int, screen_h:int, group:pg.sprite.Group, font:pg.font.Font, color:pg.Color) -> None:
         super().__init__(group)
 
         # Screen info for collisions.
         self.screen_w = screen_w
         self.screen_h = screen_h
         
-        self.direction = pg.math.Vector2()
+        self.direction = pg.math.Vector2(0, 0)
         self.side = side
         self.score = int(0)
         self.width = PlayerSettings.WIDTH
         self.height = PlayerSettings.HEIGHT
+
+        self.font = font
+        self.color = color
 
         if self.side == 'left':
             self.default_pos = (10, self.screen_h//2)
@@ -30,9 +32,16 @@ class Player(pg.sprite.Sprite):
 
         # Create the paddle (player).
         self.image = pg.Surface((self.width, self.height))
-        self.image.fill(WHITE)
+        self.image.fill(self.color)
 
         self.rect = self.image.get_rect(midleft=self.default_pos)
+        self.pos = pg.math.Vector2(self.rect.topleft)
+        self.old_rect = self.rect.copy()
+
+    def reset(self) -> None:
+        self.direction.y = 0
+
+        self.rect.midleft = self.default_pos
         self.pos = pg.math.Vector2(self.rect.topleft)
         self.old_rect = self.rect.copy()
 
@@ -79,7 +88,7 @@ class Player(pg.sprite.Sprite):
 class Ball(pg.sprite.Sprite):
     VEL_MULTIPLIER = BallSettings.VEL_MULTIPLIER
 
-    def __init__(self, screen_w:int, screen_h:int, group:pg.sprite.Group, player_left:Player, player_right:Player) -> None:
+    def __init__(self, screen_w:int, screen_h:int, color:pg.Color, group:pg.sprite.Group, player_left:Player, player_right:Player) -> None:
         super().__init__(group)
 
         # Screen info and players for collisions.
@@ -103,7 +112,7 @@ class Ball(pg.sprite.Sprite):
         self.rect_image = pg.Surface(size, pg.SRCALPHA)
         pg.draw.rect(self.rect_image, (255, 255, 255), (0, 0, *size), border_radius=width//2)
         self.image = pg.Surface(size)
-        self.image.fill(WHITE)
+        self.image.fill(color)
         self.image = self.image.convert_alpha()
         self.image.blit(self.rect_image, (0, 0), None, pg.BLEND_RGBA_MIN)
 
@@ -114,13 +123,17 @@ class Ball(pg.sprite.Sprite):
 
         self.active = False
 
-    def reset(self) -> None:
+    def reset(self, winned:bool=False) -> None:
         self.rect.center = self.default_pos
         self.pos = pg.math.Vector2(self.rect.topleft)
         self.old_rect = self.rect.copy()
 
+        if winned:
+            self.direction.x = choice((1, -1))
+        else:
+            self.direction.x *= -1
         self.direction.y = 1
-        self.direction.x *= -1
+
         self.vel_y = float(0)
         self.last_wall = str("")
 
@@ -132,7 +145,7 @@ class Ball(pg.sprite.Sprite):
         self.vel_y = (difference_in_y / reduction_factor)  
 
     def calcule_speed(self, vel:int, dt:float) -> float:
-        return (vel * 65) * dt  
+        return (vel * self.VEL_MULTIPLIER) * dt  
 
     def display_collisions(self, direction:str) -> None:
         if direction == 'vertical':
@@ -151,7 +164,10 @@ class Ball(pg.sprite.Sprite):
                 self.last_wall = str("")
 
         if direction == 'horizontal':
-            if self.rect.left < 0 or self.rect.right > self.screen_w:
+            if self.rect.left < 0:
+                self.reset()
+            
+            if self.rect.right > self.screen_w:
                 self.reset()
 
     def collisions(self, direction:str):
@@ -201,9 +217,6 @@ class Ball(pg.sprite.Sprite):
         
         # update old rect.
         self.old_rect = self.rect.copy()
-
-        if self.direction.magnitude() != 0:
-            self.direction = self.direction.normalize()
 
         if self.direction.x != 0:
             self.pos.x += self.direction.x * self.calcule_speed(self.vel_x, dt)
