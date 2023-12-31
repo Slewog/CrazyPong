@@ -1,5 +1,5 @@
 class Locales:
-    game_name = "Py Pong"
+    GAME_NAME = "Py Pong"
     START_TXT = "Appuyer sur ESPACE pour jouer"
     RESTART_TXT = "Appuyer sur ESPACE pour re-jouer"
 

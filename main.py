@@ -87,7 +87,7 @@ class Pong:
         self.clock = pg.time.Clock()
         
         self.display_surf = pg.display.set_mode((self.SCREEN_W, self.SCREEN_H))
-        pg.display.set_caption(Locales.game_name)
+        pg.display.set_caption(Locales.GAME_NAME)
 
         self.winned = False
         self.playing = False
