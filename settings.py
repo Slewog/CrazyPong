@@ -5,8 +5,8 @@ class GameSettings:
     USE_FPS = bool(False)
     FPS = int(120)
     MAX_SCORE = int(5)
-    BACKGROUND_COLOR = str('gray12') # 'gray12' or '#2F373F'
-    FONT_COLOR = str('gray79') # (27,35,43) or str('gray79')
+    BACKGROUND_COLOR = str('gray12')  # 'gray12' or '#2F373F'
+    FONT_COLOR = str('gray79')  # (27,35,43) or str('gray79')
     OBJECT_COLOR = str('white')
     HIT_SOUND_VOL = float(0.2)
     SCORE_SOUND_VOL = float(0.2)
