@@ -23,6 +23,7 @@ class Player(pg.sprite.Sprite):
         self.font_color = font_color
         self.color = color
 
+        self.active = True
         self.direction = pg.math.Vector2(0, 0)
         self.side = side
         self.side_trslt = side_trslt
@@ -44,7 +45,7 @@ class Player(pg.sprite.Sprite):
         self.old_rect = self.rect.copy()
 
     def reset(self) -> None:
-        self.direction.y = 0
+        self.reset_direction(True)
 
         self.rect.midleft = self.default_pos
         self.pos = pg.math.Vector2(self.rect.topleft)
@@ -52,7 +53,12 @@ class Player(pg.sprite.Sprite):
 
         self.score = int(0)
         self.update_score_txt()
-    
+
+    def reset_direction(self, freezed:bool) -> None:
+        self.active = freezed
+        if freezed:
+            self.direction.y = 0
+
     def update_score_txt(self) -> None:
         self.score_txt = self.font.render(str(self.score), True, self.font_color)
         score_rect = self.score_txt.get_rect()
@@ -86,6 +92,9 @@ class Player(pg.sprite.Sprite):
         # Old rect.
         self.old_rect = self.rect.copy()
 
+        if not self.active:
+            return
+        
         # Position.
         if self.direction.y != 0:
             self.pos.y += self.direction.y * self.VELOCITY * dt
@@ -107,7 +116,7 @@ class Ball(pg.sprite.Sprite):
     VEL_MULTIPLIER = int(65)
     Y_VEL_RAND = BallSettings.Y_VEL_RAND
 
-    def __init__(self, screen_w:int, screen_h:int, color:pg.Color, group:pg.sprite.Group, player_left:Player, player_right:Player, sounds:list[pg.mixer.Sound]) -> None:
+    def __init__(self, screen_w:int, screen_h:int, counter_font:pg.font.Font, counter_color:pg.Color, color:pg.Color, group:pg.sprite.Group, player_left:Player, player_right:Player, max_ply_score:int, sounds:list[pg.mixer.Sound]) -> None:
         super().__init__(group)
 
         # Screen info and players for collisions.
@@ -115,7 +124,16 @@ class Ball(pg.sprite.Sprite):
         self.screen_h = screen_h
         self.player_left = player_left
         self.player_right = player_right
+        self.max_player_score = max_ply_score
         self.last_wall = str("")
+
+        self.freeze_time = int(0)
+        self.counter = int(-1)
+        self.active = bool(False)
+
+        # Font.
+        self.font = counter_font
+        self.font_color = counter_color
 
         # Sounds.
         self.hit_sound = sounds[0]
@@ -125,7 +143,7 @@ class Ball(pg.sprite.Sprite):
         self.vel_x = BallSettings.MAX_VELOCITY
         self.vel_y = self.vel_x - 1
         self.direction = pg.math.Vector2(choice((1, -1)), choice((1, -1)))
-        self.default_pos = (screen_w //2, screen_h // 2)
+        self.default_pos = (screen_w // 2, screen_h // 2)
 
         # Get ball size.
         width = BallSettings.RADIUS * 2
@@ -151,17 +169,22 @@ class Ball(pg.sprite.Sprite):
 
         if winned:
             self.direction.x = choice((1, -1))
+            self.set_active(True)
         else:
-            self.direction.x *= -1
-        self.direction.y = choice((1, -1))
+            if (self.player_left.score < self.max_player_score and self.player_right.score < self.max_player_score
+            or self.player_right.score < self.max_player_score and self.player_left.score < self.max_player_score):
+                self.freeze_time = pg.time.get_ticks()
 
+            self.direction.x *= -1
+            self.set_active(False)
+            self.last_wall = str("")
+
+        self.direction.y = choice((1, -1))
         if self.Y_VEL_RAND:
             self.vel_y = self.vel_x - 1
 
-        self.last_wall = str("")
-
     def calcule_vel_y(self, sprite:Player) -> None:
-        # Calcule new Y vel from difference in Y pos with the ball and a player paddle.
+        """Calcule new Y vel from difference with the ball center y and the player center y who's colliding."""
         if not self.Y_VEL_RAND:
             return
         
@@ -175,6 +198,9 @@ class Ball(pg.sprite.Sprite):
             self.vel_y *= -1
 
     def calcule_speed(self, vel:int, dt:float) -> float:
+        """Multiply the player velocity by VEL_MULTIPLIER and 
+        multiply the result with delta time
+        """
         return (vel * self.VEL_MULTIPLIER) * dt  
 
     def display_collisions(self, direction:str) -> None:
@@ -250,16 +276,49 @@ class Ball(pg.sprite.Sprite):
     
         self.display_collisions(direction)
 
+    def set_active(self, state:bool) -> None:
+        if state == self.active or type(state) != bool:
+            return
+        self.active = state
+    
+    def update_counter(self, value:int) -> None:
+        self.counter = value
+
+        # Create a new counter text surface on update.
+        self.counter_txt = self.font.render(str(self.counter), True, self.font_color)
+        self.counter_rect = self.counter_txt.get_rect()
+        self.counter_rect.midbottom = (self.screen_w//2 , self.rect.top - 10)
+    
+    def check_freeze_time(self) -> None:
+        current_time = pg.time.get_ticks()
+        freezed_time = current_time - self.freeze_time
+
+        if freezed_time <= 700 and self.counter != 3:
+            self.update_counter(3)
+        if 700 < freezed_time <= 1400 and self.counter != 2:
+            self.update_counter(2)
+        if 1400 < freezed_time <= 2100 and self.counter != 1:
+            self.update_counter(1)
+        if freezed_time >= 2100:
+            self.set_active(True)
+            self.freeze_time = int(0)
+            self.update_counter(-1)
+    
+    def draw_restart_counter(self, display:pg.Surface, bg_color:pg.Color) -> None:
+        pg.draw.rect(display, bg_color, self.counter_rect)
+        display.blit(self.counter_txt, self.counter_rect)
+
     def update(self, dt:float) -> None:
-        # update old rect.
-        self.old_rect = self.rect.copy()
+        if self.active:
+            # update old rect.
+            self.old_rect = self.rect.copy()
 
-        if self.direction.x != 0:
-            self.pos.x += self.direction.x * self.calcule_speed(self.vel_x, dt)
-            self.rect.x = round(self.pos.x)
-            self.collisions('horizontal')
+            if self.direction.x != 0:
+                self.pos.x += self.direction.x * self.calcule_speed(self.vel_x, dt)
+                self.rect.x = round(self.pos.x)
+                self.collisions('horizontal')
 
-        if self.direction.y != 0:
-            self.pos.y += self.direction.y * self.calcule_speed(self.vel_y, dt)
-            self.rect.y = round(self.pos.y)
-            self.collisions('vertical')
+            if self.direction.y != 0:
+                self.pos.y += self.direction.y * self.calcule_speed(self.vel_y, dt)
+                self.rect.y = round(self.pos.y)
+                self.collisions('vertical')
