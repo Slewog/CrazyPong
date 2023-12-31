@@ -1,73 +1,12 @@
-import sys
-from os import path
+from sys import exit
 import pygame as pg
 from time import time
 
-from settings import GameSettings, DebugSettings
+from settings import GameSettings
 from locales import Locales
 from sprites import Ball, Player
+from utils import load_color, load_sound, DebugTools
 
-MAIN_DIR = getattr(sys, '_MEIPASS', path.dirname(path.abspath(__file__)))
-
-def resource_path(directory:str, resource:str) -> str:
-    """
-    Get absolute path to resource, works for dev and for PyInstaller
-    """
-    return path.join(MAIN_DIR, directory, resource)
-
-
-class NoneSound:
-    def play(self):
-        pass
-
-
-def load_sound(sound:str, vol:float=1.0):
-    if not pg.mixer or not pg.mixer.get_init():
-        return NoneSound()
-    
-    try:
-        loaded_sound = pg.mixer.Sound(resource_path("assets/sounds", sound))
-    except FileNotFoundError:
-        return NoneSound()
-    
-    loaded_sound.set_volume(vol)
-    return loaded_sound
-
-class DebugTools:
-    def __init__(self) -> None:
-        self.data:list[str] = []
-        self.font = pg.font.Font(None, DebugSettings.FONT_SIZE)
-        self.border_radius = DebugSettings.BORDER_RADIUS
-
-        self.rect = pg.Rect(DebugSettings.X_POS, DebugSettings.Y_POS, DebugSettings.WIDTH, DebugSettings.HEIGHT)
-
-        self.font.set_underline(True)
-        self.font.set_bold(True)
-        self.font.set_italic(True)
-        self.title = self.font.render('DEBUG TOOLS:', True, 'white')
-        self.title_rect = self.title.get_rect(midtop = (self.rect.midtop[0], self.rect.midtop[1] + 10))
-        self.font.set_underline(False)
-        self.font.set_bold(False)
-
-        self.offset = self.title_rect.bottom + 10
-
-    def add_data(self, data:str):
-        self.data.append(data)
-    
-    def render(self, display:pg.Surface):
-        pg.draw.rect(display, 'Black', self.rect, border_radius=self.border_radius)
-        display.blit(self.title, self.title_rect)
-
-        offset = self.offset
-
-        for data in self.data:
-            data_txt = self.font.render(data, True, 'white')
-
-            data_txt_rect = data_txt.get_rect(topleft = (self.rect.left + 10, offset))
-            display.blit(data_txt, data_txt_rect)
-            offset += data_txt_rect.height + 5
-        
-        self.data:list[str] = []
 
 class Pong:
     FPS = GameSettings.FPS
@@ -97,64 +36,72 @@ class Pong:
 
     def load_assets(self) -> None:
         # UI.
-        self.font = pg.font.SysFont('comicsans', 50)
-
-        if type(GameSettings.FONT_COLOR) == tuple:
-            self.font_color = GameSettings.FONT_COLOR
-        else:
-            self.font_color = pg.Color(GameSettings.FONT_COLOR)
-
-        if type(GameSettings.OBJECT_COLOR) == tuple:
-            self.obj_color = GameSettings.OBJECT_COLOR
-        else:
-            self.obj_color = pg.Color(GameSettings.OBJECT_COLOR)
-
-        self.bg_color = pg.Color(GameSettings.BACKGROUND_COLOR)
+        self.font = pg.font.Font('freesansbold.ttf', 40)
+        self.font_color = load_color(GameSettings.FONT_COLOR)
+        self.obj_color = load_color(GameSettings.OBJECT_COLOR)
+        self.bg_color = load_color(GameSettings.BACKGROUND_COLOR)
         self.display_surf.fill(self.bg_color)
         pg.display.flip()
 
-        # Text.
+        # Middle line.
+        self.middle_line_w = 2
+        self.middle_line_clr = load_color('black')
+        self.middle_line_start = (self.SCREEN_W // 2 - self.middle_line_w//2, 0)
+        self.middle_line_end = (self.SCREEN_W // 2 - self.middle_line_w//2, self.SCREEN_H)
+        
+        # Texts.
         self.win_txt_pos = (self.SCREEN_W // 2, self.SCREEN_H//2 - 70)
-
         self.start_txt = self.font.render(Locales.START_TXT, True, self.obj_color)
         self.start_txt_rect = self.start_txt.get_rect(center = (self.SCREEN_W // 2, self.SCREEN_H//2 + 60))
-        
         self.restart_txt = self.font.render(Locales.RESTART_TXT, True, self.obj_color)
         self.restart_txt_rect = self.restart_txt.get_rect(center = (self.SCREEN_W // 2, self.SCREEN_H//2 + 60))
+
+        # Sounds
+        hit_sound = load_sound('pong.ogg', GameSettings.HIT_SOUND_VOL)
+        score_sound = load_sound('score.ogg', GameSettings.SCORE_SOUND_VOL)
 
         # Players.
         self.player_left = Player('left', Locales.PLAYER_LEFT, self.SCREEN_W, self.SCREEN_H, self.all_sprites, self.font, self.font_color, self.obj_color)
         self.player_right = Player('right', Locales.PLAYER_RIGHT, self.SCREEN_W, self.SCREEN_H, self.all_sprites, self.font, self.font_color, self.obj_color)
         self.players:list[Player] = [self.player_left, self.player_right]
 
-        # Sounds
-        hit_sound = load_sound('pong.ogg', GameSettings.HIT_SOUND_VOL)
-        score_sound = load_sound('score.ogg', GameSettings.SCORE_SOUND_VOL)
-
         # Objects.
-        self.ball = Ball(self.SCREEN_W, self.SCREEN_H, self.obj_color, self.all_sprites, self.player_left, self.player_right, [hit_sound, score_sound])
+        self.ball = Ball(self.SCREEN_W, self.SCREEN_H, self.font, self.font_color, self.obj_color, self.all_sprites, self.player_left, self.player_right, self.MAX_SCORE, [hit_sound, score_sound])
 
     def quit(self):
+        """Kill all sprites and close pygame before quit python"""
         sprites:list[pg.sprite.Sprite] = [self.ball, self.player_left, self.player_right]
 
         for sprite in sprites:
             sprite.kill()
         
         pg.quit()
-        sys.exit()
+        exit()
     
-    def reset(self) -> None:
-        if self.winned:
+    def reset(self, player_dir:bool) -> None:
+        """Reset players direction or all entities"""
+        if player_dir:
             for player in self.players:
-                player.reset()
+                player.reset_direction(False)
+            return
+        
+        for player in self.players:
+            player.reset()
 
-            self.ball.reset(True)
-            
-            self.winned = False
+        self.ball.reset(True)
+        self.winned = bool(False)
+    
+    def start(self) -> None:
+        self.playing =  bool(True)
+        self.ball.set_active(True)
 
     def render(self) -> None:
+        """Draw the frame."""
         # Draw the background.
         self.display_surf.fill(self.bg_color)
+
+        # Draw the middle line.
+        pg.draw.line(self.display_surf, self.middle_line_clr, self.middle_line_start, self.middle_line_end, self.middle_line_w)
 
         self.all_sprites.draw(self.display_surf)
 
@@ -162,43 +109,46 @@ class Pong:
             player.draw_hud(self.display_surf)
         
         if self.winned:
+            pg.draw.rect(self.display_surf, self.bg_color, self.win_text_rect)
             self.display_surf.blit(self.win_text, self.win_text_rect)
+            pg.draw.rect(self.display_surf, self.bg_color, self.restart_txt_rect)
             self.display_surf.blit(self.restart_txt, self.restart_txt_rect)
 
         if not self.playing:
+            pg.draw.rect(self.display_surf, self.bg_color, self.start_txt_rect)
             self.display_surf.blit(self.start_txt, self.start_txt_rect)
+
+        # if self.playing and not self.winned and not self.ball.active:
+        if self.playing and self.ball.freeze_time != 0:
+            self.ball.draw_restart_counter(self.display_surf, self.bg_color)
 
         if self.playing and self.DEBUG and not self.winned:
             self.debug_tool.render(self.display_surf)
-
-        # Update the window.
-        pg.display.flip()
 
     def run(self) -> None:
         self.load_assets()
         self.prev_dt = time()
 
         while True:
-            ### Event loop. ###
+            """Update the game."""
+            # Pygame event loop.
             for event in pg.event.get():
                 # Check to close the game.
-                if event.type == pg.QUIT:
+                if event.type == pg.QUIT or event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
                     self.quit()
                 
                 # Check to reset the game after a player won.
-                if self.winned and event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
-                    for player in self.players:
-                        player.reset()
-                    self.ball.reset(True)
-                    self.winned = False
+                if self.playing and self.winned and event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
+                    self.reset(False)
 
                 # Check to start the game after launching.
                 if not self.playing and event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
-                    self.playing = True
+                    self.start()
 
-            ### Update the game. ###
             self.dt = time() - self.prev_dt
             self.prev_dt = time()
+
+            self.all_sprites.update(self.dt)
 
             if self.playing and not self.winned:
                 keys = pg.key.get_pressed()
@@ -209,9 +159,11 @@ class Pong:
                     if not self.winned and player.score == self.MAX_SCORE:
                         self.win_text = self.font.render(Locales.WIN_TXT.format(player = player.side_trslt), True, self.font_color)
                         self.win_text_rect = self.win_text.get_rect(center = self.win_txt_pos)
-                        self.winned = True
+                        self.winned =  bool(True)
+                        self.reset(True)
 
-                self.all_sprites.update(self.dt)
+                if not self.ball.active and self.ball.freeze_time != 0:# not self.winned:
+                    self.ball.check_freeze_time()
 
                 if self.DEBUG:
                     self.debug_tool.add_data(f"- player : {round(self.player_right.VELOCITY * self.dt, 3)}")
@@ -220,10 +172,12 @@ class Pong:
                     self.debug_tool.add_data(f"- ball dir x : {self.ball.direction.x}")
                     self.debug_tool.add_data(f"- ball dir y : {self.ball.direction.y}")
 
-            ### Draw the frame. ###
             self.render()
 
-            ### Apply frame cap. ###
+            """Update the window."""
+            pg.display.flip()
+
+            """Frame Cap."""
             if self.USE_FPS:
                 self.clock.tick(self.FPS)
 
