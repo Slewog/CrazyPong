@@ -2,14 +2,14 @@ class GameSettings:
     DEBUG = bool(False)
     SCREEN_W = int(1280)
     SCREEN_H = int(960)
-    USE_FPS = bool(True)
+    USE_FPS = bool(False)
     FPS = int(120)
     MAX_SCORE = int(5)
     BACKGROUND_COLOR = str('gray12') # 'gray12' or '#2F373F'
     FONT_COLOR = str('gray79') # (27,35,43) or str('gray79')
     OBJECT_COLOR = str('white')
-    HIT_SOUND_VOL = float(0.0)
-    SCORE_SOUND_VOL = float(0.0)
+    HIT_SOUND_VOL = float(0.2)
+    SCORE_SOUND_VOL = float(0.2)
 
 
 class BallSettings:
