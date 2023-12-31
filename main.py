@@ -28,8 +28,8 @@ class Pong:
         self.display_surf = pg.display.set_mode((self.SCREEN_W, self.SCREEN_H))
         pg.display.set_caption(Locales.GAME_NAME)
 
-        self.winned = False
-        self.playing = False
+        self.winned = bool(False)
+        self.playing = bool(False)
 
         # sprite group setup
         self.all_sprites = pg.sprite.Group()
@@ -44,9 +44,9 @@ class Pong:
         pg.display.flip()
 
         # Middle line.
-        self.middle_line_w = 2
-        self.middle_line_clr = load_color('black')
-        self.middle_line_start = (self.SCREEN_W // 2 - self.middle_line_w//2, 0)
+        self.middle_line_w = GameSettings.MIDDLE_LINE_W
+        self.middle_line_clr = load_color(GameSettings.MIDDLE_LINE_COLOR)
+        self.middle_line_start = (self.SCREEN_W // 2 - self.middle_line_w//2, int(0))
         self.middle_line_end = (self.SCREEN_W // 2 - self.middle_line_w//2, self.SCREEN_H)
         
         # Texts.
@@ -92,7 +92,7 @@ class Pong:
         self.winned = bool(False)
     
     def start(self) -> None:
-        self.playing =  bool(True)
+        self.playing = bool(True)
         self.ball.set_active(True)
 
     def render(self) -> None:
@@ -118,7 +118,6 @@ class Pong:
             pg.draw.rect(self.display_surf, self.bg_color, self.start_txt_rect)
             self.display_surf.blit(self.start_txt, self.start_txt_rect)
 
-        # if self.playing and not self.winned and not self.ball.active:
         if self.playing and self.ball.freeze_time != 0:
             self.ball.draw_restart_counter(self.display_surf, self.bg_color)
 
@@ -145,10 +144,10 @@ class Pong:
                 if not self.playing and event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
                     self.start()
 
-            self.dt = time() - self.prev_dt
+            dt = time() - self.prev_dt
             self.prev_dt = time()
 
-            self.all_sprites.update(self.dt)
+            self.all_sprites.update(dt)
 
             if self.playing and not self.winned:
                 keys = pg.key.get_pressed()
@@ -162,13 +161,15 @@ class Pong:
                         self.winned =  bool(True)
                         self.reset(True)
 
-                if not self.ball.active and self.ball.freeze_time != 0:# not self.winned:
+                if not self.ball.active and self.ball.freeze_time != 0:
                     self.ball.check_freeze_time()
 
                 if self.DEBUG:
-                    self.debug_tool.add_data(f"- player : {round(self.player_right.VELOCITY * self.dt, 3)}")
-                    self.debug_tool.add_data(f"- ball y : {round(self.ball.calcule_speed(self.ball.vel_y, self.dt), 3)}")
-                    self.debug_tool.add_data(f"- ball x : {round(self.ball.calcule_speed(self.ball.vel_x, self.dt), 3)}")
+                    print(self.clock.get_fps())
+                    self.debug_tool.add_data(f"- delta : {round(dt, 9)}")
+                    self.debug_tool.add_data(f"- player : {round(self.player_right.VELOCITY * dt, 3)}")
+                    self.debug_tool.add_data(f"- ball y : {round(self.ball.calcule_speed(self.ball.vel_y, dt), 3)}")
+                    self.debug_tool.add_data(f"- ball x : {round(self.ball.calcule_speed(self.ball.vel_x, dt), 3)}")
                     self.debug_tool.add_data(f"- ball dir x : {self.ball.direction.x}")
                     self.debug_tool.add_data(f"- ball dir y : {self.ball.direction.y}")
 
