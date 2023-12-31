@@ -23,16 +23,16 @@ class Player(pg.sprite.Sprite):
         self.font_color = font_color
         self.color = color
 
-        self.active = True
+        self.active = bool(True)
         self.direction = pg.math.Vector2(0, 0)
         self.side = side
         self.side_trslt = side_trslt
         self.score = int(0)
-        self.score_pos = (0, 0)
+        self.score_pos = (int(0), int(0))
         self.update_score_txt()
 
         if self.side == 'left':
-            self.default_pos = (10, self.screen_h//2)
+            self.default_pos = (int(10), self.screen_h//2)
         else:
             self.default_pos = (self.screen_w - self.width - 10, self.screen_h//2)
 
@@ -57,7 +57,7 @@ class Player(pg.sprite.Sprite):
     def reset_direction(self, freezed:bool) -> None:
         self.active = freezed
         if freezed:
-            self.direction.y = 0
+            self.direction.y = int(0)
 
     def update_score_txt(self) -> None:
         self.score_txt = self.font.render(str(self.score), True, self.font_color)
@@ -75,18 +75,18 @@ class Player(pg.sprite.Sprite):
     def check_input(self, keys:pg.key.ScancodeWrapper) -> None:
         if self.side == 'left':
             if keys[pg.K_z]:
-                self.direction.y = -1
+                self.direction.y = int(-1)
             elif keys[pg.K_s]:
-                self.direction.y = 1
+                self.direction.y = int(1)
             else:
-                self.direction.y = 0
+                self.direction.y = int(0)
         elif self.side == 'right':
             if keys[pg.K_UP]:
-                self.direction.y = -1
+                self.direction.y = int(-1)
             elif keys[pg.K_DOWN]:
-                self.direction.y = 1
+                self.direction.y = int(1)
             else:
-                self.direction.y = 0
+                self.direction.y = int(0)
 
     def update(self, dt:float) -> None:
         # Old rect.
@@ -168,7 +168,7 @@ class Ball(pg.sprite.Sprite):
         self.old_rect = self.rect.copy()
 
         if winned:
-            self.direction.x = choice((1, -1))
+            self.direction.x = int(choice((1, -1)))
             self.set_active(True)
         else:
             if (self.player_left.score < self.max_player_score and self.player_right.score < self.max_player_score
@@ -179,7 +179,7 @@ class Ball(pg.sprite.Sprite):
             self.set_active(False)
             self.last_wall = str("")
 
-        self.direction.y = choice((1, -1))
+        self.direction.y = int(choice((1, -1)))
         if self.Y_VEL_RAND:
             self.vel_y = self.vel_x - 1
 
@@ -224,7 +224,7 @@ class Ball(pg.sprite.Sprite):
             if self.rect.left < 0:
                 self.score_sound.play()
                 if self.DEBUG:
-                    self.rect.left = 0
+                    self.rect.left = int(0)
                     self.pos.x = self.rect.x
                     self.direction.x *= -1
                     return
@@ -251,25 +251,25 @@ class Ball(pg.sprite.Sprite):
             if direction == 'vertical':
                 for sprite in overlap_sprites:
                     if self.direction.y > 0 and self.rect.bottom >= sprite.rect.top and self.old_rect.bottom <= sprite.old_rect.top:
-                        self.rect.bottom = sprite.rect.top - 1
+                        self.rect.bottom = int(sprite.rect.top - 1)
                         self.pos.y = self.rect.y
                         self.direction.y *= -1
 
                     if self.direction.y < 0 and self.rect.top <= sprite.rect.bottom and self.old_rect.top >= sprite.old_rect.bottom:
-                        self.rect.top = sprite.rect.bottom + 1
+                        self.rect.top = int(sprite.rect.bottom + 1)
                         self.pos.y = self.rect.y
                         self.direction.y *= -1
 
             if direction == 'horizontal':
                 for sprite in overlap_sprites:
                     if self.direction.x > 0 and self.rect.right >= sprite.rect.left and self.old_rect.right <= sprite.old_rect.left:
-                        self.rect.right = sprite.rect.left - 1
+                        self.rect.right = int(sprite.rect.left - 1)
                         self.pos.x = self.rect.x
                         self.direction.x *= -1
                         self.calcule_vel_y(sprite)
                     
                     if self.direction.x < 0 and self.rect.left <= sprite.rect.right and self.old_rect.left >= sprite.old_rect.right:
-                        self.rect.left = sprite.rect.right + 1
+                        self.rect.left = int(sprite.rect.right + 1)
                         self.pos.x = self.rect.x
                         self.direction.x *= -1
                         self.calcule_vel_y(sprite)
