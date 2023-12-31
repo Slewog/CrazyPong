@@ -10,6 +10,8 @@ class GameSettings:
     OBJECT_COLOR = str('white')
     HIT_SOUND_VOL = float(0.2)
     SCORE_SOUND_VOL = float(0.2)
+    MIDDLE_LINE_W = int(2)
+    MIDDLE_LINE_COLOR = str('black')
 
 
 class BallSettings:
@@ -29,7 +31,7 @@ class PlayerSettings:
 
 class DebugSettings:
     WIDTH = int(200)
-    HEIGHT = int(155)
+    HEIGHT = int(180)
     X_POS = int(30)
     Y_POS = int(20)
     FONT_SIZE = int(25)
