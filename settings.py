@@ -15,7 +15,7 @@ class GameSettings:
 
 
 class BallSettings:
-    DEBUG = bool(True)
+    DEBUG = bool(False)
     RADIUS = int(14)
     MAX_VELOCITY = int(7)
     Y_VEL_RAND = bool(False)
