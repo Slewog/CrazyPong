@@ -9,21 +9,26 @@ class Player(pg.sprite.Sprite):
     WALL_OFFSET = PlayerSettings.WALL_OFFSET
     SCORE_Y_POS = PlayerSettings.SCORE_Y_POS
 
-    def __init__(self, side:str, screen_w:int, screen_h:int, group:pg.sprite.Group, font:pg.font.Font, color:pg.Color) -> None:
+    def __init__(self, side:str, side_trslt:str, screen_w:int, screen_h:int, group:pg.sprite.Group, font:pg.font.Font, font_color:pg.Color, color:pg.Color) -> None:
         super().__init__(group)
 
         # Screen info for collisions.
         self.screen_w = screen_w
         self.screen_h = screen_h
-        
-        self.direction = pg.math.Vector2(0, 0)
-        self.side = side
-        self.score = int(0)
+
         self.width = PlayerSettings.WIDTH
         self.height = PlayerSettings.HEIGHT
 
         self.font = font
+        self.font_color = font_color
         self.color = color
+
+        self.direction = pg.math.Vector2(0, 0)
+        self.side = side
+        self.side_trslt = side_trslt
+        self.score = int(0)
+        self.score_pos = (0, 0)
+        self.update_score_txt()
 
         if self.side == 'left':
             self.default_pos = (10, self.screen_h//2)
@@ -45,9 +50,23 @@ class Player(pg.sprite.Sprite):
         self.pos = pg.math.Vector2(self.rect.topleft)
         self.old_rect = self.rect.copy()
 
-    def check_input(self) -> None:
-        keys = pg.key.get_pressed()
+        self.score = int(0)
+        self.update_score_txt()
+    
+    def update_score_txt(self) -> None:
+        self.score_txt = self.font.render(str(self.score), True, self.font_color)
+        score_rect = self.score_txt.get_rect()
 
+        self.score_pos = self.side == 'left' and (self.screen_w//4 - score_rect.width//2, self.SCORE_Y_POS) or (self.screen_w*3//4 - score_rect.width//2, self.SCORE_Y_POS)
+    
+    def add_point(self) -> None:
+        self.score += 1
+        self.update_score_txt()
+    
+    def draw_hud(self, display:pg.Surface) -> None:
+        display.blit(self.score_txt, self.score_pos)
+
+    def check_input(self, keys:pg.key.ScancodeWrapper) -> None:
         if self.side == 'left':
             if keys[pg.K_z]:
                 self.direction.y = -1
@@ -67,8 +86,6 @@ class Player(pg.sprite.Sprite):
         # Old rect.
         self.old_rect = self.rect.copy()
 
-        self.check_input()
-
         # Position.
         if self.direction.y != 0:
             self.pos.y += self.direction.y * self.VELOCITY * dt
@@ -86,9 +103,11 @@ class Player(pg.sprite.Sprite):
 
 
 class Ball(pg.sprite.Sprite):
-    VEL_MULTIPLIER = BallSettings.VEL_MULTIPLIER
+    DEBUG = BallSettings.DEBUG
+    VEL_MULTIPLIER = int(65)
+    Y_VEL_RAND = BallSettings.Y_VEL_RAND
 
-    def __init__(self, screen_w:int, screen_h:int, color:pg.Color, group:pg.sprite.Group, player_left:Player, player_right:Player) -> None:
+    def __init__(self, screen_w:int, screen_h:int, color:pg.Color, group:pg.sprite.Group, player_left:Player, player_right:Player, sounds:list[pg.mixer.Sound]) -> None:
         super().__init__(group)
 
         # Screen info and players for collisions.
@@ -98,10 +117,14 @@ class Ball(pg.sprite.Sprite):
         self.player_right = player_right
         self.last_wall = str("")
 
+        # Sounds.
+        self.hit_sound = sounds[0]
+        self.score_sound = sounds[1]
+
         # Movement setup.
         self.vel_x = BallSettings.MAX_VELOCITY
-        self.vel_y = float(0) 
-        self.direction = pg.math.Vector2(choice((1, -1)), 1)
+        self.vel_y = self.vel_x - 1
+        self.direction = pg.math.Vector2(choice((1, -1)), choice((1, -1)))
         self.default_pos = (screen_w //2, screen_h // 2)
 
         # Get ball size.
@@ -121,8 +144,6 @@ class Ball(pg.sprite.Sprite):
         self.pos = pg.math.Vector2(self.rect.topleft)
         self.old_rect = self.rect.copy()
 
-        self.active = False
-
     def reset(self, winned:bool=False) -> None:
         self.rect.center = self.default_pos
         self.pos = pg.math.Vector2(self.rect.topleft)
@@ -132,17 +153,26 @@ class Ball(pg.sprite.Sprite):
             self.direction.x = choice((1, -1))
         else:
             self.direction.x *= -1
-        self.direction.y = 1
+        self.direction.y = choice((1, -1))
 
-        self.vel_y = float(0)
+        if self.Y_VEL_RAND:
+            self.vel_y = self.vel_x - 1
+
         self.last_wall = str("")
 
     def calcule_vel_y(self, sprite:Player) -> None:
         # Calcule new Y vel from difference in Y pos with the ball and a player paddle.
-        max_vel = float(self.vel_x - 1) # Remove one from max vel to get a smooth movement from ball.
+        if not self.Y_VEL_RAND:
+            return
+        
+        # Remove one from max vel to get a smooth movement from ball (only if SAME_VEL_AXIS is False).
+        max_vel = float(self.vel_x - 1) 
         difference_in_y = float(sprite.rect.center[1] - self.rect.center[1])
         reduction_factor = float((sprite.height / 2) / max_vel)
-        self.vel_y = (difference_in_y / reduction_factor)  
+        self.vel_y = (difference_in_y / reduction_factor)
+        
+        if self.vel_y < 0:
+            self.vel_y *= -1
 
     def calcule_speed(self, vel:int, dt:float) -> float:
         return (vel * self.VEL_MULTIPLIER) * dt  
@@ -150,12 +180,13 @@ class Ball(pg.sprite.Sprite):
     def display_collisions(self, direction:str) -> None:
         if direction == 'vertical':
             if self.rect.top < 0 and self.last_wall != 'top':
+                self.hit_sound.play()
                 self.rect.top = int(0)
                 self.pos.y = self.rect.y
                 self.direction.y *= -1
                 self.last_wall = str("top")
-
             elif self.rect.bottom > self.screen_h and self.last_wall != 'bottom':
+                self.hit_sound.play()
                 self.rect.bottom = self.screen_h
                 self.pos.y = self.rect.y
                 self.direction.y *= -1
@@ -165,9 +196,18 @@ class Ball(pg.sprite.Sprite):
 
         if direction == 'horizontal':
             if self.rect.left < 0:
+                self.score_sound.play()
+                if self.DEBUG:
+                    self.rect.left = 0
+                    self.pos.x = self.rect.x
+                    self.direction.x *= -1
+                    return
+                self.player_right.add_point()
                 self.reset()
             
             if self.rect.right > self.screen_w:
+                self.score_sound.play()
+                self.player_left.add_point()
                 self.reset()
 
     def collisions(self, direction:str):
@@ -180,41 +220,37 @@ class Ball(pg.sprite.Sprite):
             overlap_sprites.append(self.player_right)
 
         if overlap_sprites:
-            if direction == 'horizontal':
-                for sprite in overlap_sprites:
-                    if self.rect.right >= sprite.rect.left and self.old_rect.right <= sprite.old_rect.left:
-                        self.rect.right = sprite.rect.left - 1
-                        self.pos.x = self.rect.x
-                        self.direction.x *= -1
-                        self.direction.y *= -1
-                        self.calcule_vel_y(sprite)
-                    
-                    if self.rect.left <= sprite.rect.right and self.old_rect.left >= sprite.old_rect.right:
-                        self.rect.left = sprite.rect.right + 1
-                        self.pos.x = self.rect.x
-                        self.direction.x *= -1
-                        self.direction.y *= -1
-                        self.calcule_vel_y(sprite)
-            
+            self.hit_sound.play()
+
             if direction == 'vertical':
                 for sprite in overlap_sprites:
-                    if self.rect.bottom >= sprite.rect.top and self.old_rect.bottom <= sprite.old_rect.top:
+                    if self.direction.y > 0 and self.rect.bottom >= sprite.rect.top and self.old_rect.bottom <= sprite.old_rect.top:
                         self.rect.bottom = sprite.rect.top - 1
                         self.pos.y = self.rect.y
                         self.direction.y *= -1
-                    
-                    if self.rect.top <= sprite.rect.bottom and self.old_rect.top >= sprite.old_rect.bottom:
+
+                    if self.direction.y < 0 and self.rect.top <= sprite.rect.bottom and self.old_rect.top >= sprite.old_rect.bottom:
                         self.rect.top = sprite.rect.bottom + 1
                         self.pos.y = self.rect.y
                         self.direction.y *= -1
+
+            if direction == 'horizontal':
+                for sprite in overlap_sprites:
+                    if self.direction.x > 0 and self.rect.right >= sprite.rect.left and self.old_rect.right <= sprite.old_rect.left:
+                        self.rect.right = sprite.rect.left - 1
+                        self.pos.x = self.rect.x
+                        self.direction.x *= -1
+                        self.calcule_vel_y(sprite)
+                    
+                    if self.direction.x < 0 and self.rect.left <= sprite.rect.right and self.old_rect.left >= sprite.old_rect.right:
+                        self.rect.left = sprite.rect.right + 1
+                        self.pos.x = self.rect.x
+                        self.direction.x *= -1
+                        self.calcule_vel_y(sprite)
     
         self.display_collisions(direction)
 
     def update(self, dt:float) -> None:
-        # Check delta time.
-        if dt is None or type(dt) != float:
-            return
-        
         # update old rect.
         self.old_rect = self.rect.copy()
 
