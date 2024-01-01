@@ -117,8 +117,8 @@ class Player(pg.sprite.Sprite):
 
 class Ball(pg.sprite.Sprite):
     DEBUG = BallSettings.DEBUG
-    VEL_MULTIPLIER = int(65)
-    MAX_VELOCITY = BallSettings.MAX_VELOCITY
+    VEL_MULTIPLIER = float(62.5)
+    VELOCITY = BallSettings.VELOCITY
 
     def __init__(self, screen_w: int, screen_h: int, screen_mw:int, screen_mh:int, counter_font: pg.font.Font, counter_color: pg.Color, color: pg.Color, group: pg.sprite.Group, player_left: Player, player_right: Player, max_ply_score: int, sounds: list[pg.mixer.Sound]) -> None:
         super().__init__(group)
@@ -144,8 +144,8 @@ class Ball(pg.sprite.Sprite):
         self.score_sound = sounds[1]
 
         # Movement setup.
-        self.vel_x = self.MAX_VELOCITY * self.VEL_MULTIPLIER
-        self.vel_y = (self.MAX_VELOCITY - 1) * self.VEL_MULTIPLIER
+        self.vel_x = int(self.VELOCITY * self.VEL_MULTIPLIER)
+        self.vel_y = self.vel_x
         self.direction = pg.math.Vector2(choice((self.vel_x, -self.vel_x)), choice((self.vel_y, -self.vel_y)))
         self.default_pos = (self.screen_mw, screen_mh)
 
@@ -184,12 +184,6 @@ class Ball(pg.sprite.Sprite):
             self.set_active(False)
 
         self.direction.y = int(choice((self.vel_y, -self.vel_y)))
-
-    def calcule_speed(self, vel: int, dt: float) -> float:
-        """Multiply the player velocity by VEL_MULTIPLIER and 
-        multiply the result with delta time
-        """
-        return (vel * self.VEL_MULTIPLIER) * dt
 
     def display_collisions(self, direction: str) -> None:
         if direction == 'vertical':

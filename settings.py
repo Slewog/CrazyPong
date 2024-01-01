@@ -17,7 +17,7 @@ class GameSettings:
 class BallSettings:
     DEBUG = bool(False)
     RADIUS = int(14)
-    MAX_VELOCITY = int(7)
+    VELOCITY = int(7)
 
 
 class PlayerSettings:
