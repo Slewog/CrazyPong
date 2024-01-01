@@ -27,11 +27,11 @@ def load_sound(file: str, vol: float = 1.0) -> pg.mixer.Sound:
     return loaded_sound
 
 
-def load_color(color: str) -> pg.Color:
+def load_color(color: str | tuple[int, int, int]) -> pg.Color:
     if type(color) == tuple:
         return color
-    else:
-        return pg.Color(color)
+
+    return pg.Color(color)
 
 
 class NoneSound:
