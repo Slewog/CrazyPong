@@ -5,13 +5,12 @@ class GameSettings:
     USE_FPS = bool(False)
     FPS = int(120)
     MAX_SCORE = int(5)
-    BACKGROUND_COLOR = str('gray12')  # 'gray12' or '#2F373F'
-    FONT_COLOR = str('gray79')  # (27,35,43) or str('gray79')
-    OBJECT_COLOR = str('white')
+    BACKGROUND_COLOR = str('gray28')
+    FONT_COLOR = str('gray12')
+    OBJECT_COLOR = str('gray79')
     HIT_SOUND_VOL = float(0.12)
     SCORE_SOUND_VOL = float(0.12)
-    MIDDLE_LINE_W = int(2)
-    MIDDLE_LINE_COLOR = str('black')
+    MIDDLE_LINE_W = int(4)
 
 
 class BallSettings:

@@ -47,23 +47,19 @@ class Pong:
 
         # Middle line.
         self.middle_line_w = GameSettings.MIDDLE_LINE_W
-        self.middle_line_clr = load_color(GameSettings.MIDDLE_LINE_COLOR)
-        middle_line_mw = self.middle_line_w//2
-        self.middle_line_start = (
-            self.SCREEN_MW - middle_line_mw, int(0))
-        self.middle_line_end = (self.SCREEN_MW - middle_line_mw, self.SCREEN_H)
+        self.middle_line = pg.Rect(self.SCREEN_MW - self.middle_line_w//2, int(0), self.middle_line_w, self.SCREEN_H)
 
         # Texts.
         self.win_txt_pos = (self.SCREEN_MW, self.SCREEN_MH - 70)
         self.start_txt = self.font.render(
-            Locales.START_TXT, True, self.obj_color)
+            Locales.START_TXT, True, self.font_color)
         self.start_txt_rect = self.start_txt.get_rect(
             center=(self.SCREEN_MW, self.SCREEN_MH + 60))
         self.start_txt_bg = pg.Rect(self.start_txt_rect.x, self.start_txt_rect.y - 2,
                                     self.start_txt_rect.width, self.start_txt_rect.height)
 
         self.restart_txt = self.font.render(
-            Locales.RESTART_TXT, True, self.obj_color)
+            Locales.RESTART_TXT, True, self.font_color)
         self.restart_txt_rect = self.restart_txt.get_rect(
             center=(self.SCREEN_MW, self.SCREEN_MH + 60))
         self.restart_txt_bg = pg.Rect(self.restart_txt_rect.x, self.restart_txt_rect.y - 2,
@@ -113,9 +109,7 @@ class Pong:
     def draw(self) -> None:
         """Draw all objects on the screen."""
         # Draw the middle line.
-        pg.draw.line(self.display_surf, self.middle_line_clr,
-                     self.middle_line_start, self.middle_line_end, self.middle_line_w)
-
+        pg.draw.rect(self.display_surf, self.font_color, self.middle_line)
         self.all_sprites.draw(self.display_surf)
 
         for player in self.players:
