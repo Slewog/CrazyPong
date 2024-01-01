@@ -110,11 +110,8 @@ class Pong:
         self.playing = bool(True)
         self.ball.set_active(True)
 
-    def render(self) -> None:
-        """Draw the frame."""
-        # Draw the background.
-        self.display_surf.fill(self.bg_color)
-
+    def draw(self) -> None:
+        """Draw all objects on the screen."""
         # Draw the middle line.
         pg.draw.line(self.display_surf, self.middle_line_clr,
                      self.middle_line_start, self.middle_line_end, self.middle_line_w)
@@ -146,17 +143,13 @@ class Pong:
 
         while True:
             """Update the game."""
-            # Pygame event loop.
             for event in pg.event.get():
-                # Check to close the game.
                 if event.type == pg.QUIT or event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
                     self.quit()
 
-                # Check to reset the game after a player won.
                 if self.playing and self.winned and event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
                     self.reset(False)
 
-                # Check to start the game after launching.
                 if not self.playing and event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
                     self.start()
 
@@ -190,7 +183,9 @@ class Pong:
                     f"- fps : {round(self.clock.get_fps(), 2)}")
                 self.debug_tool.add_data(f"- delta : {round(dt, 9)}")
 
-            self.render()
+            """Draw the frame."""
+            self.display_surf.fill(self.bg_color)
+            self.draw()
 
             """Update the window."""
             pg.display.flip()
