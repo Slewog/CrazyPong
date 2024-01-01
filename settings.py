@@ -8,8 +8,8 @@ class GameSettings:
     BACKGROUND_COLOR = str('gray12')  # 'gray12' or '#2F373F'
     FONT_COLOR = str('gray79')  # (27,35,43) or str('gray79')
     OBJECT_COLOR = str('white')
-    HIT_SOUND_VOL = float(0.2)
-    SCORE_SOUND_VOL = float(0.2)
+    HIT_SOUND_VOL = float(0.12)
+    SCORE_SOUND_VOL = float(0.12)
     MIDDLE_LINE_W = int(2)
     MIDDLE_LINE_COLOR = str('black')
 
@@ -18,7 +18,6 @@ class BallSettings:
     DEBUG = bool(False)
     RADIUS = int(14)
     MAX_VELOCITY = int(7)
-    Y_VEL_RAND = bool(False)
 
 
 class PlayerSettings:
@@ -31,7 +30,7 @@ class PlayerSettings:
 
 class DebugSettings:
     WIDTH = int(200)
-    HEIGHT = int(180)
+    HEIGHT = int(90)
     X_POS = int(30)
     Y_POS = int(20)
     FONT_SIZE = int(25)
