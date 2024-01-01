@@ -12,7 +12,9 @@ class Pong:
     FPS = GameSettings.FPS
     USE_FPS = GameSettings.USE_FPS
     SCREEN_H = GameSettings.SCREEN_H
+    SCREEN_MH = SCREEN_H // 2
     SCREEN_W = GameSettings.SCREEN_W
+    SCREEN_MW = SCREEN_W // 2
     MAX_SCORE = GameSettings.MAX_SCORE
     DEBUG = GameSettings.DEBUG
 
@@ -46,31 +48,31 @@ class Pong:
         # Middle line.
         self.middle_line_w = GameSettings.MIDDLE_LINE_W
         self.middle_line_clr = load_color(GameSettings.MIDDLE_LINE_COLOR)
+        middle_line_mw = self.middle_line_w//2
         self.middle_line_start = (
-            self.SCREEN_W // 2 - self.middle_line_w//2, int(0))
-        self.middle_line_end = (self.SCREEN_W // 2 -
-                                self.middle_line_w//2, self.SCREEN_H)
+            self.SCREEN_MW - middle_line_mw, int(0))
+        self.middle_line_end = (self.SCREEN_MW - middle_line_mw, self.SCREEN_H)
 
         # Texts.
-        self.win_txt_pos = (self.SCREEN_W // 2, self.SCREEN_H//2 - 70)
+        self.win_txt_pos = (self.SCREEN_MW, self.SCREEN_MH - 70)
         self.start_txt = self.font.render(
             Locales.START_TXT, True, self.obj_color)
         self.start_txt_rect = self.start_txt.get_rect(
-            center=(self.SCREEN_W // 2, self.SCREEN_H//2 + 60))
+            center=(self.SCREEN_MW, self.SCREEN_MH + 60))
         self.restart_txt = self.font.render(
             Locales.RESTART_TXT, True, self.obj_color)
         self.restart_txt_rect = self.restart_txt.get_rect(
-            center=(self.SCREEN_W // 2, self.SCREEN_H//2 + 60))
+            center=(self.SCREEN_MW, self.SCREEN_MH + 60))
 
         # Sounds
         hit_sound = load_sound('pong.ogg', GameSettings.HIT_SOUND_VOL)
         score_sound = load_sound('score.ogg', GameSettings.SCORE_SOUND_VOL)
 
         # Players.
-        self.player_left = Player('left', Locales.PLAYER_LEFT, self.SCREEN_W,
-                                  self.SCREEN_H, self.all_sprites, self.font, self.font_color, self.obj_color)
+        self.player_left = Player('left', Locales.PLAYER_LEFT, self.SCREEN_W, self.SCREEN_H,
+                                  self.SCREEN_MH, self.all_sprites, self.font, self.font_color, self.obj_color)
         self.player_right = Player('right', Locales.PLAYER_RIGHT, self.SCREEN_W, self.SCREEN_H,
-                                   self.all_sprites, self.font, self.font_color, self.obj_color)
+                                   self.SCREEN_MH, self.all_sprites, self.font, self.font_color, self.obj_color)
         self.players: list[Player] = [self.player_left, self.player_right]
 
         # Objects.
@@ -79,10 +81,8 @@ class Pong:
 
     def quit(self):
         """Kill all sprites and close pygame before quit python"""
-        sprites: list[pg.sprite.Sprite] = [
-            self.ball, self.player_left, self.player_right]
-
-        for sprite in sprites:
+        for sprite in self.all_sprites:
+            sprite: pg.sprite.Sprite
             sprite.kill()
 
         pg.quit()
@@ -156,8 +156,9 @@ class Pong:
                 if not self.playing and event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
                     self.start()
 
-            dt = time() - self.prev_dt
-            self.prev_dt = time()
+            current_time = time()
+            dt = current_time - self.prev_dt
+            self.prev_dt = current_time
 
             self.all_sprites.update(dt)
 
@@ -170,8 +171,10 @@ class Pong:
                     if not self.winned and player.score == self.MAX_SCORE:
                         self.win_text = self.font.render(Locales.WIN_TXT.format(
                             player=player.side_trslt), True, self.font_color)
+
                         self.win_text_rect = self.win_text.get_rect(
                             center=self.win_txt_pos)
+
                         self.winned = bool(True)
                         self.reset(True)
 
@@ -179,7 +182,8 @@ class Pong:
                     self.ball.check_freeze_time()
 
                 if self.DEBUG:
-                    print(self.clock.get_fps())
+                    fps = round(self.clock.get_fps(), 2)
+                    self.debug_tool.add_data(f"- fps : {fps}")
                     self.debug_tool.add_data(f"- delta : {round(dt, 9)}")
                     self.debug_tool.add_data(
                         f"- player : {round(self.player_right.VELOCITY * dt, 3)}")
@@ -188,9 +192,7 @@ class Pong:
                     self.debug_tool.add_data(
                         f"- ball x : {round(self.ball.calcule_speed(self.ball.vel_x, dt), 3)}")
                     self.debug_tool.add_data(
-                        f"- ball dir x : {self.ball.direction.x}")
-                    self.debug_tool.add_data(
-                        f"- ball dir y : {self.ball.direction.y}")
+                        f"- ball dir x:{self.ball.direction.x}, y:{self.ball.direction.y}")
 
             self.render()
 

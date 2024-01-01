@@ -9,8 +9,7 @@ class Player(pg.sprite.Sprite):
     WALL_OFFSET = PlayerSettings.WALL_OFFSET
     SCORE_Y_POS = PlayerSettings.SCORE_Y_POS
 
-    def __init__(self, side: str, side_trslt: str, screen_w: int, screen_h: int,
-                 group: pg.sprite.Group, font: pg.font.Font, font_color: pg.Color, color: pg.Color) -> None:
+    def __init__(self, side: str, side_trslt: str, screen_w: int, screen_h: int, screen_mh:int, group: pg.sprite.Group, font: pg.font.Font, font_color: pg.Color, color: pg.Color) -> None:
         super().__init__(group)
 
         # Screen info for collisions.
@@ -29,14 +28,17 @@ class Player(pg.sprite.Sprite):
         self.side = side
         self.side_trslt = side_trslt
         self.score = int(0)
-        self.score_pos = (int(0), int(0))
-        self.update_score_txt()
-
+        
+        quarter_screen_w = self.screen_w // 4
         if self.side == 'left':
-            self.default_pos = (int(10), self.screen_h//2)
+            self.side_middle_x = quarter_screen_w
+            self.default_pos = (self.WALL_OFFSET, screen_mh)
         else:
+            self.side_middle_x = quarter_screen_w * 3
             self.default_pos = (
-                self.screen_w - self.width - 10, self.screen_h//2)
+                self.screen_w - self.width - self.WALL_OFFSET, screen_mh)
+        
+        self.update_score_txt()
 
         # Create the paddle (player).
         self.image = pg.Surface((self.width, self.height))
@@ -65,9 +67,7 @@ class Player(pg.sprite.Sprite):
         self.score_txt = self.font.render(
             str(self.score), True, self.font_color)
         score_rect = self.score_txt.get_rect()
-
-        self.score_pos = self.side == 'left' and (self.screen_w//4 - score_rect.width//2, self.SCORE_Y_POS) or (
-            self.screen_w*3//4 - score_rect.width//2, self.SCORE_Y_POS)
+        self.score_pos = (self.side_middle_x - score_rect.width//2, self.SCORE_Y_POS)
 
     def add_point(self) -> None:
         self.score += 1
@@ -77,32 +77,31 @@ class Player(pg.sprite.Sprite):
         display.blit(self.score_txt, self.score_pos)
 
     def check_input(self, keys: pg.key.ScancodeWrapper) -> None:
+        self.direction.y = int(0)
+
         if self.side == 'left':
             if keys[pg.K_z]:
                 self.direction.y = int(-1)
             elif keys[pg.K_s]:
                 self.direction.y = int(1)
-            else:
-                self.direction.y = int(0)
-        elif self.side == 'right':
-            if keys[pg.K_UP]:
-                self.direction.y = int(-1)
-            elif keys[pg.K_DOWN]:
-                self.direction.y = int(1)
-            else:
-                self.direction.y = int(0)
+            return
+        
+        # Right side.
+        if keys[pg.K_UP]:
+            self.direction.y = int(-1)
+        elif keys[pg.K_DOWN]:
+            self.direction.y = int(1)
 
     def update(self, dt: float) -> None:
         # Old rect.
         self.old_rect = self.rect.copy()
 
-        if not self.active:
+        if not self.active or self.direction.y == 0:
             return
 
         # Position.
-        if self.direction.y != 0:
-            self.pos.y += self.direction.y * self.VELOCITY * dt
-            self.rect.y = round(self.pos.y)
+        self.pos.y += self.direction.y * self.VELOCITY * dt
+        self.rect.y = round(self.pos.y)
 
         # Collisions with wall bottom.
         if self.rect.bottom > self.screen_h - self.WALL_OFFSET:
