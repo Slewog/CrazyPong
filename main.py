@@ -76,8 +76,8 @@ class Pong:
         self.players: list[Player] = [self.player_left, self.player_right]
 
         # Objects.
-        self.ball = Ball(self.SCREEN_W, self.SCREEN_H, self.font, self.font_color, self.obj_color,
-                         self.all_sprites, self.player_left, self.player_right, self.MAX_SCORE, [hit_sound, score_sound])
+        self.ball = Ball(self.SCREEN_W, self.SCREEN_H, self.SCREEN_MW, self.SCREEN_MH, self.font, self.font_color,
+                         self.obj_color, self.all_sprites, self.player_left, self.player_right, self.MAX_SCORE, [hit_sound, score_sound])
 
     def quit(self):
         """Kill all sprites and close pygame before quit python"""
@@ -133,7 +133,7 @@ class Pong:
         if self.playing and self.ball.freeze_time != 0:
             self.ball.draw_restart_counter(self.display_surf, self.bg_color)
 
-        if self.playing and self.DEBUG and not self.winned:
+        if self.DEBUG:
             self.debug_tool.render(self.display_surf)
 
     def run(self) -> None:
@@ -181,18 +181,10 @@ class Pong:
                 if not self.ball.active and self.ball.freeze_time != 0:
                     self.ball.check_freeze_time()
 
-                if self.DEBUG:
-                    fps = round(self.clock.get_fps(), 2)
-                    self.debug_tool.add_data(f"- fps : {fps}")
-                    self.debug_tool.add_data(f"- delta : {round(dt, 9)}")
-                    self.debug_tool.add_data(
-                        f"- player : {round(self.player_right.VELOCITY * dt, 3)}")
-                    self.debug_tool.add_data(
-                        f"- ball y : {round(self.ball.calcule_speed(self.ball.vel_y, dt), 3)}")
-                    self.debug_tool.add_data(
-                        f"- ball x : {round(self.ball.calcule_speed(self.ball.vel_x, dt), 3)}")
-                    self.debug_tool.add_data(
-                        f"- ball dir x:{self.ball.direction.x}, y:{self.ball.direction.y}")
+            if self.DEBUG:
+                self.debug_tool.add_data(
+                    f"- fps : {round(self.clock.get_fps(), 2)}")
+                self.debug_tool.add_data(f"- delta : {round(dt, 9)}")
 
             self.render()
 

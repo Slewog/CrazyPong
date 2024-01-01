@@ -81,16 +81,16 @@ class Player(pg.sprite.Sprite):
 
         if self.side == 'left':
             if keys[pg.K_z]:
-                self.direction.y = int(-1)
+                self.direction.y = -self.VELOCITY
             elif keys[pg.K_s]:
-                self.direction.y = int(1)
+                self.direction.y = self.VELOCITY
             return
         
         # Right side.
         if keys[pg.K_UP]:
-            self.direction.y = int(-1)
+            self.direction.y = -self.VELOCITY
         elif keys[pg.K_DOWN]:
-            self.direction.y = int(1)
+            self.direction.y = self.VELOCITY
 
     def update(self, dt: float) -> None:
         # Old rect.
@@ -100,12 +100,13 @@ class Player(pg.sprite.Sprite):
             return
 
         # Position.
-        self.pos.y += self.direction.y * self.VELOCITY * dt
+        self.pos.y += self.direction.y * dt
         self.rect.y = round(self.pos.y)
 
         # Collisions with wall bottom.
-        if self.rect.bottom > self.screen_h - self.WALL_OFFSET:
-            self.rect.bottom = self.screen_h - self.WALL_OFFSET
+        bottom = self.screen_h - self.WALL_OFFSET
+        if self.rect.bottom > bottom: 
+            self.rect.bottom = bottom
             self.pos.y = self.rect.y
 
         # Collisions with wall top.
@@ -117,19 +118,18 @@ class Player(pg.sprite.Sprite):
 class Ball(pg.sprite.Sprite):
     DEBUG = BallSettings.DEBUG
     VEL_MULTIPLIER = int(65)
-    Y_VEL_RAND = BallSettings.Y_VEL_RAND
+    MAX_VELOCITY = BallSettings.MAX_VELOCITY
 
-    def __init__(self, screen_w: int, screen_h: int, counter_font: pg.font.Font, counter_color: pg.Color, color: pg.Color,
-                 group: pg.sprite.Group, player_left: Player, player_right: Player, max_ply_score: int, sounds: list[pg.mixer.Sound]) -> None:
+    def __init__(self, screen_w: int, screen_h: int, screen_mw:int, screen_mh:int, counter_font: pg.font.Font, counter_color: pg.Color, color: pg.Color, group: pg.sprite.Group, player_left: Player, player_right: Player, max_ply_score: int, sounds: list[pg.mixer.Sound]) -> None:
         super().__init__(group)
 
         # Screen info and players for collisions.
         self.screen_w = screen_w
+        self.screen_mw = screen_mw
         self.screen_h = screen_h
         self.player_left = player_left
         self.player_right = player_right
         self.max_player_score = max_ply_score
-        self.last_wall = str("")
 
         self.freeze_time = int(0)
         self.counter = int(-1)
@@ -144,10 +144,10 @@ class Ball(pg.sprite.Sprite):
         self.score_sound = sounds[1]
 
         # Movement setup.
-        self.vel_x = BallSettings.MAX_VELOCITY
-        self.vel_y = self.vel_x - 1
-        self.direction = pg.math.Vector2(choice((1, -1)), choice((1, -1)))
-        self.default_pos = (screen_w // 2, screen_h // 2)
+        self.vel_x = self.MAX_VELOCITY * self.VEL_MULTIPLIER
+        self.vel_y = (self.MAX_VELOCITY - 1) * self.VEL_MULTIPLIER
+        self.direction = pg.math.Vector2(choice((self.vel_x, -self.vel_x)), choice((self.vel_y, -self.vel_y)))
+        self.default_pos = (self.screen_mw, screen_mh)
 
         # Get ball size.
         width = BallSettings.RADIUS * 2
@@ -156,7 +156,7 @@ class Ball(pg.sprite.Sprite):
         # Create the ball surface.
         self.rect_image = pg.Surface(size, pg.SRCALPHA)
         pg.draw.rect(self.rect_image, (255, 255, 255),
-                     (0, 0, *size), border_radius=width//2)
+                     (0, 0, *size), border_radius=BallSettings.RADIUS)
         self.image = pg.Surface(size)
         self.image.fill(color)
         self.image = self.image.convert_alpha()
@@ -173,7 +173,7 @@ class Ball(pg.sprite.Sprite):
         self.old_rect = self.rect.copy()
 
         if winned:
-            self.direction.x = int(choice((1, -1)))
+            self.direction.x = int(choice((self.vel_x, -self.vel_x)))
             self.set_active(True)
         else:
             if (self.player_left.score < self.max_player_score and self.player_right.score < self.max_player_score
@@ -182,25 +182,8 @@ class Ball(pg.sprite.Sprite):
 
             self.direction.x *= -1
             self.set_active(False)
-            self.last_wall = str("")
 
-        self.direction.y = int(choice((1, -1)))
-        if self.Y_VEL_RAND:
-            self.vel_y = self.vel_x - 1
-
-    def calcule_vel_y(self, sprite: Player) -> None:
-        """Calcule new Y vel from difference with the ball center y and the player center y who's colliding."""
-        if not self.Y_VEL_RAND:
-            return
-
-        # Remove one from max vel to get a smooth movement from ball (only if SAME_VEL_AXIS is False).
-        max_vel = float(self.vel_x - 1)
-        difference_in_y = float(sprite.rect.center[1] - self.rect.center[1])
-        reduction_factor = float((sprite.height / 2) / max_vel)
-        self.vel_y = (difference_in_y / reduction_factor)
-
-        if self.vel_y < 0:
-            self.vel_y *= -1
+        self.direction.y = int(choice((self.vel_y, -self.vel_y)))
 
     def calcule_speed(self, vel: int, dt: float) -> float:
         """Multiply the player velocity by VEL_MULTIPLIER and 
@@ -210,20 +193,16 @@ class Ball(pg.sprite.Sprite):
 
     def display_collisions(self, direction: str) -> None:
         if direction == 'vertical':
-            if self.rect.top < 0 and self.last_wall != 'top':
+            if self.rect.top < 0:
                 self.hit_sound.play()
                 self.rect.top = int(0)
                 self.pos.y = self.rect.y
                 self.direction.y *= -1
-                self.last_wall = str("top")
-            elif self.rect.bottom > self.screen_h and self.last_wall != 'bottom':
+            elif self.rect.bottom > self.screen_h:
                 self.hit_sound.play()
                 self.rect.bottom = self.screen_h
                 self.pos.y = self.rect.y
                 self.direction.y *= -1
-                self.last_wall = str("bottom")
-            else:
-                self.last_wall = str("")
 
         if direction == 'horizontal':
             if self.rect.left < 0:
@@ -271,13 +250,11 @@ class Ball(pg.sprite.Sprite):
                         self.rect.right = int(sprite.rect.left - 1)
                         self.pos.x = self.rect.x
                         self.direction.x *= -1
-                        self.calcule_vel_y(sprite)
 
                     if self.direction.x < 0 and self.rect.left <= sprite.rect.right and self.old_rect.left >= sprite.old_rect.right:
                         self.rect.left = int(sprite.rect.right + 1)
                         self.pos.x = self.rect.x
                         self.direction.x *= -1
-                        self.calcule_vel_y(sprite)
 
         self.display_collisions(direction)
 
@@ -293,7 +270,7 @@ class Ball(pg.sprite.Sprite):
         self.counter_txt = self.font.render(
             str(self.counter), True, self.font_color)
         self.counter_rect = self.counter_txt.get_rect()
-        self.counter_rect.midbottom = (self.screen_w//2, self.rect.top - 10)
+        self.counter_rect.midbottom = (self.screen_mw, self.rect.top - 10)
 
     def check_freeze_time(self) -> None:
         current_time = pg.time.get_ticks()
@@ -319,14 +296,10 @@ class Ball(pg.sprite.Sprite):
             # update old rect.
             self.old_rect = self.rect.copy()
 
-            if self.direction.x != 0:
-                self.pos.x += self.direction.x * \
-                    self.calcule_speed(self.vel_x, dt)
-                self.rect.x = round(self.pos.x)
-                self.collisions('horizontal')
+            self.pos.x += self.direction.x * dt
+            self.rect.x = round(self.pos.x)
+            self.collisions('horizontal')
 
-            if self.direction.y != 0:
-                self.pos.y += self.direction.y * \
-                    self.calcule_speed(self.vel_y, dt)
-                self.rect.y = round(self.pos.y)
-                self.collisions('vertical')
+            self.pos.y += self.direction.y * dt
+            self.rect.y = round(self.pos.y)
+            self.collisions('vertical')
