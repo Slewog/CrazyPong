@@ -27,7 +27,7 @@ class Player(pg.sprite.Sprite):
         self.direction = pg.math.Vector2(0, 0)
         self.side = side
         self.side_trslt = side_trslt
-        self.score = int(4)
+        self.score = int(0)
 
         quarter_screen_w = self.screen_w // 4
         if self.side == 'left':
