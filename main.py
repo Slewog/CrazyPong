@@ -59,10 +59,15 @@ class Pong:
             Locales.START_TXT, True, self.obj_color)
         self.start_txt_rect = self.start_txt.get_rect(
             center=(self.SCREEN_MW, self.SCREEN_MH + 60))
+        self.start_txt_bg = pg.Rect(self.start_txt_rect.x, self.start_txt_rect.y - 2,
+                                    self.start_txt_rect.width, self.start_txt_rect.height)
+
         self.restart_txt = self.font.render(
             Locales.RESTART_TXT, True, self.obj_color)
         self.restart_txt_rect = self.restart_txt.get_rect(
             center=(self.SCREEN_MW, self.SCREEN_MH + 60))
+        self.restart_txt_bg = pg.Rect(self.restart_txt_rect.x, self.restart_txt_rect.y - 2,
+                                      self.restart_txt_rect.width, self.restart_txt_rect.height)
 
         # Sounds
         hit_sound = load_sound('pong.ogg', GameSettings.HIT_SOUND_VOL)
@@ -122,12 +127,11 @@ class Pong:
         if self.winned:
             pg.draw.rect(self.display_surf, self.bg_color, self.win_text_rect)
             self.display_surf.blit(self.win_text, self.win_text_rect)
-            pg.draw.rect(self.display_surf, self.bg_color,
-                         self.restart_txt_rect)
+            pg.draw.rect(self.display_surf, self.bg_color, self.restart_txt_bg)
             self.display_surf.blit(self.restart_txt, self.restart_txt_rect)
 
         if not self.playing:
-            pg.draw.rect(self.display_surf, self.bg_color, self.start_txt_rect)
+            pg.draw.rect(self.display_surf, self.bg_color, self.start_txt_bg)
             self.display_surf.blit(self.start_txt, self.start_txt_rect)
 
         if self.playing and self.ball.freeze_time != 0:

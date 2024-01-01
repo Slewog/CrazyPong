@@ -9,7 +9,7 @@ class Player(pg.sprite.Sprite):
     WALL_OFFSET = PlayerSettings.WALL_OFFSET
     SCORE_Y_POS = PlayerSettings.SCORE_Y_POS
 
-    def __init__(self, side: str, side_trslt: str, screen_w: int, screen_h: int, screen_mh:int, group: pg.sprite.Group, font: pg.font.Font, font_color: pg.Color, color: pg.Color) -> None:
+    def __init__(self, side: str, side_trslt: str, screen_w: int, screen_h: int, screen_mh: int, group: pg.sprite.Group, font: pg.font.Font, font_color: pg.Color, color: pg.Color) -> None:
         super().__init__(group)
 
         # Screen info for collisions.
@@ -27,8 +27,8 @@ class Player(pg.sprite.Sprite):
         self.direction = pg.math.Vector2(0, 0)
         self.side = side
         self.side_trslt = side_trslt
-        self.score = int(0)
-        
+        self.score = int(4)
+
         quarter_screen_w = self.screen_w // 4
         if self.side == 'left':
             self.side_middle_x = quarter_screen_w
@@ -37,7 +37,7 @@ class Player(pg.sprite.Sprite):
             self.side_middle_x = quarter_screen_w * 3
             self.default_pos = (
                 self.screen_w - self.width - self.WALL_OFFSET, screen_mh)
-        
+
         self.update_score_txt()
 
         # Create the paddle (player).
@@ -67,7 +67,8 @@ class Player(pg.sprite.Sprite):
         self.score_txt = self.font.render(
             str(self.score), True, self.font_color)
         score_rect = self.score_txt.get_rect()
-        self.score_pos = (self.side_middle_x - score_rect.width//2, self.SCORE_Y_POS)
+        self.score_pos = (self.side_middle_x -
+                          score_rect.width//2, self.SCORE_Y_POS)
 
     def add_point(self) -> None:
         self.score += 1
@@ -85,7 +86,7 @@ class Player(pg.sprite.Sprite):
             elif keys[pg.K_s]:
                 self.direction.y = self.VELOCITY
             return
-        
+
         # Right side.
         if keys[pg.K_UP]:
             self.direction.y = -self.VELOCITY
@@ -105,7 +106,7 @@ class Player(pg.sprite.Sprite):
 
         # Collisions with wall bottom.
         bottom = self.screen_h - self.WALL_OFFSET
-        if self.rect.bottom > bottom: 
+        if self.rect.bottom > bottom:
             self.rect.bottom = bottom
             self.pos.y = self.rect.y
 
@@ -120,7 +121,7 @@ class Ball(pg.sprite.Sprite):
     VEL_MULTIPLIER = float(62.5)
     VELOCITY = BallSettings.VELOCITY
 
-    def __init__(self, screen_w: int, screen_h: int, screen_mw:int, screen_mh:int, counter_font: pg.font.Font, counter_color: pg.Color, color: pg.Color, group: pg.sprite.Group, player_left: Player, player_right: Player, max_ply_score: int, sounds: list[pg.mixer.Sound]) -> None:
+    def __init__(self, screen_w: int, screen_h: int, screen_mw: int, screen_mh: int, counter_font: pg.font.Font, counter_color: pg.Color, color: pg.Color, group: pg.sprite.Group, player_left: Player, player_right: Player, max_ply_score: int, sounds: list[pg.mixer.Sound]) -> None:
         super().__init__(group)
 
         # Screen info and players for collisions.
@@ -146,7 +147,8 @@ class Ball(pg.sprite.Sprite):
         # Movement setup.
         self.vel_x = int(self.VELOCITY * self.VEL_MULTIPLIER)
         self.vel_y = self.vel_x
-        self.direction = pg.math.Vector2(choice((self.vel_x, -self.vel_x)), choice((self.vel_y, -self.vel_y)))
+        self.direction = pg.math.Vector2(
+            choice((self.vel_x, -self.vel_x)), choice((self.vel_y, -self.vel_y)))
         self.default_pos = (self.screen_mw, screen_mh)
 
         # Get ball size.
@@ -263,8 +265,12 @@ class Ball(pg.sprite.Sprite):
         # Create a new counter text surface on update.
         self.counter_txt = self.font.render(
             str(self.counter), True, self.font_color)
+        
         self.counter_rect = self.counter_txt.get_rect()
         self.counter_rect.midbottom = (self.screen_mw, self.rect.top - 10)
+
+        self.counter_bg = pg.Rect(self.counter_rect.x, self.counter_rect.y - 3,
+                                  self.counter_rect.width, self.counter_rect.height)
 
     def check_freeze_time(self) -> None:
         current_time = pg.time.get_ticks()
@@ -282,7 +288,7 @@ class Ball(pg.sprite.Sprite):
             self.update_counter(-1)
 
     def draw_restart_counter(self, display: pg.Surface, bg_color: pg.Color) -> None:
-        pg.draw.rect(display, bg_color, self.counter_rect)
+        pg.draw.rect(display, bg_color,  self.counter_bg)
         display.blit(self.counter_txt, self.counter_rect)
 
     def update(self, dt: float) -> None:
