@@ -42,6 +42,7 @@ class Pong:
         self.font_color = load_color(GameSettings.FONT_COLOR)
         self.obj_color = load_color(GameSettings.OBJECT_COLOR)
         self.bg_color = load_color(GameSettings.BACKGROUND_COLOR)
+
         self.display_surf.fill(self.bg_color)
         pg.display.flip()
 
@@ -107,7 +108,8 @@ class Pong:
         self.ball.set_active(True)
 
     def draw(self) -> None:
-        """Draw all objects on the screen."""
+        self.display_surf.fill(self.bg_color)
+
         # Draw the middle line.
         pg.draw.rect(self.display_surf, self.font_color, self.middle_line)
         self.all_sprites.draw(self.display_surf)
@@ -130,13 +132,14 @@ class Pong:
 
         if self.DEBUG:
             self.debug_tool.render(self.display_surf)
-
+        
+        pg.display.flip()
+        
     def run(self) -> None:
         self.load_assets()
         self.prev_dt = time()
 
         while True:
-            """Update the game."""
             for event in pg.event.get():
                 if event.type == pg.QUIT or event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
                     self.quit()
@@ -147,6 +150,7 @@ class Pong:
                 if not self.playing and event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
                     self.start()
 
+            """Update the game."""
             current_time = time()
             dt = current_time - self.prev_dt
             self.prev_dt = current_time
@@ -177,14 +181,8 @@ class Pong:
                     f"- fps : {round(self.clock.get_fps(), 2)}")
                 self.debug_tool.add_data(f"- delta : {round(dt, 9)}")
 
-            """Draw the frame."""
-            self.display_surf.fill(self.bg_color)
             self.draw()
 
-            """Update the window."""
-            pg.display.flip()
-
-            """Frame Cap."""
             if self.USE_FPS:
                 self.clock.tick(self.FPS)
 
