@@ -156,13 +156,14 @@ class Ball(pg.sprite.Sprite):
         size = (width, width)
 
         # Create the ball surface.
-        self.rect_image = pg.Surface(size, pg.SRCALPHA)
-        pg.draw.rect(self.rect_image, (255, 255, 255),
+        rect_image = pg.Surface(size, pg.SRCALPHA)
+        pg.draw.rect(rect_image, (255, 255, 255),
                      (0, 0, *size), border_radius=BallSettings.RADIUS)
+
         self.image = pg.Surface(size)
         self.image.fill(color)
         self.image = self.image.convert_alpha()
-        self.image.blit(self.rect_image, (0, 0), None, pg.BLEND_RGBA_MIN)
+        self.image.blit(rect_image, (0, 0), None, pg.BLEND_RGBA_MIN)
 
         # Set the ball on the middle screen.
         self.rect = self.image.get_rect(center=self.default_pos)
