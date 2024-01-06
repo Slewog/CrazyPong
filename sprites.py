@@ -179,7 +179,7 @@ class Ball(pg.sprite.Sprite):
 
         if winned:
             self.direction.x = int(choice((self.vel_x, -self.vel_x)))
-            self.set_active(True)
+            self.freeze_time = pg.time.get_ticks()
         else:
             if (self.player_left.score < self.max_player_score and self.player_right.score < self.max_player_score
                     or self.player_right.score < self.max_player_score and self.player_left.score < self.max_player_score):
