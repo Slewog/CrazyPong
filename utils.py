@@ -7,11 +7,7 @@ MAIN_DIR = getattr(sys, '_MEIPASS', path.dirname(path.abspath(__file__)))
 
 
 def resource_path(directory: str, resource: str) -> str:
-    """
-    Get absolute path to resource, works for dev and for PyInstaller
-    """
     return path.join(MAIN_DIR, directory, resource)
-
 
 def load_sound(file: str, vol: float = 1.0) -> pg.mixer.Sound:
     if not pg.mixer or not pg.mixer.get_init():

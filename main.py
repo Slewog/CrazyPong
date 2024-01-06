@@ -19,7 +19,6 @@ class Pong:
     DEBUG = GameSettings.DEBUG
 
     def __init__(self) -> None:
-        # Setup.
         pg.mixer.pre_init(44100, -16, 2, 512)
         pg.init()
 
@@ -33,11 +32,10 @@ class Pong:
         self.winned = bool(False)
         self.playing = bool(False)
 
-        # sprite group setup
         self.all_sprites = pg.sprite.Group()
 
     def load_assets(self) -> None:
-        # UI.
+
         self.font = pg.font.Font('freesansbold.ttf', 40)
         self.font_color = load_color(GameSettings.FONT_COLOR)
         self.obj_color = load_color(GameSettings.OBJECT_COLOR)
@@ -46,11 +44,9 @@ class Pong:
         self.display_surf.fill(self.bg_color)
         pg.display.flip()
 
-        # Middle line.
         self.middle_line_w = GameSettings.MIDDLE_LINE_W
         self.middle_line = pg.Rect(self.SCREEN_MW - self.middle_line_w//2, int(0), self.middle_line_w, self.SCREEN_H)
 
-        # Texts.
         self.win_txt_pos = (self.SCREEN_MW, self.SCREEN_MH - 70)
         self.start_txt = self.font.render(
             Locales.START_TXT, True, self.font_color)
@@ -66,23 +62,19 @@ class Pong:
         self.restart_txt_bg = pg.Rect(self.restart_txt_rect.x, self.restart_txt_rect.y - 2,
                                       self.restart_txt_rect.width, self.restart_txt_rect.height)
 
-        # Sounds
         hit_sound = load_sound('pong.ogg', GameSettings.HIT_SOUND_VOL)
         score_sound = load_sound('score.ogg', GameSettings.SCORE_SOUND_VOL)
 
-        # Players.
         self.player_left = Player('left', Locales.PLAYER_LEFT, self.SCREEN_W, self.SCREEN_H,
                                   self.SCREEN_MH, self.all_sprites, self.font, self.font_color, self.obj_color)
         self.player_right = Player('right', Locales.PLAYER_RIGHT, self.SCREEN_W, self.SCREEN_H,
                                    self.SCREEN_MH, self.all_sprites, self.font, self.font_color, self.obj_color)
         self.players: list[Player] = [self.player_left, self.player_right]
 
-        # Objects.
         self.ball = Ball(self.SCREEN_W, self.SCREEN_H, self.SCREEN_MW, self.SCREEN_MH, self.font, self.font_color,
                          self.obj_color, self.all_sprites, self.player_left, self.player_right, self.MAX_SCORE, [hit_sound, score_sound])
 
     def quit(self):
-        """Kill all sprites and close pygame before quit python"""
         for sprite in self.all_sprites:
             sprite: Player | Ball
             sprite.kill()
@@ -91,7 +83,6 @@ class Pong:
         exit()
 
     def reset(self, player_dir: bool) -> None:
-        """Reset players direction or all entities"""
         if player_dir:
             for player in self.players:
                 player.reset_direction(False)
@@ -106,10 +97,8 @@ class Pong:
     def start(self) -> None:
         self.playing = bool(True)
         self.ball.freeze_time = pg.time.get_ticks()
-        # self.ball.set_active(True)
 
     def draw(self) -> None:
-        # Draw the middle line.
         pg.draw.rect(self.display_surf, self.font_color, self.middle_line)
         self.all_sprites.draw(self.display_surf)
 
@@ -154,7 +143,6 @@ class Pong:
 
             self.display_surf.fill(self.bg_color)
 
-            """Update the game."""
             current_time = time()
             dt = current_time - prev_dt
             prev_dt = current_time

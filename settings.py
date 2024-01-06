@@ -7,7 +7,7 @@ class GameSettings:
     MAX_SCORE = int(5)
     BACKGROUND_COLOR = str('#46505A')
     FONT_COLOR = (27, 35, 43)
-    OBJECT_COLOR = str('#27333E') # str('#2F373F')
+    OBJECT_COLOR = str('#27333E')
     HIT_SOUND_VOL = float(0.12)
     SCORE_SOUND_VOL = float(0.12)
     MIDDLE_LINE_W = int(4)
