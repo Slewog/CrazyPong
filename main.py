@@ -5,7 +5,7 @@ from time import time
 from settings import GameSettings
 from locales import Locales
 from sprites import Ball, Player
-from utils import load_color, load_sound, DebugTools
+from utils import load_color, load_sound
 
 
 class Pong:
@@ -16,13 +16,10 @@ class Pong:
     SCREEN_W = GameSettings.SCREEN_W
     SCREEN_MW = SCREEN_W // 2
     MAX_SCORE = GameSettings.MAX_SCORE
-    DEBUG = GameSettings.DEBUG
 
     def __init__(self) -> None:
         pg.mixer.pre_init(44100, -16, 2, 512)
         pg.init()
-
-        self.debug_tool = DebugTools()
 
         self.clock = pg.time.Clock()
 
@@ -98,7 +95,7 @@ class Pong:
         self.playing = bool(True)
         self.ball.freeze_time = pg.time.get_ticks()
 
-    def draw(self) -> None:
+    def render_frame(self) -> None:
         pg.draw.rect(self.display_surf, self.font_color, self.middle_line)
         self.all_sprites.draw(self.display_surf)
 
@@ -116,12 +113,7 @@ class Pong:
             self.display_surf.blit(self.start_txt, self.start_txt_rect)
 
         if self.playing and not self.ball.active and self.ball.freeze_time != 0:
-            self.ball.draw_restart_counter(self.display_surf, self.bg_color)
-
-        if self.DEBUG:
-            self.debug_tool.render(self.display_surf)
-        
-        pg.display.flip()
+            self.ball.draw_restart_counter(self.display_surf, self.bg_color) 
         
     def run(self) -> None:
         self.load_assets()
@@ -168,12 +160,9 @@ class Pong:
 
             self.all_sprites.update(dt)
 
-            if self.DEBUG:
-                self.debug_tool.add_data(
-                    f"- fps : {round(self.clock.get_fps(), 2)}")
-                self.debug_tool.add_data(f"- delta : {round(dt, 9)}")
+            self.render_frame()
 
-            self.draw()
+            pg.display.flip()
 
 
 if __name__ == '__main__':

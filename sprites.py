@@ -117,7 +117,6 @@ class Player(pg.sprite.Sprite):
 
 
 class Ball(pg.sprite.Sprite):
-    DEBUG = BallSettings.DEBUG
     VEL_MULTIPLIER = float(62.5)
     VELOCITY = BallSettings.VELOCITY
 
@@ -206,11 +205,6 @@ class Ball(pg.sprite.Sprite):
         if direction == 'horizontal':
             if self.rect.left < 0:
                 self.score_sound.play()
-                if self.DEBUG:
-                    self.rect.left = int(0)
-                    self.pos.x = self.rect.x
-                    self.direction.x *= -1
-                    return
                 self.player_right.add_point()
                 self.reset()
 

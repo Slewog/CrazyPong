@@ -1,5 +1,4 @@
 class GameSettings:
-    DEBUG = bool(False)
     SCREEN_W = int(1280)
     SCREEN_H = int(960)
     USE_FPS = bool(False)
@@ -14,7 +13,6 @@ class GameSettings:
 
 
 class BallSettings:
-    DEBUG = bool(False)
     RADIUS = int(14)
     VELOCITY = int(7)
 
@@ -25,12 +23,3 @@ class PlayerSettings:
     VELOCITY = int(500)
     WALL_OFFSET = int(10)
     SCORE_Y_POS = int(20)
-
-
-class DebugSettings:
-    WIDTH = int(200)
-    HEIGHT = int(90)
-    X_POS = int(30)
-    Y_POS = int(20)
-    FONT_SIZE = int(25)
-    BORDER_RADIUS = int(10)
