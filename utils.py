@@ -1,7 +1,6 @@
 import sys
 from os import path
 import pygame as pg
-from settings import DebugSettings
 
 MAIN_DIR = getattr(sys, '_MEIPASS', path.dirname(path.abspath(__file__)))
 
