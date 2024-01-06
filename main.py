@@ -84,7 +84,7 @@ class Pong:
     def quit(self):
         """Kill all sprites and close pygame before quit python"""
         for sprite in self.all_sprites:
-            sprite: pg.sprite.Sprite
+            sprite: Player | Ball
             sprite.kill()
 
         pg.quit()
@@ -105,11 +105,10 @@ class Pong:
 
     def start(self) -> None:
         self.playing = bool(True)
-        self.ball.set_active(True)
+        self.ball.freeze_time = pg.time.get_ticks()
+        # self.ball.set_active(True)
 
     def draw(self) -> None:
-        self.display_surf.fill(self.bg_color)
-
         # Draw the middle line.
         pg.draw.rect(self.display_surf, self.font_color, self.middle_line)
         self.all_sprites.draw(self.display_surf)
@@ -127,7 +126,7 @@ class Pong:
             pg.draw.rect(self.display_surf, self.bg_color, self.start_txt_bg)
             self.display_surf.blit(self.start_txt, self.start_txt_rect)
 
-        if self.playing and self.ball.freeze_time != 0:
+        if self.playing and not self.ball.active and self.ball.freeze_time != 0:
             self.ball.draw_restart_counter(self.display_surf, self.bg_color)
 
         if self.DEBUG:
@@ -137,25 +136,28 @@ class Pong:
         
     def run(self) -> None:
         self.load_assets()
-        self.prev_dt = time()
+        prev_dt = time()
 
         while True:
-            for event in pg.event.get():
-                if event.type == pg.QUIT or event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
+            if self.USE_FPS:
+                self.clock.tick(self.FPS)
+
+            for e in pg.event.get():
+                if e.type == pg.QUIT or e.type == pg.KEYDOWN and e.key == pg.K_ESCAPE:
                     self.quit()
 
-                if self.playing and self.winned and event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
+                if self.playing and self.winned and e.type == pg.KEYDOWN and e.key == pg.K_SPACE:
                     self.reset(False)
 
-                if not self.playing and event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
+                if not self.playing and e.type == pg.KEYDOWN and e.key == pg.K_SPACE:
                     self.start()
+
+            self.display_surf.fill(self.bg_color)
 
             """Update the game."""
             current_time = time()
-            dt = current_time - self.prev_dt
-            self.prev_dt = current_time
-
-            self.all_sprites.update(dt)
+            dt = current_time - prev_dt
+            prev_dt = current_time
 
             if self.playing and not self.winned:
                 keys = pg.key.get_pressed()
@@ -176,15 +178,14 @@ class Pong:
                 if not self.ball.active and self.ball.freeze_time != 0:
                     self.ball.check_freeze_time()
 
+            self.all_sprites.update(dt)
+
             if self.DEBUG:
                 self.debug_tool.add_data(
                     f"- fps : {round(self.clock.get_fps(), 2)}")
                 self.debug_tool.add_data(f"- delta : {round(dt, 9)}")
 
             self.draw()
-
-            if self.USE_FPS:
-                self.clock.tick(self.FPS)
 
 
 if __name__ == '__main__':
