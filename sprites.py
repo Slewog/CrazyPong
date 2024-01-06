@@ -111,7 +111,7 @@ class Player(pg.sprite.Sprite):
             self.pos.y = self.rect.y
 
         # Collisions with wall top.
-        if self.rect.top < self.WALL_OFFSET:
+        if self.rect.top < 0 + self.WALL_OFFSET:
             self.rect.top = self.WALL_OFFSET
             self.pos.y = self.rect.y
 
@@ -131,10 +131,6 @@ class Ball(pg.sprite.Sprite):
         self.player_left = player_left
         self.player_right = player_right
         self.max_player_score = max_ply_score
-
-        self.freeze_time = int(0)
-        self.counter = int(-1)
-        self.active = bool(False)
 
         # Font.
         self.font = counter_font
@@ -169,6 +165,12 @@ class Ball(pg.sprite.Sprite):
         self.rect = self.image.get_rect(center=self.default_pos)
         self.pos = pg.math.Vector2(self.rect.topleft)
         self.old_rect = self.rect.copy()
+
+        # COUNTDOWN.
+        self.freeze_time = int(0)
+        self.counter:int = None
+        self.active = bool(False)
+        self.update_counter(-1)
 
     def reset(self, winned: bool = False) -> None:
         self.rect.center = self.default_pos
@@ -218,38 +220,38 @@ class Ball(pg.sprite.Sprite):
                 self.reset()
 
     def collisions(self, direction: str):
-        overlap_sprites: list[pg.sprite.Sprite] = []
+        overlap_players: list[Player] = []
 
         if self.rect.colliderect(self.player_left.rect):
-            overlap_sprites.append(self.player_left)
+            overlap_players.append(self.player_left)
 
         if self.rect.colliderect(self.player_right.rect):
-            overlap_sprites.append(self.player_right)
+            overlap_players.append(self.player_right)
 
-        if overlap_sprites:
+        if overlap_players:
             self.hit_sound.play()
 
             if direction == 'vertical':
-                for sprite in overlap_sprites:
-                    if self.direction.y > 0 and self.rect.bottom >= sprite.rect.top and self.old_rect.bottom <= sprite.old_rect.top:
-                        self.rect.bottom = int(sprite.rect.top - 1)
+                for player in overlap_players:
+                    if self.direction.y > 0 and self.rect.bottom >= player.rect.top and self.old_rect.bottom <= player.old_rect.top:
+                        self.rect.bottom = int(player.rect.top - 1)
                         self.pos.y = self.rect.y
                         self.direction.y *= -1
 
-                    if self.direction.y < 0 and self.rect.top <= sprite.rect.bottom and self.old_rect.top >= sprite.old_rect.bottom:
-                        self.rect.top = int(sprite.rect.bottom + 1)
+                    if self.direction.y < 0 and self.rect.top <= player.rect.bottom and self.old_rect.top >= player.old_rect.bottom:
+                        self.rect.top = int(player.rect.bottom + 1)
                         self.pos.y = self.rect.y
                         self.direction.y *= -1
 
             if direction == 'horizontal':
-                for sprite in overlap_sprites:
-                    if self.direction.x > 0 and self.rect.right >= sprite.rect.left and self.old_rect.right <= sprite.old_rect.left:
-                        self.rect.right = int(sprite.rect.left - 1)
+                for player in overlap_players:
+                    if self.direction.x > 0 and self.rect.right >= player.rect.left and self.old_rect.right <= player.old_rect.left:
+                        self.rect.right = int(player.rect.left - 1)
                         self.pos.x = self.rect.x
                         self.direction.x *= -1
 
-                    if self.direction.x < 0 and self.rect.left <= sprite.rect.right and self.old_rect.left >= sprite.old_rect.right:
-                        self.rect.left = int(sprite.rect.right + 1)
+                    if self.direction.x < 0 and self.rect.left <= player.rect.right and self.old_rect.left >= player.old_rect.right:
+                        self.rect.left = int(player.rect.right + 1)
                         self.pos.x = self.rect.x
                         self.direction.x *= -1
 
@@ -289,7 +291,7 @@ class Ball(pg.sprite.Sprite):
             self.update_counter(-1)
 
     def draw_restart_counter(self, display: pg.Surface, bg_color: pg.Color) -> None:
-        pg.draw.rect(display, bg_color,  self.counter_bg)
+        pg.draw.rect(display, bg_color, self.counter_bg)
         display.blit(self.counter_txt, self.counter_rect)
 
     def update(self, dt: float) -> None:
