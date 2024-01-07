@@ -4,7 +4,6 @@ import pygame as pg
 
 MAIN_DIR = getattr(sys, '_MEIPASS', path.dirname(path.abspath(__file__)))
 
-
 def resource_path(directory: str, resource: str) -> str:
     return path.join(MAIN_DIR, directory, resource)
 
@@ -21,57 +20,12 @@ def load_sound(file: str, vol: float = 1.0) -> pg.mixer.Sound:
     loaded_sound.set_volume(vol)
     return loaded_sound
 
-
 def load_color(color: str | tuple[int, int, int]) -> pg.Color:
     if type(color) == tuple:
         return color
 
     return pg.Color(color)
 
-
 class NoneSound:
     def play(self):
         pass
-
-
-class DebugTools:
-    def __init__(self) -> None:
-        self.data: list[str] = []
-        self.font = pg.font.Font(None, DebugSettings.FONT_SIZE)
-        self.border_radius = DebugSettings.BORDER_RADIUS
-
-        self.rect = pg.Rect(DebugSettings.X_POS, DebugSettings.Y_POS,
-                            DebugSettings.WIDTH, DebugSettings.HEIGHT)
-        self.rect_color = pg.Color('black')
-
-        self.font.set_underline(True)
-        self.font.set_bold(True)
-        self.font.set_italic(True)
-        self.font_color = pg.Color('white')
-        self.title = self.font.render('DEBUG TOOLS:', True, self.font_color)
-        self.title_rect = self.title.get_rect(
-            midtop=(self.rect.midtop[0], self.rect.midtop[1] + 10))
-        self.font.set_underline(False)
-        self.font.set_bold(False)
-
-        self.offset = self.title_rect.bottom + 10
-
-    def add_data(self, data: str):
-        self.data.append(data)
-
-    def render(self, display: pg.Surface):
-        pg.draw.rect(display, self.rect_color, self.rect,
-                     border_radius=self.border_radius)
-        display.blit(self.title, self.title_rect)
-
-        offset = self.offset
-
-        for data in self.data:
-            data_txt = self.font.render(data, True, self.font_color)
-
-            data_txt_rect = data_txt.get_rect(
-                topleft=(self.rect.left + 10, offset))
-            display.blit(data_txt, data_txt_rect)
-            offset += data_txt_rect.height + 5
-
-        self.data.clear()
