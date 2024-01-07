@@ -2,20 +2,20 @@ from sys import exit
 import pygame as pg
 from time import time
 
-from settings import GameSettings
+from settings import FPS, SCREEN_W, SCREEN_H , MAX_SCORE, FONT_COLOR, FONT_SIZE, MIDDLE_LINE_W
+from settings import OBJECT_COLOR, BACKGROUND_COLOR, FONT_COLOR, HIT_SOUND_VOL, SCORE_SOUND_VOL
 from locales import Locales
 from sprites import Ball, Player
 from utils import load_color, load_sound
 
 
 class Pong:
-    FPS = GameSettings.FPS
-    USE_FPS = GameSettings.USE_FPS
-    SCREEN_H = GameSettings.SCREEN_H
+    FPS = FPS
+    SCREEN_H = SCREEN_H
     SCREEN_MH = SCREEN_H // 2
-    SCREEN_W = GameSettings.SCREEN_W
+    SCREEN_W = SCREEN_W
     SCREEN_MW = SCREEN_W // 2
-    MAX_SCORE = GameSettings.MAX_SCORE
+    MAX_SCORE = MAX_SCORE
 
     def __init__(self) -> None:
         pg.mixer.pre_init(44100, -16, 2, 512)
@@ -32,16 +32,15 @@ class Pong:
         self.all_sprites = pg.sprite.Group()
 
     def load_assets(self) -> None:
-
-        self.font = pg.font.Font('freesansbold.ttf', 40)
-        self.font_color = load_color(GameSettings.FONT_COLOR)
-        self.obj_color = load_color(GameSettings.OBJECT_COLOR)
-        self.bg_color = load_color(GameSettings.BACKGROUND_COLOR)
+        self.font = pg.font.Font('freesansbold.ttf', FONT_SIZE)
+        self.font_color = load_color(FONT_COLOR)
+        self.obj_color = load_color(OBJECT_COLOR)
+        self.bg_color = load_color(BACKGROUND_COLOR)
 
         self.display_surf.fill(self.bg_color)
         pg.display.flip()
 
-        self.middle_line_w = GameSettings.MIDDLE_LINE_W
+        self.middle_line_w = MIDDLE_LINE_W
         self.middle_line = pg.Rect(self.SCREEN_MW - self.middle_line_w//2, int(0), self.middle_line_w, self.SCREEN_H)
 
         self.win_txt_pos = (self.SCREEN_MW, self.SCREEN_MH - 70)
@@ -59,8 +58,8 @@ class Pong:
         self.restart_txt_bg = pg.Rect(self.restart_txt_rect.x, self.restart_txt_rect.y - 2,
                                       self.restart_txt_rect.width, self.restart_txt_rect.height)
 
-        hit_sound = load_sound('pong.ogg', GameSettings.HIT_SOUND_VOL)
-        score_sound = load_sound('score.ogg', GameSettings.SCORE_SOUND_VOL)
+        hit_sound = load_sound('pong.ogg', HIT_SOUND_VOL)
+        score_sound = load_sound('score.ogg', SCORE_SOUND_VOL)
 
         self.player_left = Player('left', Locales.PLAYER_LEFT, self.SCREEN_W, self.SCREEN_H,
                                   self.SCREEN_MH, self.all_sprites, self.font, self.font_color, self.obj_color)
@@ -120,8 +119,7 @@ class Pong:
         prev_dt = time()
 
         while True:
-            if self.USE_FPS:
-                self.clock.tick(self.FPS)
+            self.clock.tick(self.FPS)
 
             for e in pg.event.get():
                 if e.type == pg.QUIT or e.type == pg.KEYDOWN and e.key == pg.K_ESCAPE:

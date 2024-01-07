@@ -1,13 +1,15 @@
 import pygame as pg
 from random import choice
 
-from settings import BallSettings, PlayerSettings
+from settings import BALL_RADIUS, BALL_VELOCITY, BALL_VEL_MULTIPLIER, PADDLE_WIDTH, PADDLE_HEIGHT, PADDLE_VELOCITY, PADDLE_WALL_OFFSET, PADDLE_SCORE_Y_POS
 
 
 class Player(pg.sprite.Sprite):
-    VELOCITY = PlayerSettings.VELOCITY
-    WALL_OFFSET = PlayerSettings.WALL_OFFSET
-    SCORE_Y_POS = PlayerSettings.SCORE_Y_POS
+    VELOCITY = PADDLE_VELOCITY
+    WALL_OFFSET = PADDLE_WALL_OFFSET
+    SCORE_Y_POS = PADDLE_SCORE_Y_POS
+    WIDTH = PADDLE_WIDTH
+    HEIGHT = PADDLE_HEIGHT
 
     def __init__(self, side: str, side_trslt: str, screen_w: int, screen_h: int, screen_mh: int, group: pg.sprite.Group, font: pg.font.Font, font_color: pg.Color, color: pg.Color) -> None:
         super().__init__(group)
@@ -15,9 +17,6 @@ class Player(pg.sprite.Sprite):
         # Screen info for collisions.
         self.screen_w = screen_w
         self.screen_h = screen_h
-
-        self.width = PlayerSettings.WIDTH
-        self.height = PlayerSettings.HEIGHT
 
         self.font = font
         self.font_color = font_color
@@ -36,12 +35,12 @@ class Player(pg.sprite.Sprite):
         else:
             self.side_middle_x = quarter_screen_w * 3
             self.default_pos = (
-                self.screen_w - self.width - self.WALL_OFFSET, screen_mh)
+                self.screen_w - self.WIDTH - self.WALL_OFFSET, screen_mh)
 
         self.update_score_txt()
 
         # Create the paddle (player).
-        self.image = pg.Surface((self.width, self.height))
+        self.image = pg.Surface((self.WIDTH, self.HEIGHT))
         self.image.fill(self.color)
 
         self.rect = self.image.get_rect(midleft=self.default_pos)
@@ -99,7 +98,7 @@ class Player(pg.sprite.Sprite):
 
         if not self.active or self.direction.y == 0:
             return
-
+        
         # Position.
         self.pos.y += self.direction.y * dt
         self.rect.y = round(self.pos.y)
@@ -117,8 +116,9 @@ class Player(pg.sprite.Sprite):
 
 
 class Ball(pg.sprite.Sprite):
-    VEL_MULTIPLIER = float(62.5)
-    VELOCITY = BallSettings.VELOCITY
+    VEL_MULTIPLIER = BALL_VEL_MULTIPLIER
+    VELOCITY = BALL_VELOCITY
+    RADIUS = BALL_RADIUS
 
     def __init__(self, screen_w: int, screen_h: int, screen_mw: int, screen_mh: int, counter_font: pg.font.Font, counter_color: pg.Color, color: pg.Color, group: pg.sprite.Group, player_left: Player, player_right: Player, max_ply_score: int, sounds: list[pg.mixer.Sound]) -> None:
         super().__init__(group)
@@ -147,13 +147,13 @@ class Ball(pg.sprite.Sprite):
         self.default_pos = (self.screen_mw, screen_mh)
 
         # Get ball size.
-        width = BallSettings.RADIUS * 2
+        width = self.RADIUS * 2
         size = (width, width)
 
         # Create the ball surface.
         rect_image = pg.Surface(size, pg.SRCALPHA)
         pg.draw.rect(rect_image, (255, 255, 255),
-                     (0, 0, *size), border_radius=BallSettings.RADIUS)
+                     (0, 0, *size), border_radius=self.RADIUS)
 
         self.image = pg.Surface(size)
         self.image.fill(color)

@@ -1,25 +1,23 @@
-class GameSettings:
-    SCREEN_W = int(1280)
-    SCREEN_H = int(960)
-    USE_FPS = bool(False)
-    FPS = int(120)
-    MAX_SCORE = int(5)
-    BACKGROUND_COLOR = str('#46505A')
-    FONT_COLOR = (27, 35, 43)
-    OBJECT_COLOR = str('#27333E')
-    HIT_SOUND_VOL = float(0.12)
-    SCORE_SOUND_VOL = float(0.12)
-    MIDDLE_LINE_W = int(4)
+SCREEN_W = int(1280)
+SCREEN_H = int(960)
+FPS = int(120)
+MAX_SCORE = int(5)
+BACKGROUND_COLOR = str('#46505A')
+FONT_COLOR = (27, 35, 43)
+FONT_SIZE = int(40)
+OBJECT_COLOR = str('#27333E')
+HIT_SOUND_VOL = float(0.12)
+SCORE_SOUND_VOL = float(0.12)
+MIDDLE_LINE_W = int(4)
 
 
-class BallSettings:
-    RADIUS = int(14)
-    VELOCITY = int(7)
+BALL_RADIUS = int(14)
+BALL_VELOCITY = int(7)
+BALL_VEL_MULTIPLIER = 62.5
 
 
-class PlayerSettings:
-    WIDTH = int(12)
-    HEIGHT = int(180)
-    VELOCITY = int(500)
-    WALL_OFFSET = int(10)
-    SCORE_Y_POS = int(20)
+PADDLE_WIDTH = int(12)
+PADDLE_HEIGHT = int(180)
+PADDLE_VELOCITY = int(500)
+PADDLE_WALL_OFFSET = int(10)
+PADDLE_SCORE_Y_POS = int(20)
