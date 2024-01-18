@@ -1,0 +1,1 @@
+COPYRIGHT = "Create by Slewog"
