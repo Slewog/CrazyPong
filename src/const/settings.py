@@ -21,6 +21,7 @@ BUTTON = {
     'text_offset': 1,
     'border_radius': int(12),
     'border_size': int(5),
+    'sound_vol': 0.2,
     'colors': {
         'font': (27, 35, 43, 255),
         'top_color': '#3F4851',

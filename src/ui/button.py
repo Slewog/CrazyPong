@@ -1,7 +1,7 @@
 import pygame as pg
 
 from ..const.custom_event import CE_BTN_CLICKED
-from ..utils import load_color, ColorValue
+from ..utils import load_color, ColorValue, load_sound
 
 from ..const.settings import BUTTON
 
@@ -14,7 +14,7 @@ class Button:
     BORDER_RADIUS = int(BUTTON['border_radius'])
     BORDER_SIZE = int(BUTTON['border_size'])
 
-    CLICK_SOUND: pg.mixer.Sound
+    CLICK_SOUND = load_sound("btn_click.wav", BUTTON['sound_vol'])
 
     for color_name, color in BUTTON['colors'].items():
         COLORS[color_name] = load_color(color)
@@ -71,6 +71,7 @@ class Button:
         self.pressed = True
         self.change_elevation(0)
         self.click_time = pg.time.get_ticks()
+        self.CLICK_SOUND.play()
 
     def check_hover(self, mouse_pos: tuple[int, int]) -> None:
         if self.top_rect.collidepoint(mouse_pos) or self.bottom_rect.collidepoint(mouse_pos):
