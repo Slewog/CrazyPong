@@ -1,6 +1,6 @@
 GAME = {
     'name': str("Py Pong"),
-    'fps': int(60),
+    'fps': int(120),
     'width': int(1280),
     'height': int(960)
 }
@@ -24,8 +24,9 @@ BUTTON = {
     'border_radius': int(12),
     'border_size': int(5),
     'sound_vol': 0.05,
+    'sound_file': str("button.wav"),
     'colors': {
-        'top_color': "#3F4851",
+        'top_color': str("#3F4851"),
         'top_color_hover': COLORS['background'],
         'bg_color' : COLORS['font'],
     }
@@ -42,7 +43,7 @@ MENU = {
         'pos': (GAME['width'] // 2, GAME['height'] - int(20))
     },
     'pg_logo': {
-        'file': "pygame_logo.png",
+        'file': str("pygame_logo.png"),
         'pos': (GAME['width'] - 10, GAME['height'] - 9)
     },
     'buttons': [
