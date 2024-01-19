@@ -1,8 +1,8 @@
 from typing import Any
 import pygame as pg
 
-from ..const.settings import MENU
-from ..utils import load_font
+from ..const.settings import MENU, BUTTON
+from ..utils import load_font, load_sound
 from .button import Button
 
 
@@ -27,6 +27,7 @@ class Menu:
 
         Button.FONT = font
         Button.FONT_COLOR = colors['font']
+        Button.CLICK_SOUND = load_sound("button.wav", BUTTON['sound_vol'])
 
         self.buttons.append(Button(
             {'text': "1 PLAYER", 'action': 'play', 'level': 'oneplayer'}, (screen_rect.width // 2 - 175, screen_rect.height // 2)
