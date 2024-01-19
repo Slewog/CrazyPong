@@ -64,7 +64,7 @@ class Pong:
                     self.set_state('menu')
 
                 if self.state == 'menu' and e.type == pg.MOUSEBUTTONDOWN and e.button == 1:
-                    self.menu.check_for_btn_click(e.pos)
+                    self.menu.check_for_btn_click()
                 
                 if e.type == CE_BTN_CLICKED:
                     if e.action == 'play':
@@ -87,5 +87,4 @@ class Pong:
             # Middle Y
             pg.draw.line(self.display_surf, pg.Color("red"), (self.SCREEN_RECT.width / 2, 0), (self.SCREEN_RECT.width / 2, self.SCREEN_RECT.height), 1)
 
-            self.debug.render()
             pg.display.flip()

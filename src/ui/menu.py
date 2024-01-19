@@ -40,7 +40,7 @@ class Menu:
             {'text': "QUIT", 'action': 'quit', 'level': None}, (screen_rect.width // 2, self.buttons[1].text_rect.bottom + 75)
         ))
 
-    def check_for_btn_click(self, pos: tuple [int, int]):
+    def check_for_btn_click(self):
         for button in self.buttons:
             if button.hovered:
                 button.click()
