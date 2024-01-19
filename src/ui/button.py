@@ -10,12 +10,12 @@ class Button:
     FONT_COLOR: ColorValue
     TXT_OFFSET = int(BUTTON['text_offset'])
     
-    COLORS: dict[str, ColorValue] = {}
     BORDER_RADIUS = int(BUTTON['border_radius'])
     BORDER_SIZE = int(BUTTON['border_size'])
 
     CLICK_SOUND: pg.mixer.Sound
 
+    COLORS: dict[str, ColorValue] = {}
     for color_name, color in BUTTON['colors'].items():
         COLORS[color_name] = load_color(color)
 
