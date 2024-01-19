@@ -1,7 +1,7 @@
 import pygame as pg
 
 from ..const.custom_event import CE_BTN_CLICKED
-from ..utils import load_color, ColorValue, load_sound
+from ..utils import load_color, ColorValue
 
 from ..const.settings import BUTTON
 
@@ -14,7 +14,7 @@ class Button:
     BORDER_RADIUS = int(BUTTON['border_radius'])
     BORDER_SIZE = int(BUTTON['border_size'])
 
-    CLICK_SOUND = load_sound("btn_click.wav", BUTTON['sound_vol'])
+    CLICK_SOUND: pg.mixer.Sound
 
     for color_name, color in BUTTON['colors'].items():
         COLORS[color_name] = load_color(color)
