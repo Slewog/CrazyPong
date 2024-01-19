@@ -11,6 +11,12 @@ FONT = {
     'size': int(30)
 }
 
+COLORS = {
+    'font': (27, 35, 43, 255),
+    'objects': str('#27333E'),
+    'background': str('#46505A'),
+}
+
 MENU = {
     "copyright_pos_offset": int(20),
     'copyright_txt': "Create by Slewog - © 2024",
@@ -29,15 +35,8 @@ BUTTON = {
     'border_size': int(5),
     'sound_vol': 0.05,
     'colors': {
-        'font': (27, 35, 43, 255),
         'top_color': '#3F4851',
         'top_color_hover': '#46505A',
-        'bg_color' : (27, 35, 43, 255),
+        'bg_color' : COLORS['font'],
     }
-}
-
-COLORS = {
-    'font': (27, 35, 43, 255),
-    'objects': str('#27333E'),
-    'background': str('#46505A'),
 }
