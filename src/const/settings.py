@@ -8,7 +8,7 @@ GAME = {
 FONT = {
     'family': str('freesansbold.ttf'),
     'from_system': bool(False),
-    'size': int(40)
+    'size': int(30)
 }
 
 MENU = {
