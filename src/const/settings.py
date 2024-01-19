@@ -12,11 +12,25 @@ FONT = {
 }
 
 MENU = {
-    'copyright': "Create by Slewog",
-    'title': GAME['name'],
-    'btn_radius': int(12)
+    'copyright_txt': "Create by Slewog",
+    'title_txt': GAME['name'],
+    'title_txt_size': int(100)
 }
 
-FONT_COLOR = (27, 35, 43)
-OBJECT_COLOR = str('#27333E')
-BACKGROUND_COLOR = str('#46505A')
+BUTTON = {
+    'text_offset': 1,
+    'border_radius': int(12),
+    'border_size': int(5),
+    'colors': {
+        'font': (27, 35, 43, 255),
+        'top_color': '#3F4851',
+        'top_color_hover': '#46505A',
+        'bg_color' : (27, 35, 43, 255),
+    }
+}
+
+COLORS = {
+    'font': (27, 35, 43, 255),
+    'objects': str('#27333E'),
+    'background': str('#46505A'),
+}
