@@ -23,13 +23,9 @@ class Button:
         self.cursor_changed = bool(False)
         self.pressed = bool(False)
         self.hovered = bool(False)
-
         self.click_time:int = None
 
-        self.data = {
-            'action': str(data['action']),
-            'level': str(data['level'])
-        }
+        self.data = data
 
         self.elevation = elevation
         self.dynamic_elevation = elevation
@@ -38,7 +34,7 @@ class Button:
         self.text_surf = self.FONT.render(data['text'], True, self.FONT_COLOR)
         self.text_rect = self.text_surf.get_rect(center=(pos[0], (pos[1] - elevation) + self.TXT_OFFSET))
 
-        self.top_rect = pg.Rect(pos[0], pos[1], self.text_rect.width + 50, self.text_rect.height + 25)
+        self.top_rect = pg.Rect(pos[0], pos[1], self.text_rect.width + BUTTON['width_gap'], self.text_rect.height + BUTTON['height_gap'])
         self.top_rect.center = (pos[0], self.original_y_pos - elevation)
         self.top_rect_color = self.COLORS['top_color']
 
