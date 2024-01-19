@@ -16,9 +16,10 @@ class Paddle(pg.sprite.Sprite):
     COLOR: pg.Color
     SCREEN_RECT: pg.Rect
     SCREEN_CENTERY: int
+    SCREEN_BOTTOM: int
     
-    def __init__(self, side, screen_centery) -> None:
-        pg.sprite.Sprite.__init__(self)
+    def __init__(self, side, screen_centery, paddles_group: pg.sprite.Group()) -> None:
+        pg.sprite.Sprite.__init__(self, paddles_group)
 
         self.image = pg.Surface((self.WIDTH, self.HEIGHT))
         self.image.fill(self.COLOR)
@@ -31,17 +32,29 @@ class Paddle(pg.sprite.Sprite):
 
         self.rect = self.image.get_rect(midleft=self.default_pos)
         self.pos = pg.math.Vector2(self.rect.topleft)
-        self.old_rect = self.rect.copy()
+    
+    def check_wall_collision(self, dir_y: float):
+        if self.rect.top + dir_y < self.WALL_OFFSET:
+            dir_y = -self.rect.top + self.WALL_OFFSET
+        
+        if self.rect.bottom + dir_y > self.SCREEN_BOTTOM:
+            dir_y = self.SCREEN_BOTTOM - self.rect.bottom
+
+        return dir_y
+    
+    def move(self, dir_y: float):
+        dir_y = self.check_wall_collision(dir_y)
+
+        if dir_y != 0:
+            self.rect.move_ip(0, dir_y)
 
 
-class Player(Paddle):
-    def __init__(self, side, screen_centery) -> None:
-        super().__init__(side, screen_centery)
+class PlayerPaddle(Paddle):
+    def __init__(self, side, screen_centery, paddles_group: pg.sprite.Group()) -> None:
+        super().__init__(side, screen_centery, paddles_group)
 
     def update(self, dt: float, keys: pg.key.ScancodeWrapper) -> None:
-        self.old_rect = self.rect.copy()
-
-        dir_y = 0
+        dir_y = int(0)
 
         if self.side == 'left':
             if keys[pg.K_z]:
@@ -55,40 +68,19 @@ class Player(Paddle):
             elif keys[pg.K_DOWN]:
                 dir_y = self.VELOCITY
 
-        dir_y = dir_y * dt
-
-        if self.rect.top + dir_y < self.WALL_OFFSET:
-            dir_y = -self.rect.top + self.WALL_OFFSET
-
-        bottom = self.SCREEN_RECT.height - self.WALL_OFFSET
-        if self.rect.bottom + dir_y > bottom:
-            dir_y = bottom - self.rect.bottom
-
-        if dir_y != 0:
-            self.rect.move_ip(0, dir_y)
+        self.move(dir_y * dt)
 
 
-class AI(Paddle):
-    def __init__(self, side, screen_centery) -> None:
-        super().__init__(side, screen_centery)
+class AIPaddle(Paddle):
+    def __init__(self, side, screen_centery, paddles_group: pg.sprite.Group()) -> None:
+        super().__init__(side, screen_centery, paddles_group)
 
     def update(self, dt: float, ball: Ball):
-        self.old_rect = self.rect.copy()
         dir_y = int(0)
 
-        if self.rect.top < ball.rect.y:
+        if self.rect.top <= ball.rect.y:
             dir_y = self.VELOCITY
-        elif self.rect.bottom > ball.rect.y:
+        elif self.rect.bottom >= ball.rect.y:
             dir_y = -self.VELOCITY
 
-        dir_y = dir_y * dt
-
-        if self.rect.top + dir_y < self.WALL_OFFSET:
-            dir_y = -self.rect.top + self.WALL_OFFSET
-
-        bottom = self.SCREEN_RECT.height - self.WALL_OFFSET
-        if self.rect.bottom + dir_y > bottom:
-            dir_y = bottom - self.rect.bottom
-
-        if dir_y != 0:
-            self.rect.move_ip(0, dir_y)
+        self.move(dir_y * dt)
