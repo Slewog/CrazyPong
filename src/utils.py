@@ -34,6 +34,20 @@ def load_font(font: str, size: int, from_system: bool = False):
 
     return pg.font.Font(font_path, size)
 
+def load_sound(file: str, vol: float = 1.0, sub_dir: str = "") -> pg.mixer.Sound:
+    """Return NoneSound to avoid errors if the file doesn't exist"""
+    if not pg.mixer or not pg.mixer.get_init():
+        return NoneSound()
+
+    file_path = path.join(sounds_dir, sub_dir, file)
+
+    if not path.exists(file_path):
+        return NoneSound()
+
+    loaded_sound = pg.mixer.Sound(file_path)
+    loaded_sound.set_volume(vol)
+    return loaded_sound
+
 
 class NoneSound:
     """Fake sound class to avoid errors"""
