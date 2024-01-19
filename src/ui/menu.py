@@ -18,7 +18,7 @@ class Menu:
     def __init__(self) -> None:
         self.buttons: list[Button] = []
 
-    def load(self, screen_rect: pg.Rect, font_data: dict[str, Any], font_color: pg.Color):
+    def load(self, font_data: dict[str, Any], font_color: pg.Color):
         font = load_font(font_data['family'], font_data['size'])
 
         title = MENU['title']
@@ -36,10 +36,9 @@ class Menu:
 
         Button.FONT = font
         Button.FONT_COLOR = font_color
-        Button.CLICK_SOUND = load_sound("button.wav", BUTTON['sound_vol'])
+        Button.CLICK_SOUND = load_sound(BUTTON['sound_file'], BUTTON['sound_vol'])
 
         for button in MENU['buttons']:
-            print(button)
             self.buttons.append(Button(button[0], button[1]))
 
     def handle_btn_click(self):
