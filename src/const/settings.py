@@ -1,5 +1,5 @@
 GAME = {
-    'name': "Py Pong",
+    'name': str("Py Pong"),
     'fps': int(120),
     'width': int(1280),
     'height': int(960)
@@ -12,13 +12,19 @@ FONT = {
 }
 
 MENU = {
-    'copyright_txt': "Create by Slewog",
+    "copyright_pos_offset": int(20),
+    'copyright_txt': "Create by Slewog - © 2024",
     'title_txt': GAME['name'],
-    'title_txt_size': int(100)
+    "title_pos_offset": int(50),
+    'title_txt_size': int(100),
+    "btn_offset_centerx": int(175),
+    "btn_offset_centery": int(100),
 }
 
 BUTTON = {
-    'text_offset': 1,
+    'text_offset': int(1),
+    'width_gap': int(50),
+    'height_gap': int(25),
     'border_radius': int(12),
     'border_size': int(5),
     'sound_vol': 0.05,
