@@ -25,6 +25,7 @@ class Pong:
         self.menu = Menu()
 
         self.state = str('menu')
+        self.current_level = None
         self.colors: dict[str, ColorValue] = {}
 
     def set_state(self, new_state: str):
@@ -64,7 +65,7 @@ class Pong:
                     self.set_state('menu')
 
                 if self.state == 'menu' and e.type == pg.MOUSEBUTTONDOWN and e.button == 1:
-                    self.menu.check_for_btn_click()
+                    self.menu.handle_btn_click()
                 
                 if e.type == CE_BTN_CLICKED:
                     if e.action == 'play':
