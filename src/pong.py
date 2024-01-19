@@ -41,7 +41,7 @@ class Pong:
         for color_name, color in COLORS.items():
             self.colors[color_name] = load_color(color)
 
-        self.menu.load(self.SCREEN_RECT, FONT, self.colors)
+        self.menu.load(self.SCREEN_RECT, FONT, self.colors['font'])
 
         self.display_surf.fill(self.colors['background'])
         pg.display.flip()
@@ -81,11 +81,5 @@ class Pong:
 
             if self.state == 'menu':
                 self.menu.render(self.display_surf)
-
-            # Middle X
-            pg.draw.line(self.display_surf, pg.Color("red"), (0, self.SCREEN_RECT.height // 2), (self.SCREEN_RECT.width, self.SCREEN_RECT.height // 2), 1)
-
-            # Middle Y
-            pg.draw.line(self.display_surf, pg.Color("red"), (self.SCREEN_RECT.width / 2, 0), (self.SCREEN_RECT.width / 2, self.SCREEN_RECT.height), 1)
 
             pg.display.flip()
