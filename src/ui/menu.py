@@ -20,34 +20,27 @@ class Menu:
 
     def load(self, screen_rect: pg.Rect, font_data: dict[str, Any], font_color: pg.Color):
         font = load_font(font_data['family'], font_data['size'])
-        font_title = load_font(font_data['family'], MENU['title_txt_size'])
 
-        self.title_surf = font_title.render(MENU['title_txt'], True, font_color)
-        self.title_rect = self.title_surf.get_rect(midtop = (screen_rect.width // 2, screen_rect.height // 3 -  MENU['title_pos_offset']))
+        title = MENU['title']
+        font_title = load_font(font_data['family'], title['font_size'])
+        self.title_surf = font_title.render(title['text'], True, font_color)
+        self.title_rect = self.title_surf.get_rect(midtop = title['pos'])
 
-        self.copyright_surf = font.render(MENU['copyright_txt'], True, font_color)
-        self.copyright_rect = self.copyright_surf.get_rect(midbottom = (screen_rect.width // 2, screen_rect.height - MENU['copyright_pos_offset']))
+        copyright = MENU['copyright']
+        self.copyright_surf = font.render(copyright['text'], True, font_color)
+        self.copyright_rect = self.copyright_surf.get_rect(midbottom = copyright['pos'])
 
-        self.pg_logo_surf = load_img("pygame_logo.png", convert_a=True)
-        self.pg_logo_rect = self.pg_logo_surf.get_rect()
-        self.pg_logo_rect.right = screen_rect.width - 10
-        self.pg_logo_rect.bottom = screen_rect.height - 9
+        pg_logo = MENU['pg_logo']
+        self.pg_logo_surf = load_img(pg_logo['file'], convert_a=True)
+        self.pg_logo_rect = self.pg_logo_surf.get_rect(bottomright = pg_logo['pos'])
 
         Button.FONT = font
         Button.FONT_COLOR = font_color
         Button.CLICK_SOUND = load_sound("button.wav", BUTTON['sound_vol'])
 
-        self.buttons.append(Button(
-            {'text': "1 PLAYER", 'action': 'play', 'level': 'oneplayer'}, (screen_rect.width // 2 - MENU['btn_offset_centerx'], screen_rect.height // 2)
-        ))
-
-        self.buttons.append(Button(
-            {'text': "2 PLAYER", 'action': 'play', 'level': 'twoplayer'}, (screen_rect.width // 2 + MENU['btn_offset_centerx'], screen_rect.height // 2)
-        ))
-
-        self.buttons.append(Button(
-            {'text': "QUIT", 'action': 'quit', 'level': None}, (screen_rect.width // 2, self.buttons[1].text_rect.bottom + MENU['btn_offset_centery'])
-        ))
+        for button in MENU['buttons']:
+            print(button)
+            self.buttons.append(Button(button[0], button[1]))
 
     def handle_btn_click(self):
         for button in self.buttons:
