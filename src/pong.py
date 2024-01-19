@@ -2,12 +2,11 @@ import pygame as pg
 from sys import exit
 from time import time
 
-from .const.settings import GAME, FONT
-from .const.settings import OBJECT_COLOR, BACKGROUND_COLOR, FONT_COLOR
+from .const.custom_event import CE_BTN_CLICKED
+from .const.settings import GAME, FONT, COLORS
 from .ui.menu import Menu
 
-from .utils import load_color
-
+from .utils import load_color, ColorValue
 
 
 class Pong:
@@ -23,9 +22,10 @@ class Pong:
         self.display_surf = pg.display.set_mode((self.SCREEN_RECT.size))
         pg.display.set_caption(GAME['name'])
 
-        self.menu = Menu(self.set_state)
+        self.menu = Menu()
 
-        self.state = 'menu'
+        self.state = str('menu')
+        self.colors: dict[str, ColorValue] = {}
 
     def set_state(self, new_state: str):
         if self.state == new_state or type(new_state) != str:
@@ -37,11 +37,8 @@ class Pong:
         self.state = new_state
 
     def load_assets(self):
-        self.colors = {
-            'font': load_color(FONT_COLOR),
-            'objects': load_color(OBJECT_COLOR),
-            'background': load_color(BACKGROUND_COLOR), 
-        }
+        for color_name, color in COLORS.items():
+            self.colors[color_name] = load_color(color)
 
         self.menu.load(self.SCREEN_RECT, FONT, self.colors)
 
@@ -66,6 +63,15 @@ class Pong:
                 if e.type == pg.KEYDOWN and e.key == pg.K_ESCAPE:
                     self.set_state('menu')
 
+                if self.state == 'menu' and e.type == pg.MOUSEBUTTONDOWN and e.button == 1:
+                    self.menu.check_for_btn_click(e.pos)
+                
+                if e.type == CE_BTN_CLICKED:
+                    if e.action == 'play':
+                        print(e)
+                    elif e.action == 'quit':
+                        self.set_state('quit')
+
             current_time = time()
             dt = current_time - prev_dt
             prev_dt = current_time
@@ -81,4 +87,5 @@ class Pong:
             # Middle Y
             pg.draw.line(self.display_surf, pg.Color("red"), (self.SCREEN_RECT.width / 2, 0), (self.SCREEN_RECT.width / 2, self.SCREEN_RECT.height), 1)
 
+            self.debug.render()
             pg.display.flip()
