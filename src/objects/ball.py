@@ -19,8 +19,8 @@ class Ball(pg.sprite.Sprite):
     COLOR: pg.Color
     SCREEN_RECT: pg.Rect
 
-    def __init__(self, paddle_left: Paddle, paddle_right: Paddle) -> None:
-        pg.sprite.Sprite.__init__(self)
+    def __init__(self, paddle_left: Paddle, paddle_right: Paddle, ball_group: pg.sprite.GroupSingle()) -> None:
+        pg.sprite.Sprite.__init__(self, ball_group)
 
         self.paddle_left = paddle_left
         self.paddle_right = paddle_right
@@ -65,7 +65,6 @@ class Ball(pg.sprite.Sprite):
             if self.rect.right + new_pos > self.SCREEN_RECT.width:
                 new_pos = self.rect.right - self.rect.right
                 self.direction.x *= -1
-
         return new_pos
 
     def collisions(self, direction: str, new_pos: float):
@@ -79,6 +78,7 @@ class Ball(pg.sprite.Sprite):
         if overlap_paddles:
             if direction == 'horizontal':
                 for paddle in overlap_paddles:
+
                     distance_left = abs(self.rect.left - paddle.rect.right)
                     if distance_left < 10 and self.direction.x < 0:
                         new_pos = distance_left
@@ -91,6 +91,7 @@ class Ball(pg.sprite.Sprite):
             
             if direction == 'vertical':
                 for paddle in overlap_paddles:
+                    
                     distance_top = abs(self.rect.bottom - paddle.rect.top)
                     if distance_top < 10 and self.direction.y > 0:
                         new_pos = -distance_top

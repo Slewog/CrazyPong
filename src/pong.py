@@ -11,14 +11,14 @@ from .utils import load_color, ColorValue
 from .debug import DebugTool
 
 from .objects.ball import Ball
-from .objects.paddle import Paddle, Player, AI
+from .objects.paddle import Paddle, PlayerPaddle, AIPaddle
 
 class OnePlayer:
-    def __init__(self, screen_centery) -> None:
-        self.left_player = Player('left', screen_centery)
-        self.right_player = AI('right', screen_centery)
+    def __init__(self, screen_centery, ball_group: pg.sprite.GroupSingle(), paddles_group: pg.sprite.Group()) -> None:
+        self.left_player = PlayerPaddle('left', screen_centery, paddles_group)
+        self.right_player = AIPaddle('right', screen_centery, paddles_group)
 
-        self.ball = Ball(self.left_player, self.right_player)
+        self.ball = Ball(self.left_player, self.right_player, ball_group)
 
     def update(self, dt, keys: pg.key.ScancodeWrapper):
         self.left_player.update(dt, keys)
@@ -26,12 +26,12 @@ class OnePlayer:
         self.ball.update(dt)
 
 class TwoPlayer:
-    def __init__(self, screen_centery) -> None:
+    def __init__(self, screen_centery, ball_group: pg.sprite.GroupSingle(), paddles_group: pg.sprite.Group()) -> None:
     
-        self.left_player = Player('left', screen_centery)
-        self.right_player = Player('right', screen_centery)
+        self.left_player = PlayerPaddle('left', screen_centery, paddles_group)
+        self.right_player = PlayerPaddle('right', screen_centery, paddles_group)
 
-        self.ball = Ball(self.left_player, self.right_player)
+        self.ball = Ball(self.left_player, self.right_player, ball_group)
         
     def update(self, dt, keys: pg.key.ScancodeWrapper):
         self.left_player.update(dt, keys)
@@ -53,17 +53,14 @@ class LevelManager:
 
         Paddle.SCREEN_RECT = screen_rect
         Paddle.SCREEN_CENTERY = screen_centery
+        Paddle.SCREEN_BOTTOM = screen_rect.height - Paddle.WALL_OFFSET
         Paddle.COLOR = obj_color
 
     def select_level(self, target_level):
         if target_level == 'oneplayer':
-            self.current_level = OnePlayer(self.screen_centery)
+            self.current_level = OnePlayer(self.screen_centery, self.ball_group, self.paddle_group)
         elif target_level == 'twoplayer':
-            self.current_level = TwoPlayer(self.screen_centery)
-
-        self.paddle_group.add(self.current_level.left_player)
-        self.paddle_group.add(self.current_level.right_player)
-        self.ball_group.add(self.current_level.ball)
+            self.current_level = TwoPlayer(self.screen_centery, self.ball_group, self.paddle_group)
         
     def quit_level(self):
         self.set_game_state('menu')
