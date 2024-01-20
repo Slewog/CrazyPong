@@ -74,10 +74,10 @@ class StartingMenu:
         self.create_menu()
 
     def create_menu(self):
-        for button in MENU['buttons']:
+        for button in STARTING_MENU['buttons']:
             self.buttons.append(Button(button[0], button[1]))
         
-        title = MENU['title']
+        title = STARTING_MENU['title']
         self.title = Text(
             load_font(self.font_data['family'], title['font_size']),
             title['text'],
@@ -87,11 +87,11 @@ class StartingMenu:
         )
         TextBackground(self.title.rect, self.all_bg, offset_y=-10)
 
-        copyright = MENU['copyright']
+        copyright = STARTING_MENU['copyright']
         self.copyright = Text(self.font, copyright['text'], copyright['pos'], 'midbottom', self.all_text)
         TextBackground(self.copyright.rect, self.all_bg)
 
-        pg_logo = MENU['pg_logo']
+        pg_logo = STARTING_MENU['pg_logo']
         Image(pg_logo['file'], pg_logo['pos'], self.all_img)
 
     def handle_btn_click(self):
