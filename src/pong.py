@@ -98,6 +98,7 @@ class Pong:
         self.current_game = None
 
     def quit(self):
+        pg.display.quit()
         pg.quit()
         exit()
 
