@@ -18,7 +18,7 @@ class Paddle(pg.sprite.Sprite):
     SCREEN_CENTERY: int
     SCREEN_BOTTOM: int
 
-    def __init__(self, side: str, screen_centery: int, paddles_group: pg.sprite.Group()) -> None:
+    def __init__(self, side: str, paddles_group: pg.sprite.Group()) -> None:
         pg.sprite.Sprite.__init__(self, paddles_group)
 
         self.image = pg.Surface((self.WIDTH, self.HEIGHT))
@@ -26,11 +26,11 @@ class Paddle(pg.sprite.Sprite):
 
         self.side = side
         if side == 'left':
-            self.default_pos = (self.WALL_OFFSET, screen_centery)
+            self.default_pos = (self.WALL_OFFSET, self.SCREEN_CENTERY)
         else:
             self.default_pos = (
                 self.SCREEN_RECT.width - self.WIDTH - self.WALL_OFFSET,
-                screen_centery
+                self.SCREEN_CENTERY
             )
 
         self.rect = self.image.get_rect(midleft=self.default_pos)
@@ -51,8 +51,8 @@ class Paddle(pg.sprite.Sprite):
 
 
 class PlayerPaddle(Paddle):
-    def __init__(self, side: str, screen_centery: int, paddles_group: pg.sprite.Group()) -> None:
-        super().__init__(side, screen_centery, paddles_group)
+    def __init__(self, side: str, paddles_group: pg.sprite.Group()) -> None:
+        super().__init__(side, paddles_group)
 
     def update(self, dt: float, keys: pg.key.ScancodeWrapper, ball: Ball) -> None:
         dir_y = int(0)
@@ -73,8 +73,8 @@ class PlayerPaddle(Paddle):
 
 
 class AIPaddle(Paddle):
-    def __init__(self, side: str, screen_centery: int, paddles_group: pg.sprite.Group()) -> None:
-        super().__init__(side, screen_centery, paddles_group)
+    def __init__(self, paddles_group: pg.sprite.Group()) -> None:
+        super().__init__('right', paddles_group)
 
     def update(self, dt: float, keys: pg.key.ScancodeWrapper, ball: Ball):
         dir_y = int(0)

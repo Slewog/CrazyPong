@@ -13,62 +13,19 @@ from .debug import DebugTool
 from .objects.ball import Ball
 from .objects.paddle import Paddle, PlayerPaddle, AIPaddle
 
-class OnePlayer:
-    def __init__(self, screen_centery, ball_group: pg.sprite.GroupSingle(), paddles_group: pg.sprite.Group()) -> None:
-        self.type = str('oneplayer')
 
-        self.left_player = PlayerPaddle('left', screen_centery, paddles_group)
-        self.right_player = AIPaddle('right', screen_centery, paddles_group)
+class GameType:
+    def __init__(self, game_type: str, ball_group: pg.sprite.GroupSingle(), paddles_group: pg.sprite.Group()) -> None:
+        if game_type == 'oneplayer':
+            self.left_player = PlayerPaddle('left', paddles_group)
+            self.right_player = AIPaddle(paddles_group)
+        else:
+            self.left_player = PlayerPaddle('left', paddles_group)
+            self.right_player = PlayerPaddle('right', paddles_group)
+
         self.ball = Ball(self.left_player, self.right_player, ball_group)
 
-
-class TwoPlayer:
-    def __init__(self, screen_centery, ball_group: pg.sprite.GroupSingle(), paddles_group: pg.sprite.Group()) -> None:
-        self.type = str('twoplayer')
-
-        self.left_player = PlayerPaddle('left', screen_centery, paddles_group)
-        self.right_player = PlayerPaddle('right', screen_centery, paddles_group)
-        self.ball = Ball(self.left_player, self.right_player, ball_group)
-
-
-class LevelManager:
-    def __init__(self, screen_rect: pg.Rect, screen_centerx: int, screen_centery: int, obj_color, set_game_state) -> None:
-        self.set_game_state = set_game_state
-        self.screen_centery = screen_centery
-        self.current_level = None
-
-        self.ball_group = pg.sprite.GroupSingle()
-        self.paddle_group = pg.sprite.Group()
-
-        Ball.SCREEN_RECT = screen_rect
-        Ball.START_POS = (screen_centerx, screen_centery)
-        Ball.COLOR = obj_color
-
-        Paddle.SCREEN_RECT = screen_rect
-        Paddle.SCREEN_CENTERY = screen_centery
-        Paddle.SCREEN_BOTTOM = screen_rect.height - Paddle.WALL_OFFSET
-        Paddle.COLOR = obj_color
-
-    def select_level(self, target_level):
-        if target_level == 'oneplayer':
-            self.current_level = OnePlayer(self.screen_centery, self.ball_group, self.paddle_group)
-        elif target_level == 'twoplayer':
-            self.current_level = TwoPlayer(self.screen_centery, self.ball_group, self.paddle_group)
-        
-    def quit_level(self):
-        self.set_game_state('menu')
-
-        self.paddle_group.empty()
-        self.ball_group.empty()
-        self.current_level = None
-
-    def run(self, display_surf: pg.Surface, dt: float):
-        self.ball_group.draw(display_surf)
-        self.paddle_group.draw(display_surf)
-
-        keys = pg.key.get_pressed()
-        self.paddle_group.update(dt, keys, self.current_level.ball)
-        self.ball_group.update(dt)
+        self.all_sprites: list[pg.sprite.Sprite] = [self.left_player, self.right_player, self.ball]
 
 
 class Pong:
@@ -87,8 +44,12 @@ class Pong:
         pg.display.set_caption(GAME['name'])
 
         self.menu = Menu()
+        
         self.debug = DebugTool(self.display_surf)
 
+        self.ball_group = pg.sprite.GroupSingle()
+        self.paddle_group = pg.sprite.Group()
+        self.current_game_type = None
         self.state = str('menu')
         self.colors: dict[str, pg.Color] = {}
 
@@ -101,7 +62,7 @@ class Pong:
         
         self.state = new_state
 
-    def load_assets(self):
+    def load(self):
         for color_name, color in COLORS.items():
             self.colors[color_name] = load_color(color)
 
@@ -110,14 +71,33 @@ class Pong:
         self.display_surf.fill(self.colors['background'])
         pg.display.flip()
 
-        self.level_manager = LevelManager(self.SCREEN_RECT, self.SCREEN_MW, self.SCREEN_MH, self.colors['objects'], self.set_state)
+        Ball.SCREEN_RECT = self.SCREEN_RECT
+        Ball.START_POS = (self.SCREEN_MW, self.SCREEN_MH)
+        Ball.COLOR = self.colors['objects']
+
+        Paddle.SCREEN_RECT = self.SCREEN_RECT
+        Paddle.SCREEN_CENTERY = self.SCREEN_MH
+        Paddle.SCREEN_BOTTOM = self.SCREEN_RECT.height - Paddle.WALL_OFFSET
+        Paddle.COLOR = self.colors['objects']
+
+    def select_game_type(self, type_target: str):
+        self.current_game_type = GameType(type_target, self.ball_group, self.paddle_group)
+        self.set_state('play')
+
+    def quit_current_game(self):
+        self.set_state('menu')
+
+        for sprite in self.current_game_type.all_sprites:
+            sprite.kill()
+
+        self.current_game_type = None
 
     def quit(self):
         pg.quit()
         exit()
 
     def run(self):
-        self.load_assets()
+        self.load()
         prev_dt = time()
 
         while True:
@@ -127,23 +107,21 @@ class Pong:
                 if e.type == pg.QUIT:
                     self.set_state('quit')
                 
-                if self.level_manager.current_level is not None and e.type == pg.KEYDOWN and e.key == pg.K_ESCAPE:
-                    self.level_manager.quit_level()
+                if self.current_game_type is not None and e.type == pg.KEYDOWN and e.key == pg.K_ESCAPE:
+                    self.quit_current_game()
                     
-
                 if self.state == 'menu' and e.type == pg.MOUSEBUTTONDOWN and e.button == 1:
                     self.menu.handle_btn_click()
                 
                 if e.type == CE_BTN_CLICKED:
-                    if e.target_level is not None:
-                        self.level_manager.select_level(e.target_level)
-                    self.set_state(e.action)
+                    if e.action == 'quit':
+                        self.set_state('quit')
+                    elif e.action == 'play' and self.current_game_type is None:
+                        self.select_game_type(e.target_level)
 
             current_time = time()
             dt = current_time - prev_dt
             prev_dt = current_time
-
-            self.debug.add_data(f"{dt}")
 
             self.display_surf.fill(self.colors['background'])
 
@@ -151,8 +129,11 @@ class Pong:
                 self.menu.render(self.display_surf)
 
             if self.state == 'play':
-                self.level_manager.run(self.display_surf, dt)
-            
-            # self.debug.render()
+                self.ball_group.draw(self.display_surf)
+                self.paddle_group.draw(self.display_surf)
+
+                keys = pg.key.get_pressed()
+                self.paddle_group.update(dt, keys, self.current_game_type.ball)
+                self.ball_group.update(dt)
 
             pg.display.flip()
