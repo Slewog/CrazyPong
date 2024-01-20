@@ -2,7 +2,8 @@ GAME = {
     'name': str("Py Pong"),
     'fps': int(120),
     'width': int(1280),
-    'height': int(960)
+    'height': int(960),
+    'middle_rect_w': int(6)
 }
 
 FONT = {
@@ -19,7 +20,8 @@ COLORS = {
 
 BALL = {
     'radius': int(15),
-    'velocity': int(435)
+    'velocity': int(435),
+    'collision_tol': int(10)
 }
 
 PADDLE = {
