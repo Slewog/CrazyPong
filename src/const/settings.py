@@ -39,7 +39,7 @@ BUTTON = {
     'border_radius': int(12),
     'border_size': int(5),
     'sound_vol': 0.05,
-    'sound_file': str("button.wav"),
+    'sound_file': str("btn_click.wav"),
     'colors': {
         'top_color': str("#3F4851"),
         'top_color_hover': COLORS['background'],
