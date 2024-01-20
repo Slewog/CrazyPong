@@ -15,28 +15,21 @@ from .objects.paddle import Paddle, PlayerPaddle, AIPaddle
 
 class OnePlayer:
     def __init__(self, screen_centery, ball_group: pg.sprite.GroupSingle(), paddles_group: pg.sprite.Group()) -> None:
+        self.type = str('oneplayer')
+
         self.left_player = PlayerPaddle('left', screen_centery, paddles_group)
         self.right_player = AIPaddle('right', screen_centery, paddles_group)
-
         self.ball = Ball(self.left_player, self.right_player, ball_group)
 
-    def update(self, dt, keys: pg.key.ScancodeWrapper):
-        self.left_player.update(dt, keys)
-        self.right_player.update(dt, self.ball)
-        self.ball.update(dt)
 
 class TwoPlayer:
     def __init__(self, screen_centery, ball_group: pg.sprite.GroupSingle(), paddles_group: pg.sprite.Group()) -> None:
-    
+        self.type = str('twoplayer')
+
         self.left_player = PlayerPaddle('left', screen_centery, paddles_group)
         self.right_player = PlayerPaddle('right', screen_centery, paddles_group)
-
         self.ball = Ball(self.left_player, self.right_player, ball_group)
-        
-    def update(self, dt, keys: pg.key.ScancodeWrapper):
-        self.left_player.update(dt, keys)
-        self.right_player.update(dt, keys)
-        self.ball.update(dt)
+
 
 class LevelManager:
     def __init__(self, screen_rect: pg.Rect, screen_centerx: int, screen_centery: int, obj_color, set_game_state) -> None:
@@ -69,13 +62,13 @@ class LevelManager:
         self.ball_group.empty()
         self.current_level = None
 
-    def update_current_level(self, dt):
-        keys = pg.key.get_pressed()
-        self.current_level.update(dt, keys)
-        
-    def render(self, display_surf: pg.Surface):
+    def run(self, display_surf: pg.Surface, dt: float):
         self.ball_group.draw(display_surf)
         self.paddle_group.draw(display_surf)
+
+        keys = pg.key.get_pressed()
+        self.paddle_group.update(dt, keys, self.current_level.ball)
+        self.ball_group.update(dt)
 
 
 class Pong:
@@ -97,7 +90,7 @@ class Pong:
         self.debug = DebugTool(self.display_surf)
 
         self.state = str('menu')
-        self.colors: dict[str, ColorValue] = {}
+        self.colors: dict[str, pg.Color] = {}
 
     def set_state(self, new_state: str):
         if self.state == new_state or type(new_state) != str:
@@ -134,8 +127,9 @@ class Pong:
                 if e.type == pg.QUIT:
                     self.set_state('quit')
                 
-                if e.type == pg.KEYDOWN and e.key == pg.K_ESCAPE:
+                if self.level_manager.current_level is not None and e.type == pg.KEYDOWN and e.key == pg.K_ESCAPE:
                     self.level_manager.quit_level()
+                    
 
                 if self.state == 'menu' and e.type == pg.MOUSEBUTTONDOWN and e.button == 1:
                     self.menu.handle_btn_click()
@@ -157,8 +151,7 @@ class Pong:
                 self.menu.render(self.display_surf)
 
             if self.state == 'play':
-                self.level_manager.render(self.display_surf)
-                self.level_manager.update_current_level(dt)
+                self.level_manager.run(self.display_surf, dt)
             
             # self.debug.render()
 

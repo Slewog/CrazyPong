@@ -1,8 +1,8 @@
-from __future__ import annotations # <-still need this.
+from __future__ import annotations
 from typing import TYPE_CHECKING
 
-if TYPE_CHECKING: # <-try this,
-    from .ball import Ball # <-if this is only for type hintin
+if TYPE_CHECKING:
+    from .ball import Ball
 
 import pygame as pg
 
@@ -17,8 +17,8 @@ class Paddle(pg.sprite.Sprite):
     SCREEN_RECT: pg.Rect
     SCREEN_CENTERY: int
     SCREEN_BOTTOM: int
-    
-    def __init__(self, side, screen_centery, paddles_group: pg.sprite.Group()) -> None:
+
+    def __init__(self, side: str, screen_centery: int, paddles_group: pg.sprite.Group()) -> None:
         pg.sprite.Sprite.__init__(self, paddles_group)
 
         self.image = pg.Surface((self.WIDTH, self.HEIGHT))
@@ -28,7 +28,10 @@ class Paddle(pg.sprite.Sprite):
         if side == 'left':
             self.default_pos = (self.WALL_OFFSET, screen_centery)
         else:
-            self.default_pos = (self.SCREEN_RECT.width - self.WIDTH - self.WALL_OFFSET, screen_centery)
+            self.default_pos = (
+                self.SCREEN_RECT.width - self.WIDTH - self.WALL_OFFSET,
+                screen_centery
+            )
 
         self.rect = self.image.get_rect(midleft=self.default_pos)
         self.pos = pg.math.Vector2(self.rect.topleft)
@@ -43,17 +46,15 @@ class Paddle(pg.sprite.Sprite):
         return dir_y
     
     def move(self, dir_y: float):
-        dir_y = self.check_wall_collision(dir_y)
-
         if dir_y != 0:
-            self.rect.move_ip(0, dir_y)
+            self.rect.move_ip(0, self.check_wall_collision(dir_y))
 
 
 class PlayerPaddle(Paddle):
-    def __init__(self, side, screen_centery, paddles_group: pg.sprite.Group()) -> None:
+    def __init__(self, side: str, screen_centery: int, paddles_group: pg.sprite.Group()) -> None:
         super().__init__(side, screen_centery, paddles_group)
 
-    def update(self, dt: float, keys: pg.key.ScancodeWrapper) -> None:
+    def update(self, dt: float, keys: pg.key.ScancodeWrapper, ball: Ball) -> None:
         dir_y = int(0)
 
         if self.side == 'left':
@@ -72,10 +73,10 @@ class PlayerPaddle(Paddle):
 
 
 class AIPaddle(Paddle):
-    def __init__(self, side, screen_centery, paddles_group: pg.sprite.Group()) -> None:
+    def __init__(self, side: str, screen_centery: int, paddles_group: pg.sprite.Group()) -> None:
         super().__init__(side, screen_centery, paddles_group)
 
-    def update(self, dt: float, ball: Ball):
+    def update(self, dt: float, keys: pg.key.ScancodeWrapper, ball: Ball):
         dir_y = int(0)
 
         if self.rect.top <= ball.rect.y:
