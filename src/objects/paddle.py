@@ -6,7 +6,7 @@ if TYPE_CHECKING:
 
 import pygame as pg
 
-from ..const.settings import PADDLE
+from src.const.settings import PADDLE
 
 
 class Paddle(pg.sprite.Sprite):

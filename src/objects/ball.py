@@ -7,7 +7,7 @@ if TYPE_CHECKING:
 import pygame as pg
 from random import choice
 
-from ..const.settings import BALL
+from src.const.settings import BALL
 
 
 class Ball(pg.sprite.Sprite):
