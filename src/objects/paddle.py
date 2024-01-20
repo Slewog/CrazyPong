@@ -6,30 +6,33 @@ if TYPE_CHECKING:
 
 import pygame as pg
 
+from ..const.settings import PADDLE
+
 
 class Paddle(pg.sprite.Sprite):
-    WIDTH = int(12)
-    HEIGHT = int(180)
-    VELOCITY = int(500)
-    WALL_OFFSET = int(10)
+    WIDTH = PADDLE['width']
+    HEIGHT = PADDLE['height']
+    VELOCITY = PADDLE['velocity']
+    OFFSET_X = PADDLE['offset_x']
+    OFFSET_Y = PADDLE['offset_y']
 
     COLOR: pg.Color
     SCREEN_RECT: pg.Rect
     SCREEN_CENTERY: int
     SCREEN_BOTTOM: int
 
-    def __init__(self, side: str, paddles_group: pg.sprite.Group()) -> None:
-        pg.sprite.Sprite.__init__(self, paddles_group)
+    def __init__(self, side: str, paddles_group: pg.sprite.Group(), all: pg.sprite.Group()) -> None:
+        pg.sprite.Sprite.__init__(self, paddles_group, all)
 
         self.image = pg.Surface((self.WIDTH, self.HEIGHT))
         self.image.fill(self.COLOR)
 
         self.side = side
         if side == 'left':
-            self.default_pos = (self.WALL_OFFSET, self.SCREEN_CENTERY)
+            self.default_pos = (self.OFFSET_X, self.SCREEN_CENTERY)
         else:
             self.default_pos = (
-                self.SCREEN_RECT.width - self.WIDTH - self.WALL_OFFSET,
+                self.SCREEN_RECT.width - self.WIDTH - self.OFFSET_X,
                 self.SCREEN_CENTERY
             )
 
@@ -37,8 +40,8 @@ class Paddle(pg.sprite.Sprite):
         self.pos = pg.math.Vector2(self.rect.topleft)
     
     def check_wall_collision(self, dir_y: float):
-        if self.rect.top + dir_y < self.WALL_OFFSET:
-            dir_y = -self.rect.top + self.WALL_OFFSET
+        if self.rect.top + dir_y < self.OFFSET_Y:
+            dir_y = -self.rect.top + self.OFFSET_Y
         
         if self.rect.bottom + dir_y > self.SCREEN_BOTTOM:
             dir_y = self.SCREEN_BOTTOM - self.rect.bottom
@@ -51,8 +54,8 @@ class Paddle(pg.sprite.Sprite):
 
 
 class PlayerPaddle(Paddle):
-    def __init__(self, side: str, paddles_group: pg.sprite.Group()) -> None:
-        super().__init__(side, paddles_group)
+    def __init__(self, side: str, paddles_group: pg.sprite.Group(), all: pg.sprite.Group()) -> None:
+        super().__init__(side, paddles_group, all)
 
     def update(self, dt: float, keys: pg.key.ScancodeWrapper, ball: Ball) -> None:
         dir_y = int(0)
@@ -73,8 +76,8 @@ class PlayerPaddle(Paddle):
 
 
 class AIPaddle(Paddle):
-    def __init__(self, paddles_group: pg.sprite.Group()) -> None:
-        super().__init__('right', paddles_group)
+    def __init__(self, paddles_group: pg.sprite.Group(), all: pg.sprite.Group()) -> None:
+        super().__init__('right', paddles_group, all)
 
     def update(self, dt: float, keys: pg.key.ScancodeWrapper, ball: Ball):
         dir_y = int(0)

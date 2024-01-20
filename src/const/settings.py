@@ -17,6 +17,19 @@ COLORS = {
     'background': str("#46505A"),
 }
 
+BALL = {
+    'radius': int(15),
+    'velocity': int(435)
+}
+
+PADDLE = {
+    'width': int(20),
+    'height': int(180),
+    'velocity': int(500),
+    'offset_x': int(20),
+    'offset_y': int(20),
+}
+
 BUTTON = {
     'text_offset': int(1),
     'width_gap': int(50),
@@ -60,9 +73,4 @@ MENU = {
             (GAME['width'] // 2, GAME['height'] // 2 + 100)
         ]
     ]
-}
-
-BALL = {
-    'radius': int(14),
-    'velocity': int(435)
 }
