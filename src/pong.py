@@ -13,9 +13,9 @@ from .objects.paddle import Paddle
 from .objects.ball import Ball
 
 
-class GameType:
-    def __init__(self, game_type: str, ball_group: pg.sprite.GroupSingle(), paddles_group: pg.sprite.Group(), all: pg.sprite.Group()) -> None:
-        if game_type == 'oneplayer':
+class Level:
+    def __init__(self, level_type: str, ball_group: pg.sprite.GroupSingle(), paddles_group: pg.sprite.Group(), all: pg.sprite.Group()) -> None:
+        if level_type == 'oneplayer':
             self.paddle_left = Paddle('left', 'player', paddles_group, all)
             self.paddle_right = Paddle('right', 'ai', paddles_group, all)
         else:
@@ -45,7 +45,7 @@ class Pong:
         self.ball_group = pg.sprite.GroupSingle()
         self.paddle_group = pg.sprite.Group()
         self.all_sprites = pg.sprite.Group()
-        self.current_game = None
+        self.level = None
         self.state = str('menu')
         self.colors: dict[str, pg.Color] = {}
 
@@ -84,7 +84,7 @@ class Pong:
         self.state = new_state
 
     def select_game_type(self, type_target: str):
-        self.current_game = GameType(type_target, self.ball_group, self.paddle_group, self.all_sprites)
+        self.level = Level(type_target, self.ball_group, self.paddle_group, self.all_sprites)
         self.set_state('play')
 
     def quit_current_game(self):
@@ -95,7 +95,7 @@ class Pong:
             sprite.kill()
 
         self.set_state('menu')
-        self.current_game = None
+        self.level = None
 
     def quit(self):
         pg.display.quit()
@@ -116,7 +116,7 @@ class Pong:
                 if e.type == pg.QUIT:
                     self.set_state('quit')
                 
-                if self.current_game is not None and e.type == pg.KEYDOWN and e.key == pg.K_ESCAPE:
+                if self.level is not None and e.type == pg.KEYDOWN and e.key == pg.K_ESCAPE:
                     self.quit_current_game()
                     
                 if self.state == 'menu' and e.type == pg.MOUSEBUTTONDOWN and e.button == 1:
@@ -125,7 +125,7 @@ class Pong:
                 if e.type == CE_BTN_CLICKED:
                     if e.action == 'quit':
                         self.set_state('quit')
-                    elif e.action == 'play' and self.current_game is None:
+                    elif e.action == 'play' and self.level is None:
                         self.select_game_type(e.target_level)
 
             current_time = time()
@@ -142,7 +142,7 @@ class Pong:
                 self.all_sprites.draw(self.display_surf)
 
                 keys = pg.key.get_pressed()
-                self.paddle_group.update(dt, keys, self.current_game.ball)
+                self.paddle_group.update(dt, keys, self.level.ball)
                 self.ball_group.update(dt)
 
             pg.display.flip()
