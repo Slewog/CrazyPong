@@ -88,6 +88,8 @@ class Pong:
         self.set_state('play')
 
     def quit_current_game(self):
+        self.menu.buttons[0].CLICK_SOUND.play()
+        
         for sprite in self.all_sprites:
             sprite: pg.sprite.Sprite
             sprite.kill()
