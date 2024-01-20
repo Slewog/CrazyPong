@@ -17,23 +17,29 @@ class Level:
     def __init__(self, level_type: str) -> None:
         self.ball_group = pg.sprite.GroupSingle()
         self.paddles_group = pg.sprite.Group()
-        self.all_sprites = pg.sprite.Group()
 
         self.winned = bool(False)
 
         if level_type == 'oneplayer':
-            self.paddle_left = Paddle('left', 'player', self.paddles_group, self.all_sprites)
-            self.paddle_right = Paddle('right', 'ai', self.paddles_group, self.all_sprites)
+            self.paddle_left = Paddle('left', 'player', self.paddles_group)
+            self.paddle_right = Paddle('right', 'ai', self.paddles_group)
         else:
-            self.paddle_left = Paddle('left', 'player', self.paddles_group, self.all_sprites)
-            self.paddle_right = Paddle('right', 'player', self.paddles_group, self.all_sprites)
+            self.paddle_left = Paddle('left', 'player', self.paddles_group)
+            self.paddle_right = Paddle('right', 'player', self.paddles_group)
 
-        self.ball = Ball(self.paddle_left, self.paddle_right, self.ball_group, self.all_sprites)
+        self.ball = Ball(self.ball_group)
 
         self.paddles = [self.paddle_left, self.paddle_right]
 
+    def destroy(self):
+        self.ball.kill()
+
+        for paddle in self.paddles:
+            paddle.kill()
+    
     def render_frame(self, display_surf):
-        self.all_sprites.draw(display_surf)
+        self.paddles_group.draw(display_surf)
+        self.ball_group.draw(display_surf)
 
     def run(self, display_surf, dt):
         if not self.winned:
@@ -42,7 +48,7 @@ class Level:
                 paddle.check_input(keys)
 
         self.paddles_group.update(dt, self.ball)
-        self.ball_group.update(dt)
+        self.ball_group.update(dt, self.paddles)
 
         self.render_frame(display_surf)
         
@@ -108,11 +114,8 @@ class Pong:
 
     def quit_current_game(self):
         self.starting_menu.buttons[0].CLICK_SOUND.play()
-        
-        for sprite in self.level.all_sprites:
-            sprite: pg.sprite.Sprite
-            sprite.kill()
 
+        self.level.destroy()
         self.set_state('menu')
         self.level = None
 

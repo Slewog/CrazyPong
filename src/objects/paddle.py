@@ -21,8 +21,8 @@ class Paddle(pg.sprite.Sprite):
     SCREEN_CENTERY: int
     SCREEN_BOTTOM: int
 
-    def __init__(self, side: str, paddle_type: str, paddles_group: pg.sprite.Group(), all: pg.sprite.Group()) -> None:
-        pg.sprite.Sprite.__init__(self, paddles_group, all)
+    def __init__(self, side: str, paddle_type: str, paddles: pg.sprite.Group) -> None:
+        pg.sprite.Sprite.__init__(self, paddles)
 
         self.type = paddle_type
         self.cur_vel = int(0)
@@ -68,7 +68,7 @@ class Paddle(pg.sprite.Sprite):
     def update(self, dt: float, ball: Ball) -> None:
         dir_y = int(0)
 
-        if self.type == 'ai':
+        if self.type == 'ai' and ball.active:
             if self.rect.top <= ball.rect.y:
                 dir_y = self.VELOCITY
             elif self.rect.bottom >= ball.rect.y:

@@ -21,11 +21,10 @@ class Ball(pg.sprite.Sprite):
     COLOR: pg.Color
     SCREEN_RECT: pg.Rect
 
-    def __init__(self, paddle_left: Paddle, paddle_right: Paddle, ball_group: pg.sprite.GroupSingle(), all: pg.sprite.Group()) -> None:
-        pg.sprite.Sprite.__init__(self, ball_group, all)
+    def __init__(self, ball: pg.sprite.GroupSingle) -> None:
+        pg.sprite.Sprite.__init__(self, ball)
 
-        self.paddle_left = paddle_left
-        self.paddle_right = paddle_right
+        self.active = bool(True)
 
         self.direction = pg.math.Vector2(
             choice((self.VELOCITY, -self.VELOCITY)),
@@ -70,53 +69,58 @@ class Ball(pg.sprite.Sprite):
                 self.direction.x *= -1
         return new_pos
 
-    def check_collisions(self, direction: str, new_pos: float):
+    def check_collisions(self, direction: str, paddles, new_pos: float):
         overlap_paddles: list[Paddle] = []
 
-        if self.rect.colliderect(self.paddle_left.rect):
-            overlap_paddles.append(self.paddle_left)
-        if self.rect.colliderect(self.paddle_right.rect):
-            overlap_paddles.append(self.paddle_right)
+        for paddle in paddles:
+            if self.rect.colliderect(paddle.rect):
+                overlap_paddles.append(paddle)
 
-        if overlap_paddles:
-            if direction == 'horizontal':
-                for paddle in overlap_paddles:
-                    if self.direction.x < 0:
-                        distance_left = abs(self.rect.left - paddle.rect.right)
+        if not overlap_paddles:
+            return self.check_display_collisions(direction, new_pos)
+        
+        if direction == 'horizontal':
+            for paddle in overlap_paddles:
+                if self.direction.x < 0:
+                    distance_left = abs(self.rect.left - paddle.rect.right)
 
-                        if distance_left < self.COLLISION_TOL:
-                            new_pos = distance_left
-                            self.direction.x *= -1
+                    if distance_left < self.COLLISION_TOL:
+                        new_pos = distance_left
+                        self.direction.x *= -1
 
-                    if self.direction.x > 0:
-                        distance_right = abs(self.rect.right - paddle.rect.left)
+                if self.direction.x > 0:
+                    distance_right = abs(self.rect.right - paddle.rect.left)
 
-                        if distance_right < self.COLLISION_TOL:
-                            new_pos = -distance_right
-                            self.direction.x *= -1
-            
-            if direction == 'vertical':
-                for paddle in overlap_paddles:
-                    if self.direction.y > 0:
-                        distance_top = abs(self.rect.bottom - paddle.rect.top)
+                    if distance_right < self.COLLISION_TOL:
+                        new_pos = -distance_right
+                        self.direction.x *= -1
+        
+        if direction == 'vertical':
+            for paddle in overlap_paddles:
+                if self.direction.y > 0:
+                    distance_top = abs(self.rect.bottom - paddle.rect.top)
 
-                        if distance_top < self.COLLISION_TOL:
-                            new_pos = -distance_top
-                            self.direction.y *= -1
+                    if distance_top < self.COLLISION_TOL:
+                        new_pos = -distance_top
+                        self.direction.y *= -1
 
-                    if self.direction.y < 0:
-                        distance_bottom = abs((self.rect.top) - paddle.rect.bottom)
-                        
-                        if distance_bottom < self.COLLISION_TOL:
-                            new_pos = distance_bottom
-                            self.direction.y *= -1
+                if self.direction.y < 0:
+                    distance_bottom = abs((self.rect.top) - paddle.rect.bottom)
+                    
+                    if distance_bottom < self.COLLISION_TOL:
+                        new_pos = distance_bottom
+                        self.direction.y *= -1
+
         return self.check_display_collisions(direction, new_pos)
 
-    def update(self, dt):
+    def update(self, dt, paddles):
+        if not self.active:
+            return
+
         dir_x, dir_y = int(0), int(0)
 
-        dir_x = self.check_collisions('horizontal', self.direction.x * dt)
-        dir_y = self.check_collisions('vertical', self.direction.y * dt)
+        dir_x = self.check_collisions('horizontal', paddles, self.direction.x * dt)
+        dir_y = self.check_collisions('vertical', paddles, self.direction.y * dt)
 
         if dir_x != 0 or dir_y != 0:
             self.rect.move_ip(dir_x, dir_y)
