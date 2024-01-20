@@ -1,19 +1,19 @@
-from typing import Union, Tuple, List
 
+import sys
+from typing import Union, Tuple, List
 from os import path
 import pygame as pg
 
+# Get absolute path to resource, works for dev and for PyInstaller.
+MAIN_PATH = getattr(sys, '_MEIPASS', path.dirname(path.abspath(__file__))).split("\\src")[0]
+del sys # Delete sys from memory.
+
+FONTS_DIR = path.join(MAIN_PATH, "assets", "fonts")
+SOUNDS_DIR = path.join(MAIN_PATH, "assets", "sounds")
+GRAPHICS_DIR = path.join(MAIN_PATH, "assets", "graphics")
+
 ColorValue = Union[str, Tuple[int, int, int], List[int]]
 
-sounds_dir: str = None
-fonts_dir: str = None
-graphics_dir: str = None
-
-def set_path(main_dir: str):
-    global sounds_dir, fonts_dir, graphics_dir
-    sounds_dir = path.join(main_dir, "assets", "sounds")
-    fonts_dir = path.join(main_dir, "assets", "fonts")
-    graphics_dir = path.join(main_dir, "assets", "graphics")
 
 def load_color(color: ColorValue) -> pg.Color:
     """color: str | tuple[int, int, int] | list[int]"""
@@ -30,7 +30,7 @@ def load_font(font: str, size: int, from_system: bool = False):
     if from_system:
         return pg.font.SysFont(font, size)
 
-    font_path = path.join(fonts_dir, font)
+    font_path = path.join(FONTS_DIR, font)
     if not path.exists(font_path):
         return pg.font.SysFont(None, size)
 
@@ -41,7 +41,7 @@ def load_sound(file: str, vol: float = 1.0, sub_dir: str = "") -> pg.mixer.Sound
     if not pg.mixer or not pg.mixer.get_init():
         return NoneSound()
 
-    file_path = path.join(sounds_dir, sub_dir, file)
+    file_path = path.join(SOUNDS_DIR, sub_dir, file)
 
     if not path.exists(file_path):
         return NoneSound()
@@ -57,7 +57,7 @@ def load_img(file: str, sub_dir: str = "", convert_a: bool = False, convert: boo
         convert_a: Convert with alpha
         scale: int | float | '2x' | tuple[int, int]
     """
-    file_path = path.join(graphics_dir, sub_dir, file)
+    file_path = path.join(GRAPHICS_DIR, sub_dir, file)
 
     if not path.exists(file_path):
         img = pg.Surface((50, 50))
