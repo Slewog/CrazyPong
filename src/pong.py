@@ -49,15 +49,6 @@ class Pong:
         self.state = str('menu')
         self.colors: dict[str, pg.Color] = {}
 
-    def set_state(self, new_state: str):
-        if self.state == new_state or type(new_state) != str:
-            return
-        
-        if new_state == 'quit':
-            self.quit()
-        
-        self.state = new_state
-
     def load(self):
         for color_name, color in COLORS.items():
             self.colors[color_name] = load_color(color)
@@ -82,6 +73,15 @@ class Pong:
         Paddle.SCREEN_CENTERY = self.SCREEN_MH
         Paddle.SCREEN_BOTTOM = self.SCREEN_RECT.height - Paddle.OFFSET_Y
         Paddle.COLOR = self.colors['objects']
+    
+    def set_state(self, new_state: str):
+        if self.state == new_state or type(new_state) != str:
+            return
+        
+        if new_state == 'quit':
+            self.quit()
+        
+        self.state = new_state
 
     def select_game_type(self, type_target: str):
         self.current_game = GameType(type_target, self.ball_group, self.paddle_group, self.all_sprites)

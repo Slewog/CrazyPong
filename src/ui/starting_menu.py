@@ -103,7 +103,6 @@ class StartingMenu:
         mouse_pos = pg.mouse.get_pos()
         for button in self.buttons:
             button.check_hover(mouse_pos)
-            
             button.check_click()
             button.draw(display_surf)
         
