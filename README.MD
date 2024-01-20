@@ -14,9 +14,7 @@ Play with two players or players vs AI.</br>
 </br>
 
 # Todo:
-- Create ball class.
-- Create paddle class.
-- Create player class.
-- Create opponent controlled by the game (basic IA).
+- Starting countdown.
+- Create score system (add score to a player when ball collide a horizontal wall)
 - Render score for every players.
-- Add sounds.
+- Add sounds effects.
