@@ -5,7 +5,7 @@ from ..utils import load_color, ColorValue
 
 from ..const.settings import BUTTON
 
-class Button:
+class AnimateButton:
     FONT: pg.font.Font
     FONT_COLOR: pg.Color
     TXT_OFFSET = int(BUTTON['text_offset'])
