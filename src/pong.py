@@ -9,19 +9,20 @@ from .utils import load_color
 from .debug import DebugTool
 
 from .ui.menu import Menu
-from .objects.paddle import Paddle, PlayerPaddle, AIPaddle
+from .objects.paddle import Paddle
 from .objects.ball import Ball
+
 
 class GameType:
     def __init__(self, game_type: str, ball_group: pg.sprite.GroupSingle(), paddles_group: pg.sprite.Group(), all: pg.sprite.Group()) -> None:
         if game_type == 'oneplayer':
-            self.left_player = PlayerPaddle('left', paddles_group, all)
-            self.right_player = AIPaddle(paddles_group, all)
+            self.paddle_left = Paddle('left', 'player', paddles_group, all)
+            self.paddle_right = Paddle('right', 'ai', paddles_group, all)
         else:
-            self.left_player = PlayerPaddle('left', paddles_group, all)
-            self.right_player = PlayerPaddle('right', paddles_group, all)
+            self.paddle_left = Paddle('left', 'player', paddles_group, all)
+            self.paddle_right = Paddle('right', 'player', paddles_group, all)
 
-        self.ball = Ball(self.left_player, self.right_player, ball_group, all)
+        self.ball = Ball(self.paddle_left, self.paddle_right, ball_group, all)
 
 
 class Pong:
@@ -39,8 +40,6 @@ class Pong:
         self.display_surf = pg.display.set_mode((self.SCREEN_RECT.size))
         pg.display.set_caption(GAME['name'])
 
-        self.menu = Menu()
-        
         self.debug = DebugTool(self.display_surf)
 
         self.ball_group = pg.sprite.GroupSingle()
@@ -63,9 +62,16 @@ class Pong:
         for color_name, color in COLORS.items():
             self.colors[color_name] = load_color(color)
 
-        self.menu.load(FONT, self.colors['font'])
+        self.menu = Menu(FONT, self.colors['font'], self.colors['background'])
 
         self.display_surf.fill(self.colors['background'])
+        self.middle_rect = pg.Rect(
+            self.SCREEN_MW - GAME['middle_rect_w']//2,
+            int(0),
+            GAME['middle_rect_w'],
+            self.SCREEN_RECT.height
+        )
+        pg.draw.rect(self.display_surf, self.colors['font'], self.middle_rect)
         pg.display.flip()
 
         Ball.SCREEN_RECT = self.SCREEN_RECT
@@ -92,6 +98,9 @@ class Pong:
     def quit(self):
         pg.quit()
         exit()
+
+    def render_frame(self):
+        pass
 
     def run(self):
         self.load()
@@ -121,6 +130,7 @@ class Pong:
             prev_dt = current_time
 
             self.display_surf.fill(self.colors['background'])
+            pg.draw.rect(self.display_surf, self.colors['font'], self.middle_rect)
 
             if self.state == 'menu':
                 self.menu.render(self.display_surf)
