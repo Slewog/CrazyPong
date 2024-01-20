@@ -7,7 +7,7 @@ from ..const.settings import BUTTON
 
 class Button:
     FONT: pg.font.Font
-    FONT_COLOR: ColorValue
+    FONT_COLOR: pg.Color
     TXT_OFFSET = int(BUTTON['text_offset'])
     
     BORDER_RADIUS = int(BUTTON['border_radius'])
