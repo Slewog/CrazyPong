@@ -18,6 +18,25 @@ COLORS = {
     'background': str("#46505A"),
 }
 
+SOUNDS = {
+    'ball': {
+        'file': str("ball_hit.wav"),
+        'vol': 0.4,    
+    },
+    'score': {
+        'file': str("add_score.wav"),
+        'vol': 0.4,
+    }
+}
+
+CRS_EFFECT = {
+    'file': str('vignette.png'),
+    'line_gap': int(4),
+    'line_color': (int(20), int(20), int(20)),
+    'min_alpha': int(50),
+    'max_alpha': int(70)
+}
+
 BALL = {
     'radius': int(15),
     'velocity': int(435),
