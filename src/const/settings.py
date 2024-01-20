@@ -21,11 +21,11 @@ COLORS = {
 SOUNDS = {
     'ball': {
         'file': str("ball_hit.wav"),
-        'vol': 0.4,    
+        'vol': 0.1,    
     },
     'score': {
         'file': str("add_score.wav"),
-        'vol': 0.4,
+        'vol': 0.1,
     }
 }
 
@@ -40,7 +40,8 @@ CRS_EFFECT = {
 BALL = {
     'radius': int(15),
     'velocity': int(435),
-    'collision_tol': int(10)
+    'min_coll_tol': int(2),
+    'max_coll_tol': int(10),
 }
 
 PADDLE = {

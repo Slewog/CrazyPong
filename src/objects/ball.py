@@ -11,7 +11,8 @@ from src.const.settings import BALL
 
 
 class Ball(pg.sprite.Sprite):
-    COLLISION_TOL = BALL['collision_tol']
+    MIN_COLL_TOL = BALL['min_coll_tol']
+    MAX_COLL_TOL = BALL['max_coll_tol']
     VELOCITY = BALL['velocity']
     RADIUS = BALL['radius']
     SIZE = (RADIUS * 2, RADIUS * 2)
@@ -82,21 +83,21 @@ class Ball(pg.sprite.Sprite):
         if not overlap_paddles:
             return self.check_display_collisions(direction, new_pos)
         
-        self.HIT_SOUND.play()
-        
         if direction == 'horizontal':
             for paddle in overlap_paddles:
                 if self.direction.x < 0:
                     distance_left = abs(self.rect.left - paddle.rect.right)
-
-                    if distance_left < self.COLLISION_TOL:
+                    
+                    if distance_left < self.MAX_COLL_TOL and distance_left > self.MIN_COLL_TOL:
+                        self.HIT_SOUND.play()
                         new_pos = distance_left
                         self.direction.x *= -1
 
                 if self.direction.x > 0:
                     distance_right = abs(self.rect.right - paddle.rect.left)
-
-                    if distance_right < self.COLLISION_TOL:
+                    
+                    if distance_right < self.MAX_COLL_TOL and distance_right > self.MIN_COLL_TOL:
+                        self.HIT_SOUND.play()
                         new_pos = -distance_right
                         self.direction.x *= -1
         
@@ -105,14 +106,16 @@ class Ball(pg.sprite.Sprite):
                 if self.direction.y > 0:
                     distance_top = abs(self.rect.bottom - paddle.rect.top)
 
-                    if distance_top < self.COLLISION_TOL:
+                    if distance_top < self.MAX_COLL_TOL and distance_top > self.MIN_COLL_TOL:
+                        self.HIT_SOUND.play()
                         new_pos = -distance_top
                         self.direction.y *= -1
 
                 if self.direction.y < 0:
                     distance_bottom = abs((self.rect.top) - paddle.rect.bottom)
                     
-                    if distance_bottom < self.COLLISION_TOL:
+                    if distance_bottom < self.MAX_COLL_TOL and distance_bottom > self.MIN_COLL_TOL:
+                        self.HIT_SOUND.play()
                         new_pos = distance_bottom
                         self.direction.y *= -1
 
