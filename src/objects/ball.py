@@ -19,8 +19,8 @@ class Ball(pg.sprite.Sprite):
     COLOR: pg.Color
     SCREEN_RECT: pg.Rect
 
-    def __init__(self, paddle_left: Paddle, paddle_right: Paddle, ball_group: pg.sprite.GroupSingle()) -> None:
-        pg.sprite.Sprite.__init__(self, ball_group)
+    def __init__(self, paddle_left: Paddle, paddle_right: Paddle, ball_group: pg.sprite.GroupSingle(), all: pg.sprite.Group()) -> None:
+        pg.sprite.Sprite.__init__(self, ball_group, all)
 
         self.paddle_left = paddle_left
         self.paddle_right = paddle_right

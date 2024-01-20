@@ -4,28 +4,24 @@ from time import time
 
 from .const.custom_event import CE_BTN_CLICKED
 from .const.settings import GAME, FONT, COLORS
-from .ui.menu import Menu
-
-from .utils import load_color, ColorValue
+from .utils import load_color
 
 from .debug import DebugTool
 
-from .objects.ball import Ball
+from .ui.menu import Menu
 from .objects.paddle import Paddle, PlayerPaddle, AIPaddle
-
+from .objects.ball import Ball
 
 class GameType:
-    def __init__(self, game_type: str, ball_group: pg.sprite.GroupSingle(), paddles_group: pg.sprite.Group()) -> None:
+    def __init__(self, game_type: str, ball_group: pg.sprite.GroupSingle(), paddles_group: pg.sprite.Group(), all: pg.sprite.Group()) -> None:
         if game_type == 'oneplayer':
-            self.left_player = PlayerPaddle('left', paddles_group)
-            self.right_player = AIPaddle(paddles_group)
+            self.left_player = PlayerPaddle('left', paddles_group, all)
+            self.right_player = AIPaddle(paddles_group, all)
         else:
-            self.left_player = PlayerPaddle('left', paddles_group)
-            self.right_player = PlayerPaddle('right', paddles_group)
+            self.left_player = PlayerPaddle('left', paddles_group, all)
+            self.right_player = PlayerPaddle('right', paddles_group, all)
 
-        self.ball = Ball(self.left_player, self.right_player, ball_group)
-
-        self.all_sprites: list[pg.sprite.Sprite] = [self.left_player, self.right_player, self.ball]
+        self.ball = Ball(self.left_player, self.right_player, ball_group, all)
 
 
 class Pong:
@@ -49,7 +45,8 @@ class Pong:
 
         self.ball_group = pg.sprite.GroupSingle()
         self.paddle_group = pg.sprite.Group()
-        self.current_game_type = None
+        self.all_sprites = pg.sprite.Group()
+        self.current_game = None
         self.state = str('menu')
         self.colors: dict[str, pg.Color] = {}
 
@@ -77,20 +74,20 @@ class Pong:
 
         Paddle.SCREEN_RECT = self.SCREEN_RECT
         Paddle.SCREEN_CENTERY = self.SCREEN_MH
-        Paddle.SCREEN_BOTTOM = self.SCREEN_RECT.height - Paddle.WALL_OFFSET
+        Paddle.SCREEN_BOTTOM = self.SCREEN_RECT.height - Paddle.OFFSET_Y
         Paddle.COLOR = self.colors['objects']
 
     def select_game_type(self, type_target: str):
-        self.current_game_type = GameType(type_target, self.ball_group, self.paddle_group)
+        self.current_game = GameType(type_target, self.ball_group, self.paddle_group, self.all_sprites)
         self.set_state('play')
 
     def quit_current_game(self):
-        self.set_state('menu')
-
-        for sprite in self.current_game_type.all_sprites:
+        for sprite in self.all_sprites:
+            sprite: pg.sprite.Sprite
             sprite.kill()
 
-        self.current_game_type = None
+        self.set_state('menu')
+        self.current_game = None
 
     def quit(self):
         pg.quit()
@@ -107,7 +104,7 @@ class Pong:
                 if e.type == pg.QUIT:
                     self.set_state('quit')
                 
-                if self.current_game_type is not None and e.type == pg.KEYDOWN and e.key == pg.K_ESCAPE:
+                if self.current_game is not None and e.type == pg.KEYDOWN and e.key == pg.K_ESCAPE:
                     self.quit_current_game()
                     
                 if self.state == 'menu' and e.type == pg.MOUSEBUTTONDOWN and e.button == 1:
@@ -116,7 +113,7 @@ class Pong:
                 if e.type == CE_BTN_CLICKED:
                     if e.action == 'quit':
                         self.set_state('quit')
-                    elif e.action == 'play' and self.current_game_type is None:
+                    elif e.action == 'play' and self.current_game is None:
                         self.select_game_type(e.target_level)
 
             current_time = time()
@@ -129,11 +126,10 @@ class Pong:
                 self.menu.render(self.display_surf)
 
             if self.state == 'play':
-                self.ball_group.draw(self.display_surf)
-                self.paddle_group.draw(self.display_surf)
+                self.all_sprites.draw(self.display_surf)
 
                 keys = pg.key.get_pressed()
-                self.paddle_group.update(dt, keys, self.current_game_type.ball)
+                self.paddle_group.update(dt, keys, self.current_game.ball)
                 self.ball_group.update(dt)
 
             pg.display.flip()
