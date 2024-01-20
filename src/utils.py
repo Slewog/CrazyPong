@@ -8,6 +8,7 @@ import pygame as pg
 MAIN_PATH = getattr(sys, '_MEIPASS', path.dirname(path.abspath(__file__))).split("\\src")[0]
 del sys # Delete sys from memory.
 
+# Create all dir path
 FONTS_DIR = path.join(MAIN_PATH, "assets", "fonts")
 SOUNDS_DIR = path.join(MAIN_PATH, "assets", "sounds")
 GRAPHICS_DIR = path.join(MAIN_PATH, "assets", "graphics")

@@ -14,22 +14,45 @@ from .objects.ball import Ball
 
 
 class Level:
-    def __init__(self, level_type: str, ball_group: pg.sprite.GroupSingle(), paddles_group: pg.sprite.Group(), all: pg.sprite.Group()) -> None:
+    def __init__(self, level_type: str) -> None:
+        self.ball_group = pg.sprite.GroupSingle()
+        self.paddles_group = pg.sprite.Group()
+        self.all_sprites = pg.sprite.Group()
+
+        self.winned = bool(False)
+
         if level_type == 'oneplayer':
-            self.paddle_left = Paddle('left', 'player', paddles_group, all)
-            self.paddle_right = Paddle('right', 'ai', paddles_group, all)
+            self.paddle_left = Paddle('left', 'player', self.paddles_group, self.all_sprites)
+            self.paddle_right = Paddle('right', 'ai', self.paddles_group, self.all_sprites)
         else:
-            self.paddle_left = Paddle('left', 'player', paddles_group, all)
-            self.paddle_right = Paddle('right', 'player', paddles_group, all)
+            self.paddle_left = Paddle('left', 'player', self.paddles_group, self.all_sprites)
+            self.paddle_right = Paddle('right', 'player', self.paddles_group, self.all_sprites)
 
-        self.ball = Ball(self.paddle_left, self.paddle_right, ball_group, all)
+        self.ball = Ball(self.paddle_left, self.paddle_right, self.ball_group, self.all_sprites)
 
+        self.paddles = [self.paddle_left, self.paddle_right]
+
+    def render_frame(self, display_surf):
+        self.all_sprites.draw(display_surf)
+
+    def run(self, display_surf, dt):
+        if not self.winned:
+            keys = pg.key.get_pressed()
+            for paddle in self.paddles:
+                paddle.check_input(keys)
+
+        self.paddles_group.update(dt, self.ball)
+        self.ball_group.update(dt)
+
+        self.render_frame(display_surf)
+        
 
 class Pong:
     FPS = GAME['fps']
     SCREEN_RECT = pg.Rect(0, 0, GAME['width'], GAME['height'])
     SCREEN_MW = SCREEN_RECT.width // 2
     SCREEN_MH = SCREEN_RECT.height // 2
+    level:Level = None
 
     def __init__(self) -> None:
         pg.mixer.pre_init(44100, -16, 2, 512)
@@ -42,10 +65,6 @@ class Pong:
 
         self.debug = DebugTool(self.display_surf)
 
-        self.ball_group = pg.sprite.GroupSingle()
-        self.paddle_group = pg.sprite.Group()
-        self.all_sprites = pg.sprite.Group()
-        self.level = None
         self.state = str('menu')
         self.colors: dict[str, pg.Color] = {}
 
@@ -84,13 +103,13 @@ class Pong:
         self.state = new_state
 
     def select_game_type(self, type_target: str):
-        self.level = Level(type_target, self.ball_group, self.paddle_group, self.all_sprites)
+        self.level = Level(type_target)
         self.set_state('play')
 
     def quit_current_game(self):
         self.starting_menu.buttons[0].CLICK_SOUND.play()
         
-        for sprite in self.all_sprites:
+        for sprite in self.level.all_sprites:
             sprite: pg.sprite.Sprite
             sprite.kill()
 
@@ -101,9 +120,6 @@ class Pong:
         pg.display.quit()
         pg.quit()
         exit()
-
-    def render_frame(self):
-        pass
 
     def run(self):
         self.load()
@@ -138,11 +154,7 @@ class Pong:
             if self.state == 'menu':
                 self.starting_menu.render(self.display_surf)
 
-            if self.state == 'play':
-                self.all_sprites.draw(self.display_surf)
-
-                keys = pg.key.get_pressed()
-                self.paddle_group.update(dt, keys, self.level.ball)
-                self.ball_group.update(dt)
+            if self.state == 'play' and self.level is not None:
+                self.level.run(self.display_surf, dt)
 
             pg.display.flip()

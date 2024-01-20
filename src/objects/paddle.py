@@ -24,7 +24,8 @@ class Paddle(pg.sprite.Sprite):
     def __init__(self, side: str, paddle_type: str, paddles_group: pg.sprite.Group(), all: pg.sprite.Group()) -> None:
         pg.sprite.Sprite.__init__(self, paddles_group, all)
 
-        self.paddle_type = paddle_type
+        self.type = paddle_type
+        self.cur_vel = int(0)
 
         self.side = side
         if side == 'left':
@@ -49,27 +50,32 @@ class Paddle(pg.sprite.Sprite):
 
         return dir_y
     
-    def update(self, dt: float, keys: pg.key.ScancodeWrapper, ball: Ball) -> None:
+    def check_input(self, keys: pg.key.ScancodeWrapper):
+        self.cur_vel = int(0)
+
+        if self.side == 'left':
+            if keys[pg.K_z]:
+                self.cur_vel = -self.VELOCITY
+            elif keys[pg.K_s]:
+                self.cur_vel = self.VELOCITY
+
+        if self.side == 'right':
+            if keys[pg.K_UP]:
+                self.cur_vel = -self.VELOCITY
+            elif keys[pg.K_DOWN]:
+                self.cur_vel = self.VELOCITY
+    
+    def update(self, dt: float, ball: Ball) -> None:
         dir_y = int(0)
 
-        if self.paddle_type == 'ai':
+        if self.type == 'ai':
             if self.rect.top <= ball.rect.y:
                 dir_y = self.VELOCITY
             elif self.rect.bottom >= ball.rect.y:
                 dir_y = -self.VELOCITY
                 
-        if self.paddle_type == 'player':
-            if self.side == 'left':
-                if keys[pg.K_z]:
-                    dir_y = -self.VELOCITY
-                elif keys[pg.K_s]:
-                    dir_y = self.VELOCITY
-
-            if self.side == 'right':
-                if keys[pg.K_UP]:
-                    dir_y = -self.VELOCITY
-                elif keys[pg.K_DOWN]:
-                    dir_y = self.VELOCITY
+        if self.type == 'player':
+            dir_y = self.cur_vel
         
         if dir_y != 0:
             self.rect.move_ip(0, self.check_wall_collision(dir_y * dt))
