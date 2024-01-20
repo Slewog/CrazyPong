@@ -8,7 +8,7 @@ from .utils import load_color
 
 from .debug import DebugTool
 
-from .ui.menu import Menu
+from .ui.starting_menu import StartingMenu
 from .objects.paddle import Paddle
 from .objects.ball import Ball
 
@@ -62,7 +62,7 @@ class Pong:
         for color_name, color in COLORS.items():
             self.colors[color_name] = load_color(color)
 
-        self.menu = Menu(FONT, self.colors['font'], self.colors['background'])
+        self.starting_menu = StartingMenu(FONT, self.colors['font'], self.colors['background'])
 
         self.display_surf.fill(self.colors['background'])
         self.middle_rect = pg.Rect(
@@ -88,7 +88,7 @@ class Pong:
         self.set_state('play')
 
     def quit_current_game(self):
-        self.menu.buttons[0].CLICK_SOUND.play()
+        self.starting_menu.buttons[0].CLICK_SOUND.play()
         
         for sprite in self.all_sprites:
             sprite: pg.sprite.Sprite
@@ -120,7 +120,7 @@ class Pong:
                     self.quit_current_game()
                     
                 if self.state == 'menu' and e.type == pg.MOUSEBUTTONDOWN and e.button == 1:
-                    self.menu.handle_btn_click()
+                    self.starting_menu.handle_btn_click()
                 
                 if e.type == CE_BTN_CLICKED:
                     if e.action == 'quit':
@@ -136,7 +136,7 @@ class Pong:
             pg.draw.rect(self.display_surf, self.colors['font'], self.middle_rect)
 
             if self.state == 'menu':
-                self.menu.render(self.display_surf)
+                self.starting_menu.render(self.display_surf)
 
             if self.state == 'play':
                 self.all_sprites.draw(self.display_surf)

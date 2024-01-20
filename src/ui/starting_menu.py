@@ -1,7 +1,7 @@
 from typing import Any
 import pygame as pg
 
-from ..const.settings import MENU, BUTTON
+from ..const.settings import STARTING_MENU, BUTTON
 from ..utils import load_font, load_sound, load_img
 from .button import Button
 
@@ -41,7 +41,7 @@ class Image(pg.sprite.Sprite):
         self.rect = self.image.get_rect(bottomright=pos)
 
 
-class Menu:
+class StartingMenu:
     title_surf: pg.Surface
     title_rect: pg.Rect
     title_bg_rect: pg.Rect

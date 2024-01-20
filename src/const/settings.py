@@ -47,7 +47,7 @@ BUTTON = {
     }
 }
 
-MENU = {
+STARTING_MENU = {
     'title': {
         'text': GAME['name'],
         'font_size': int(100),
