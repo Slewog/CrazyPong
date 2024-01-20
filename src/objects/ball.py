@@ -20,6 +20,7 @@ class Ball(pg.sprite.Sprite):
     START_POS: tuple[int, int]
     COLOR: pg.Color
     SCREEN_RECT: pg.Rect
+    HIT_SOUND: pg.mixer.Sound
 
     def __init__(self, ball: pg.sprite.GroupSingle) -> None:
         pg.sprite.Sprite.__init__(self, ball)
@@ -52,10 +53,12 @@ class Ball(pg.sprite.Sprite):
     def check_display_collisions(self, direction: str, new_pos: float):
         if direction == 'vertical':
             if self.rect.top + new_pos < 0:
+                self.HIT_SOUND.play()
                 new_pos = -self.rect.top
                 self.direction.y *= -1
 
             if self.rect.bottom + new_pos > self.SCREEN_RECT.height:
+                self.HIT_SOUND.play()
                 new_pos = self.SCREEN_RECT.height - self.rect.bottom
                 self.direction.y *= -1
 
@@ -69,7 +72,7 @@ class Ball(pg.sprite.Sprite):
                 self.direction.x *= -1
         return new_pos
 
-    def check_collisions(self, direction: str, paddles, new_pos: float):
+    def check_collisions(self, direction: str, paddles: list[Paddle], new_pos: float):
         overlap_paddles: list[Paddle] = []
 
         for paddle in paddles:
@@ -78,6 +81,8 @@ class Ball(pg.sprite.Sprite):
 
         if not overlap_paddles:
             return self.check_display_collisions(direction, new_pos)
+        
+        self.HIT_SOUND.play()
         
         if direction == 'horizontal':
             for paddle in overlap_paddles:

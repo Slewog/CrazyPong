@@ -3,11 +3,12 @@ from sys import exit
 from time import time
 
 from .const.custom_event import CE_BTN_CLICKED
-from .const.settings import GAME, FONT, COLORS
-from .utils import load_color
+from .const.settings import GAME, FONT, COLORS, CRS_EFFECT, SOUNDS
+from .utils import load_color, load_img, load_sound
 
 from .debug import DebugTool
 
+from .ui.screen_effect import CRS
 from .ui.starting_menu import StartingMenu
 from .objects.paddle import Paddle
 from .objects.ball import Ball
@@ -58,7 +59,10 @@ class Pong:
     SCREEN_RECT = pg.Rect(0, 0, GAME['width'], GAME['height'])
     SCREEN_MW = SCREEN_RECT.width // 2
     SCREEN_MH = SCREEN_RECT.height // 2
+
+    crs_effect: CRS
     level:Level = None
+    starting_menu: StartingMenu
 
     def __init__(self) -> None:
         pg.mixer.pre_init(44100, -16, 2, 512)
@@ -78,21 +82,30 @@ class Pong:
         for color_name, color in COLORS.items():
             self.colors[color_name] = load_color(color)
 
-        self.starting_menu = StartingMenu(FONT, self.colors['font'], self.colors['background'])
 
-        self.display_surf.fill(self.colors['background'])
+        CRS_EFFECT['vignette'] = load_img(CRS_EFFECT["file"], convert_a=True)
+        CRS_EFFECT["line_color"] = load_color(CRS_EFFECT["line_color"])
+        CRS_EFFECT['screen_rect'] = self.SCREEN_RECT
+
+        self.crs_effect = CRS(CRS_EFFECT)
+        self.starting_menu = StartingMenu(FONT, self.colors['font'], self.colors['background'])
         self.middle_rect = pg.Rect(
             self.SCREEN_MW - GAME['middle_rect_w']//2,
             int(0),
             GAME['middle_rect_w'],
             self.SCREEN_RECT.height
         )
+
+        self.display_surf.fill(self.colors['background'])
         pg.draw.rect(self.display_surf, self.colors['font'], self.middle_rect)
+        self.starting_menu.render(self.display_surf)
         pg.display.flip()
 
+        ball_sound_data = SOUNDS['ball']
         Ball.SCREEN_RECT = self.SCREEN_RECT
         Ball.START_POS = (self.SCREEN_MW, self.SCREEN_MH)
         Ball.COLOR = self.colors['objects']
+        Ball.HIT_SOUND = load_sound(ball_sound_data['file'], vol=ball_sound_data['vol'])
 
         Paddle.SCREEN_RECT = self.SCREEN_RECT
         Paddle.SCREEN_CENTERY = self.SCREEN_MH
@@ -159,5 +172,7 @@ class Pong:
 
             if self.state == 'play' and self.level is not None:
                 self.level.run(self.display_surf, dt)
+
+            self.crs_effect.render(self.display_surf)
 
             pg.display.flip()
