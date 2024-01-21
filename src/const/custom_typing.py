@@ -28,12 +28,12 @@ class FontData(TypedDict):
 class ButtonData(TypedDict):
     text_offset: int
     width_gap: int
-    height_gap: bool
+    height_gap: int
     border_radius: int
     border_size: int
-    sound_vol: int
-    sound_file: int
-    colors: Dict
+    sound_vol: float
+    sound_file: str
+    colors: Dict[str, ColorValue]
 
 
 class CRSData(TypedDict):
@@ -44,3 +44,22 @@ class CRSData(TypedDict):
     min_alpha: int
     max_alpha: int
     screen_rect: Rect
+
+
+class TextData(TypedDict):
+    text: str
+    font_size: int
+    pos: Tuple[int, int]
+    center_by: str
+
+
+class ImageData(TypedDict):
+    file: str
+    pos: Tuple[int, int]
+
+
+class MenuTitleData(TypedDict):
+    title: TextData
+    copyright: TextData
+    pg_logo: ImageData
+    buttons: List[List]
