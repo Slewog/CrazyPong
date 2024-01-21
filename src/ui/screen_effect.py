@@ -1,20 +1,12 @@
-from typing import TypedDict
+from ..const.custom_typing import CRSData
+
 from random import randint
 import pygame as pg
 
-CRS_DICT  = TypedDict("crs", {
-    'file': str,
-    'vignette': pg.Surface,
-    'line_gap': int,
-    'line_color': pg.Color,
-    'min_alpha': int,
-    'max_alpha': int,
-    'screen_rect': pg.Rect
-})
 
 class CRS:
     """Simule a cathode ray screen"""
-    def __init__(self, data:CRS_DICT) -> None:
+    def __init__(self, data:CRSData) -> None:
         self.min_alpha = data['min_alpha']
         self.max_alpha = data['max_alpha']
         self.vignette = pg.transform.scale(data['vignette'], data['screen_rect'].size)

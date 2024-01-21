@@ -1,7 +1,9 @@
 import pygame as pg
 from sys import exit
 from time import time
+from typing import Dict
 
+from .const.custom_typing import SoundData
 from .const.custom_event import CE_BTN_CLICKED
 from .const.settings import GAME, FONT, COLORS, CRS_EFFECT, SOUNDS
 from .utils import load_color, load_img, load_sound
@@ -38,11 +40,11 @@ class Level:
         for paddle in self.paddles:
             paddle.kill()
     
-    def render_frame(self, display_surf):
+    def render_frame(self, display_surf: pg.Surface):
         self.paddles_group.draw(display_surf)
         self.ball_group.draw(display_surf)
 
-    def run(self, display_surf, dt):
+    def run(self, display_surf: pg.Surface, dt: float):
         if not self.winned:
             keys = pg.key.get_pressed()
             for paddle in self.paddles:
@@ -63,6 +65,7 @@ class Pong:
     crs_effect: CRS
     level:Level = None
     starting_menu: StartingMenu
+    colors: Dict[str, pg.Color] = {}
 
     def __init__(self) -> None:
         pg.mixer.pre_init(44100, -16, 2, 512)
@@ -74,23 +77,20 @@ class Pong:
         pg.display.set_caption(GAME['name'])
 
         self.debug = DebugTool(self.display_surf)
-
         self.state = str('menu')
-        self.colors: dict[str, pg.Color] = {}
 
-    def load(self):
+    def load(self) -> None:
         for color_name, color in COLORS.items():
             self.colors[color_name] = load_color(color)
 
-
-        CRS_EFFECT['vignette'] = load_img(CRS_EFFECT["file"], convert_a=True)
-        CRS_EFFECT["line_color"] = load_color(CRS_EFFECT["line_color"])
+        CRS_EFFECT['vignette'] = load_img(CRS_EFFECT['file'], convert_a=True)
+        CRS_EFFECT['line_color'] = load_color(CRS_EFFECT['line_color'])
         CRS_EFFECT['screen_rect'] = self.SCREEN_RECT
 
         self.crs_effect = CRS(CRS_EFFECT)
         self.starting_menu = StartingMenu(FONT, self.colors['font'], self.colors['background'])
         self.middle_rect = pg.Rect(
-            self.SCREEN_MW - GAME['middle_rect_w']//2,
+            self.SCREEN_MW - GAME['middle_rect_w'] // 2,
             int(0),
             GAME['middle_rect_w'],
             self.SCREEN_RECT.height
@@ -101,7 +101,7 @@ class Pong:
         self.starting_menu.render(self.display_surf)
         pg.display.flip()
 
-        ball_sound_data = SOUNDS['ball']
+        ball_sound_data:SoundData = SOUNDS['ball']
         Ball.SCREEN_RECT = self.SCREEN_RECT
         Ball.START_POS = (self.SCREEN_MW, self.SCREEN_MH)
         Ball.COLOR = self.colors['objects']
@@ -112,7 +112,7 @@ class Pong:
         Paddle.SCREEN_BOTTOM = self.SCREEN_RECT.height - Paddle.OFFSET_Y
         Paddle.COLOR = self.colors['objects']
     
-    def set_state(self, new_state: str):
+    def set_state(self, new_state: str) -> None:
         if self.state == new_state or type(new_state) != str:
             return
         
@@ -121,23 +121,23 @@ class Pong:
         
         self.state = new_state
 
-    def select_game_type(self, type_target: str):
+    def select_game_type(self, type_target: str) -> None:
         self.level = Level(type_target)
         self.set_state('play')
 
-    def quit_current_game(self):
+    def quit_current_game(self) -> None:
         self.starting_menu.buttons[0].CLICK_SOUND.play()
 
         self.level.destroy()
         self.set_state('menu')
         self.level = None
 
-    def quit(self):
+    def quit(self) -> None:
         pg.display.quit()
         pg.quit()
         exit()
 
-    def run(self):
+    def run(self) -> None:
         self.load()
         prev_dt = time()
 

@@ -1,93 +1,98 @@
-GAME = {
-    'name': str("Py Pong"),
-    'fps': int(120),
-    'width': int(1280),
-    'height': int(960),
-    'middle_rect_w': int(6)
+from .custom_typing import CRSData, GameData, FontData, ButtonData, ColorValue, MenuTitleData
+from typing import Dict
+
+GAME:GameData = {
+    'name': "Py Pong",
+    'fps': 120,
+    'width': 1280,
+    'height': 960,
+    'middle_rect_w': 6
 }
 
-FONT = {
-    'family': str("freesansbold.ttf"),
-    'from_system': bool(False),
-    'size': int(30)
+FONT:FontData = {
+    'family': "freesansbold.ttf",
+    'from_system': False,
+    'size': 30
 }
 
-COLORS = {
+COLORS: Dict[str, ColorValue] = {
     'font': (27, 35, 43, 255),
-    'objects': str("#27333E"),
-    'background': str("#46505A"),
+    'objects': "#27333E",
+    'background': "#46505A",
 }
 
-SOUNDS = {
+SOUNDS: Dict[str, Dict[str, str | float]] = {
     'ball': {
-        'file': str("ball_hit.wav"),
-        'vol': 0.1,    
+        'file': "ball_hit.wav",
+        'vol': 0.1
     },
     'score': {
-        'file': str("add_score.wav"),
-        'vol': 0.1,
+        'file': "add_score.wav",
+        'vol': 0.1
     }
 }
 
-CRS_EFFECT = {
-    'file': str('vignette.png'),
-    'line_gap': int(4),
-    'line_color': (int(20), int(20), int(20)),
-    'min_alpha': int(50),
-    'max_alpha': int(70)
+CRS_EFFECT:CRSData = {
+    'file': "vignette.png",
+    'line_gap': 4,
+    'line_color': (20, 20, 20),
+    'min_alpha': 50,
+    'max_alpha': 70
 }
 
-BALL = {
-    'radius': int(15),
-    'velocity': int(435),
-    'min_coll_tol': int(2),
-    'max_coll_tol': int(10),
+BALL: Dict[str, int] = {
+    'radius': 15,
+    'velocity': 435,
+    'min_coll_tol': 2,
+    'max_coll_tol': 10,
 }
 
-PADDLE = {
-    'width': int(20),
-    'height': int(180),
-    'velocity': int(500),
-    'offset_x': int(20),
-    'offset_y': int(20),
+PADDLE: Dict[str, int] = {
+    'width': 20,
+    'height': 180,
+    'velocity': 500,
+    'offset_x': 20,
+    'offset_y': 20,
 }
 
-BUTTON = {
-    'text_offset': int(1),
-    'width_gap': int(50),
-    'height_gap': int(25),
-    'border_radius': int(12),
-    'border_size': int(5),
+BUTTON:ButtonData = {
+    'text_offset': 1,
+    'width_gap': 50,
+    'height_gap': 25,
+    'border_radius': 12,
+    'border_size': 5,
     'sound_vol': 0.05,
-    'sound_file': str("btn_click.wav"),
+    'sound_file': "btn_click.wav",
     'colors': {
-        'top_color': str("#3F4851"),
+        'top_color': "#3F4851",
         'top_color_hover': COLORS['background'],
         'bg_color' : COLORS['font'],
     }
 }
 
-STARTING_MENU = {
+STARTING_MENU:MenuTitleData = {
     'title': {
         'text': GAME['name'],
-        'font_size': int(100),
-        'pos': (GAME['width'] // 2, (GAME['height'] // 3) - int(50))
+        'font_size': 100,
+        'pos': (GAME['width'] // 2, (GAME['height'] // 3) - 50),
+        'center_by': "midtop"
     },
     'copyright': {
-        'text': str("Create by Slewog - © 2024"),
-        'pos': (GAME['width'] // 2, GAME['height'] - int(20))
+        'text': "Create by Slewog - © 2024",
+        'pos': (GAME['width'] // 2, GAME['height'] - 20),
+        'center_by': "midbottom"
     },
     'pg_logo': {
-        'file': str("pygame_logo.png"),
+        'file': "pygame_logo.png",
         'pos': (GAME['width'] - 10, GAME['height'] - 9)
     },
     'buttons': [
         [
-            {'text': "1 PLAYER", 'action': "play", 'target_level': 'oneplayer'},
+            {'text': "1 PLAYER", 'action': "play", 'target_level': "oneplayer"},
             (GAME['width'] // 2 - 175, GAME['height'] // 2)
         ],
         [
-            {'text': "2 PLAYER", 'action': "play", 'target_level': 'twoplayer'},
+            {'text': "2 PLAYER", 'action': "play", 'target_level': "twoplayer"},
             (GAME['width'] // 2 + 175, GAME['height'] // 2)
         ],
         [

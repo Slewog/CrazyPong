@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, List, Tuple
 
 if TYPE_CHECKING:
     from .paddle import Paddle
@@ -8,6 +8,7 @@ import pygame as pg
 from random import choice
 
 from src.const.settings import BALL
+from src.const.custom_event import CE_BALL_OUT_SCREEN
 
 
 class Ball(pg.sprite.Sprite):
@@ -18,7 +19,7 @@ class Ball(pg.sprite.Sprite):
     SIZE = (RADIUS * 2, RADIUS * 2)
 
 
-    START_POS: tuple[int, int]
+    START_POS: Tuple[int, int]
     COLOR: pg.Color
     SCREEN_RECT: pg.Rect
     HIT_SOUND: pg.mixer.Sound
@@ -26,7 +27,7 @@ class Ball(pg.sprite.Sprite):
     def __init__(self, ball: pg.sprite.GroupSingle) -> None:
         pg.sprite.Sprite.__init__(self, ball)
 
-        self.active = bool(True)
+        self.active = bool(False)
 
         self.direction = pg.math.Vector2(
             choice((self.VELOCITY, -self.VELOCITY)),
@@ -50,8 +51,13 @@ class Ball(pg.sprite.Sprite):
         # Ball rect.
         self.rect = self.image.get_rect(center=self.START_POS)
         self.pos = pg.math.Vector2(self.rect.topleft)
+    
+    def set_active(self, state: bool) -> None:
+        if state == self.active or type(state) != bool:
+            return
+        self.active = state
 
-    def check_display_collisions(self, direction: str, new_pos: float):
+    def check_display_collisions(self, direction: str, new_pos: float) -> int | float:
         if direction == 'vertical':
             if self.rect.top + new_pos < 0:
                 self.HIT_SOUND.play()
@@ -67,14 +73,16 @@ class Ball(pg.sprite.Sprite):
             if self.rect.left + new_pos < 0:
                 new_pos = -self.rect.left
                 self.direction.x *= -1
+                pg.event.post(pg.event.Event(CE_BALL_OUT_SCREEN, {'target_player': 'right'}))
 
             if self.rect.right + new_pos > self.SCREEN_RECT.width:
                 new_pos = self.rect.right - self.rect.right
                 self.direction.x *= -1
+                pg.event.post(pg.event.Event(CE_BALL_OUT_SCREEN, {'target_player': 'left'}))
         return new_pos
 
-    def check_collisions(self, direction: str, paddles: list[Paddle], new_pos: float):
-        overlap_paddles: list[Paddle] = []
+    def check_collisions(self, direction: str, paddles: List[Paddle], new_pos: float) -> int | float:
+        overlap_paddles: List[Paddle] = []
 
         for paddle in paddles:
             if self.rect.colliderect(paddle.rect):
@@ -121,7 +129,7 @@ class Ball(pg.sprite.Sprite):
 
         return self.check_display_collisions(direction, new_pos)
 
-    def update(self, dt, paddles):
+    def update(self, dt: float, paddles: List[Paddle]) -> None:
         if not self.active:
             return
 

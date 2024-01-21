@@ -1,3 +1,4 @@
+from typing import Tuple
 import pygame as pg
 
 from ..utils import load_img
@@ -18,19 +19,19 @@ class TextBackground(pg.sprite.Sprite):
 class Text(pg.sprite.Sprite):
     COLOR: pg.Color
 
-    def __init__(self, font: pg.font.Font, text: str, pos: tuple[int, int], rect_pos: str, all_text: pg.sprite.Group) -> None:
+    def __init__(self, font: pg.font.Font, text: str, pos: Tuple[int, int], center_by: str, all_text: pg.sprite.Group) -> None:
         pg.sprite.Sprite.__init__(self, all_text)
 
         self.image = font.render(text, True, self.COLOR)
     
-        if rect_pos == 'midtop':
+        if center_by == 'midtop':
             self.rect = self.image.get_rect(midtop=pos)
-        elif rect_pos == 'midbottom':
+        elif center_by == 'midbottom':
             self.rect = self.image.get_rect(midbottom=pos)
 
 
 class Image(pg.sprite.Sprite):
-    def __init__(self, file: str, pos: tuple[int, int], all_img: pg.sprite.Group) -> None:
+    def __init__(self, file: str, pos: Tuple[int, int], all_img: pg.sprite.Group) -> None:
         pg.sprite.Sprite.__init__(self, all_img)
 
         self.image = load_img(file, convert_a=True)

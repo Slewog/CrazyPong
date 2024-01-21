@@ -1,6 +1,6 @@
 
 import sys
-from typing import Union, Tuple, List
+from .const.custom_typing import ColorValue
 from os import path
 import pygame as pg
 
@@ -13,11 +13,9 @@ FONTS_DIR = path.join(MAIN_PATH, "assets", "fonts")
 SOUNDS_DIR = path.join(MAIN_PATH, "assets", "sounds")
 GRAPHICS_DIR = path.join(MAIN_PATH, "assets", "graphics")
 
-ColorValue = Union[str, Tuple[int, int, int], List[int]]
-
 
 def load_color(color: ColorValue) -> pg.Color:
-    """color: str | tuple[int, int, int] | list[int]"""
+    """color: str | Tuple[int, int, int] | List[int]"""
     if type(color) == tuple:
         return color
 
@@ -26,7 +24,7 @@ def load_color(color: ColorValue) -> pg.Color:
 
     return pg.Color(color)
 
-def load_font(font: str, size: int, from_system: bool = False):
+def load_font(font: str, size: int, from_system: bool = False) -> pg.font.Font:
     """Return the default font to avoid errors if the font doesn't exist."""
     if from_system:
         return pg.font.SysFont(font, size)
@@ -56,7 +54,7 @@ def load_img(file: str, sub_dir: str = "", convert_a: bool = False, convert: boo
     Return a Surface if the file doesn't exist to avoid errors.
         convert: Convert without alpha
         convert_a: Convert with alpha
-        scale: int | float | '2x' | tuple[int, int]
+        scale: int | float | '2x' |Tuple[int, int]
     """
     file_path = path.join(GRAPHICS_DIR, sub_dir, file)
 

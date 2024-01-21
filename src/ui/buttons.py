@@ -1,37 +1,38 @@
+from typing import Tuple, Dict
 import pygame as pg
 
 from ..const.custom_event import CE_BTN_CLICKED
-from ..utils import load_color, ColorValue
+from ..utils import load_color
 
 from ..const.settings import BUTTON
 
 class AnimateButton:
     FONT: pg.font.Font
     FONT_COLOR: pg.Color
-    TXT_OFFSET = int(BUTTON['text_offset'])
+    TXT_OFFSET = BUTTON['text_offset']
     
-    BORDER_RADIUS = int(BUTTON['border_radius'])
-    BORDER_SIZE = int(BUTTON['border_size'])
+    BORDER_RADIUS = BUTTON['border_radius']
+    BORDER_SIZE = BUTTON['border_size']
 
     CLICK_SOUND: pg.mixer.Sound
 
-    COLORS: dict[str, ColorValue] = {}
+    COLORS: dict[str, pg.Color] = {}
     for color_name, color in BUTTON['colors'].items():
         COLORS[color_name] = load_color(color)
 
-    def __init__(self, data: dict, pos: tuple[int, int], elevation: int = 5) -> None:
+    def __init__(self, event_data: Dict[str, str], pos: Tuple[int, int], elevation: int = 5) -> None:
         self.cursor_changed = bool(False)
         self.pressed = bool(False)
         self.hovered = bool(False)
-        self.click_time:int = None
+        self.click_time = None
 
-        self.data = data
+        self.event_data = event_data
 
         self.elevation = elevation
         self.dynamic_elevation = elevation
         self.original_y_pos = pos[1]
 
-        self.text_surf = self.FONT.render(data['text'], True, self.FONT_COLOR)
+        self.text_surf = self.FONT.render(event_data['text'], True, self.FONT_COLOR)
         self.text_rect = self.text_surf.get_rect(center=(pos[0], (pos[1] - elevation) + self.TXT_OFFSET))
 
         self.top_rect = pg.Rect(pos[0], pos[1], self.text_rect.width + BUTTON['width_gap'], self.text_rect.height + BUTTON['height_gap'])
@@ -64,12 +65,12 @@ class AnimateButton:
         if self.pressed: 
             return
         
-        self.pressed = True
+        self.pressed = bool(True)
         self.change_elevation(0)
         self.click_time = pg.time.get_ticks()
         self.CLICK_SOUND.play()
 
-    def check_hover(self, mouse_pos: tuple[int, int]) -> None:
+    def check_hover(self, mouse_pos: Tuple[int, int]) -> None:
         if self.top_rect.collidepoint(mouse_pos) or self.bottom_rect.collidepoint(mouse_pos):
             if not self.cursor_changed:
                 pg.mouse.set_cursor(pg.SYSTEM_CURSOR_HAND)
@@ -95,6 +96,6 @@ class AnimateButton:
                 self.change_elevation(self.elevation)
 
             if current_time - self.click_time >= 200:
-                pg.event.post(pg.event.Event(CE_BTN_CLICKED, self.data))
-                self.pressed = False
+                pg.event.post(pg.event.Event(CE_BTN_CLICKED, self.event_data))
+                self.pressed = bool(False)
                 self.click_time = None

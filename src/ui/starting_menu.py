@@ -1,11 +1,12 @@
-from typing import Any
+from typing import List
 import pygame as pg
 
-from ..const.settings import STARTING_MENU, BUTTON
+from src.const.custom_typing import FontData
+from src.const.settings import STARTING_MENU, BUTTON
 from ..utils import load_font, load_sound
 
 from .sprites_components import Text, TextBackground, Image
-from .buttons import AnimateButton as Button
+from .buttons import AnimateButton
 
 
 class StartingMenu:
@@ -19,8 +20,8 @@ class StartingMenu:
     pg_logo_surf: pg.Surface
     pg_logo_rect: pg.Rect
 
-    def __init__(self, font_data: dict[str, Any], font_color: pg.Color, bg_color: pg.Color) -> None:
-        self.buttons: list[Button] = []
+    def __init__(self, font_data: FontData, font_color: pg.Color, bg_color: pg.Color) -> None:
+        self.buttons: List[AnimateButton] = []
 
         self.all_text = pg.sprite.Group()
         self.all_bg = pg.sprite.Group()
@@ -34,28 +35,28 @@ class StartingMenu:
         Text.COLOR = font_color
         TextBackground.COLOR = bg_color
 
-        Button.FONT = self.font
-        Button.FONT_COLOR = font_color
-        Button.CLICK_SOUND = load_sound(BUTTON['sound_file'], BUTTON['sound_vol'])
+        AnimateButton.FONT = self.font
+        AnimateButton.FONT_COLOR = font_color
+        AnimateButton.CLICK_SOUND = load_sound(BUTTON['sound_file'], BUTTON['sound_vol'])
 
         self.create_menu()
-
+    
     def create_menu(self):
         for button in STARTING_MENU['buttons']:
-            self.buttons.append(Button(button[0], button[1]))
+            self.buttons.append(AnimateButton(button[0], button[1]))
         
         title = STARTING_MENU['title']
         self.title = Text(
             load_font(self.font_data['family'], title['font_size']),
             title['text'],
             title['pos'],
-            'midtop',
+            title['center_by'],
             self.all_text
         )
         TextBackground(self.title.rect, self.all_bg, offset_y=-10)
 
         copyright = STARTING_MENU['copyright']
-        self.copyright = Text(self.font, copyright['text'], copyright['pos'], 'midbottom', self.all_text)
+        self.copyright = Text(self.font, copyright['text'], copyright['pos'], copyright['center_by'], self.all_text)
         TextBackground(self.copyright.rect, self.all_bg)
 
         pg_logo = STARTING_MENU['pg_logo']
