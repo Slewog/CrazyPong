@@ -24,10 +24,10 @@ class Ball(pg.sprite.Sprite):
     SCREEN_RECT: pg.Rect
     HIT_SOUND: pg.mixer.Sound
 
-    def __init__(self, ball: pg.sprite.GroupSingle) -> None:
-        pg.sprite.Sprite.__init__(self, ball)
+    def __init__(self, group: pg.sprite.GroupSingle) -> None:
+        pg.sprite.Sprite.__init__(self, group)
 
-        self.active = bool(False)
+        self.active = bool(True)
 
         self.direction = pg.math.Vector2(
             choice((self.VELOCITY, -self.VELOCITY)),

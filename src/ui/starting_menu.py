@@ -3,9 +3,7 @@ import pygame as pg
 
 from src.const.custom_typing import FontData
 from src.const.settings import STARTING_MENU, BUTTON
-from ..utils import load_font, load_sound
-
-from .sprites_components import Text, TextBackground, Image
+from src.utils import load_font, load_sound, Text, TextBackground, Image
 from .buttons import AnimateButton
 
 

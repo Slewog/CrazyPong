@@ -1,8 +1,10 @@
 
 import sys
-from .const.custom_typing import ColorValue
 from os import path
+from typing import Tuple
 import pygame as pg
+
+from .const.custom_typing import ColorValue
 
 # Get absolute path to resource, works for dev and for PyInstaller.
 MAIN_PATH = getattr(sys, '_MEIPASS', path.dirname(path.abspath(__file__))).split("\\src")[0]
@@ -69,6 +71,44 @@ def load_img(file: str, sub_dir: str = "", convert_a: bool = False, convert: boo
         img = img.convert()
 
     return img
+
+
+class TextBackground(pg.sprite.Sprite):
+    """Create a text background as sprite to render in a group"""
+    COLOR: pg.Color
+
+    def __init__(self, rect: pg.Rect, group: pg.sprite.Group, offset_y: int = 0, offset_x: int = 0) -> None:
+        pg.sprite.Sprite.__init__(self, group)
+
+        self.image = pg.Surface(rect.size)
+        self.image.fill(self.COLOR)
+
+        self.rect = rect.copy()
+        self.rect.move_ip(offset_x, offset_y)
+
+
+class Text(pg.sprite.Sprite):
+    """Create a text as sprite to render in a group"""
+    COLOR: pg.Color
+
+    def __init__(self, font: pg.font.Font, text: str, pos: Tuple[int, int], center_by: str, group: pg.sprite.Group) -> None:
+        pg.sprite.Sprite.__init__(self, group)
+
+        self.image = font.render(text, True, self.COLOR)
+    
+        if center_by == 'midtop':
+            self.rect = self.image.get_rect(midtop=pos)
+        elif center_by == 'midbottom':
+            self.rect = self.image.get_rect(midbottom=pos)
+
+
+class Image(pg.sprite.Sprite):
+    """Create a img as sprite to render in a group"""
+    def __init__(self, file: str, pos: Tuple[int, int], group: pg.sprite.Group) -> None:
+        pg.sprite.Sprite.__init__(self, group)
+
+        self.image = load_img(file, convert_a=True)
+        self.rect = self.image.get_rect(bottomright=pos)
 
 
 class NoneSound:

@@ -24,7 +24,7 @@ class CRS:
                 1
             )
     
-    def render(self, display_surf: pg.Surface):
+    def render(self, display_surf: pg.Surface) -> None:
         self.vignette.set_alpha(randint(self.min_alpha, self.max_alpha))
         display_surf.blit(self.vignette, (0, 0))
         

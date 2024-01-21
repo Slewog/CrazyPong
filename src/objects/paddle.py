@@ -21,8 +21,8 @@ class Paddle(pg.sprite.Sprite):
     SCREEN_CENTERY: int
     SCREEN_BOTTOM: int
 
-    def __init__(self, side: str, paddle_type: str, paddles: pg.sprite.Group) -> None:
-        pg.sprite.Sprite.__init__(self, paddles)
+    def __init__(self, side: str, paddle_type: str, group: pg.sprite.Group) -> None:
+        pg.sprite.Sprite.__init__(self, group)
 
         self.type = paddle_type
         self.cur_vel = int(0)
@@ -50,7 +50,7 @@ class Paddle(pg.sprite.Sprite):
 
         return dir_y
     
-    def check_input(self, keys: pg.key.ScancodeWrapper):
+    def check_input(self, keys: pg.key.ScancodeWrapper) -> None:
         self.cur_vel = int(0)
 
         if self.side == 'left':

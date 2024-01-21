@@ -34,17 +34,17 @@ class Level:
 
         self.paddles = [self.paddle_left, self.paddle_right]
 
-    def destroy(self):
+    def destroy(self) -> None:
         self.ball.kill()
 
         for paddle in self.paddles:
             paddle.kill()
     
-    def render_frame(self, display_surf: pg.Surface):
+    def render_frame(self, display_surf: pg.Surface) -> None:
         self.paddles_group.draw(display_surf)
         self.ball_group.draw(display_surf)
 
-    def run(self, display_surf: pg.Surface, dt: float):
+    def run(self, display_surf: pg.Surface, dt: float) -> None:
         if not self.winned:
             keys = pg.key.get_pressed()
             for paddle in self.paddles:

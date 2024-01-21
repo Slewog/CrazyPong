@@ -1,10 +1,10 @@
 from typing import Tuple, Dict
 import pygame as pg
 
-from ..const.custom_event import CE_BTN_CLICKED
-from ..utils import load_color
+from src.const.custom_event import CE_BTN_CLICKED
+from src.const.settings import BUTTON
+from src.utils import load_color
 
-from ..const.settings import BUTTON
 
 class AnimateButton:
     FONT: pg.font.Font
@@ -16,7 +16,7 @@ class AnimateButton:
 
     CLICK_SOUND: pg.mixer.Sound
 
-    COLORS: dict[str, pg.Color] = {}
+    COLORS: Dict[str, pg.Color] = {}
     for color_name, color in BUTTON['colors'].items():
         COLORS[color_name] = load_color(color)
 
