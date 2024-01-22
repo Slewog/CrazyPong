@@ -73,8 +73,8 @@ def load_img(file: str, sub_dir: str = "", convert_a: bool = False, convert: boo
     return img
 
 
-class TextBackground(pg.sprite.Sprite):
-    """Create a text background as sprite to render in a group"""
+class RectBackground(pg.sprite.Sprite):
+    """Create a background from a rect as sprite to render in a group"""
     COLOR: pg.Color
 
     def __init__(self, rect: pg.Rect, group: pg.sprite.Group, offset_y: int = 0, offset_x: int = 0) -> None:
@@ -91,15 +91,18 @@ class Text(pg.sprite.Sprite):
     """Create a text as sprite to render in a group"""
     COLOR: pg.Color
 
-    def __init__(self, font: pg.font.Font, text: str, pos: Tuple[int, int], center_by: str, group: pg.sprite.Group) -> None:
-        pg.sprite.Sprite.__init__(self, group)
-
+    def __init__(self, font: pg.font.Font, text: str, pos: Tuple[int, int], center_by: str, group: pg.sprite.Group, bg: bool = False, bg_offset_y: int = 0, bg_offset_x: int = 0) -> None:
         self.image = font.render(text, True, self.COLOR)
-    
+
         if center_by == 'midtop':
             self.rect = self.image.get_rect(midtop=pos)
         elif center_by == 'midbottom':
             self.rect = self.image.get_rect(midbottom=pos)
+
+        if bg:
+            RectBackground(self.rect, group, bg_offset_y, bg_offset_x)
+
+        pg.sprite.Sprite.__init__(self, group)
 
 
 class Image(pg.sprite.Sprite):
