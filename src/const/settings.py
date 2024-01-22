@@ -1,7 +1,8 @@
-from .custom_typing import CRSData, GameData, FontData, ButtonData, ColorValue, MenuTitleData
+from .custom_typing import GameData, BallData, PaddleData, ColorValue
+from .custom_typing import CRSData, FontData, ButtonData, MenuTitleData
 from typing import Dict
 
-GAME:GameData = {
+GAME: GameData = {
     'name': "Py Pong",
     'fps': 120,
     'width': 1280,
@@ -9,7 +10,7 @@ GAME:GameData = {
     'middle_rect_w': 6
 }
 
-FONT:FontData = {
+FONT: FontData = {
     'family': "freesansbold.ttf",
     'from_system': False,
     'size': 30
@@ -32,7 +33,7 @@ SOUNDS: Dict[str, Dict[str, str | float]] = {
     }
 }
 
-CRS_EFFECT:CRSData = {
+CRS_EFFECT: CRSData = {
     'file': "vignette.png",
     'line_gap': 4,
     'line_color': (20, 20, 20),
@@ -40,22 +41,23 @@ CRS_EFFECT:CRSData = {
     'max_alpha': 70
 }
 
-BALL: Dict[str, int] = {
-    'radius': 15,
-    'velocity': 435,
+BALL: BallData = {
+    'radius': 14,
+    'velocity': 450,
     'min_coll_tol': 2,
     'max_coll_tol': 10,
 }
 
-PADDLE: Dict[str, int] = {
-    'width': 20,
-    'height': 180,
+PADDLE: PaddleData = {
+    'width': 36,
+    'height': 160,
     'velocity': 500,
+    'ai_vel_debuff': 100,
     'offset_x': 20,
-    'offset_y': 20,
+    'offset_y': 10
 }
 
-BUTTON:ButtonData = {
+BUTTON: ButtonData = {
     'text_offset': 1,
     'width_gap': 50,
     'height_gap': 25,
@@ -70,7 +72,7 @@ BUTTON:ButtonData = {
     }
 }
 
-STARTING_MENU:MenuTitleData = {
+STARTING_MENU: MenuTitleData = {
     'title': {
         'text': GAME['name'],
         'font_size': 100,

@@ -13,6 +13,7 @@ class Paddle(pg.sprite.Sprite):
     WIDTH = PADDLE['width']
     HEIGHT = PADDLE['height']
     VELOCITY = PADDLE['velocity']
+    AI_VELOCITY = VELOCITY - PADDLE['ai_vel_debuff']
     OFFSET_X = PADDLE['offset_x']
     OFFSET_Y = PADDLE['offset_y']
 
@@ -69,10 +70,11 @@ class Paddle(pg.sprite.Sprite):
         dir_y = int(0)
 
         if self.type == 'ai' and ball.active:
-            if self.rect.top <= ball.rect.y:
-                dir_y = self.VELOCITY
-            elif self.rect.bottom >= ball.rect.y:
-                dir_y = -self.VELOCITY
+            if self.rect.centery < ball.rect.top:
+                dir_y = self.AI_VELOCITY
+            
+            if self.rect.centery > ball.rect.bottom:
+                dir_y = -self.AI_VELOCITY
                 
         if self.type == 'player':
             dir_y = self.cur_vel

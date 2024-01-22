@@ -4,7 +4,7 @@ from time import time
 from typing import Dict
 
 from .const.custom_typing import SoundData
-from .const.custom_event import CE_BTN_CLICKED
+from .const.custom_event import CE_BTN_CLICKED, CE_BALL_OUT_SCREEN
 from .const.settings import GAME, FONT, COLORS, CRS_EFFECT, SOUNDS
 from .utils import load_color, load_img, load_sound
 
@@ -17,20 +17,17 @@ from .objects.ball import Ball
 
 
 class Level:
-    def __init__(self, level_type: str) -> None:
+    def __init__(self, level_type: str, add_debug: DebugTool) -> None:
+        self.debug = add_debug
         self.ball_group = pg.sprite.GroupSingle()
         self.paddles_group = pg.sprite.Group()
 
         self.winned = bool(False)
 
-        if level_type == 'oneplayer':
-            self.paddle_left = Paddle('left', 'player', self.paddles_group)
-            self.paddle_right = Paddle('right', 'ai', self.paddles_group)
-        else:
-            self.paddle_left = Paddle('left', 'player', self.paddles_group)
-            self.paddle_right = Paddle('right', 'player', self.paddles_group)
+        self.paddle_left = Paddle('left', 'player', self.paddles_group)
+        self.paddle_right = Paddle('right', level_type == 'oneplayer' and 'ai' or 'player', self.paddles_group)
 
-        self.ball = Ball(self.ball_group)
+        self.ball = Ball(self.ball_group, add_debug)
 
         self.paddles = [self.paddle_left, self.paddle_right]
 
@@ -43,6 +40,8 @@ class Level:
     def render_frame(self, display_surf: pg.Surface) -> None:
         self.paddles_group.draw(display_surf)
         self.ball_group.draw(display_surf)
+
+        # self.debug.render()
 
     def run(self, display_surf: pg.Surface, dt: float) -> None:
         if not self.winned:
@@ -122,7 +121,7 @@ class Pong:
         self.state = new_state
 
     def select_game_type(self, type_target: str) -> None:
-        self.level = Level(type_target)
+        self.level = Level(type_target, self.debug.add_data)
         self.set_state('play')
 
     def quit_current_game(self) -> None:
@@ -153,6 +152,9 @@ class Pong:
                     
                 if self.state == 'menu' and e.type == pg.MOUSEBUTTONDOWN and e.button == 1:
                     self.starting_menu.handle_btn_click()
+
+                if e.type == CE_BALL_OUT_SCREEN:
+                    print('ball out of screen')
                 
                 if e.type == CE_BTN_CLICKED:
                     if e.action == 'quit':
