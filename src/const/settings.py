@@ -7,13 +7,21 @@ GAME: GameData = {
     'fps': 120,
     'width': 1280,
     'height': 960,
-    'middle_rect_w': 6
+    'middle_rect_w': 6,
+    'hud': {
+        'counter_bg_offset': 2,
+        'counter_offset_y': 10,
+        'score_offset_y': 20
+    }
 }
+
 
 FONT: FontData = {
     'family': "freesansbold.ttf",
     'from_system': False,
-    'size': 30
+    'default_size': 30,
+    'title_size': 100,
+    'hud_size': 40
 }
 
 COLORS: Dict[str, ColorValue] = {
@@ -54,10 +62,11 @@ PADDLE: PaddleData = {
     'velocity': 500,
     'ai_vel_debuff': 100,
     'offset_x': 20,
-    'offset_y': 10
+    'offset_y': 10,
+    'max_score': 5
 }
 
-BUTTON: ButtonData = {
+BUTTON_ANIMATE: ButtonData = {
     'text_offset': 1,
     'width_gap': 50,
     'height_gap': 25,
@@ -75,7 +84,6 @@ BUTTON: ButtonData = {
 STARTING_MENU: MenuTitleData = {
     'title': {
         'text': GAME['name'],
-        'font_size': 100,
         'pos': (GAME['width'] // 2, (GAME['height'] // 3) - 50),
         'center_by': "midtop"
     },
@@ -98,7 +106,7 @@ STARTING_MENU: MenuTitleData = {
             (GAME['width'] // 2 + 175, GAME['height'] // 2)
         ],
         [
-            {'text': "QUIT", 'action': "quit", 'target_level': None},
+            {'text': "QUIT", 'action': "quit"},
             (GAME['width'] // 2, GAME['height'] // 2 + 100)
         ]
     ]
