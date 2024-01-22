@@ -8,16 +8,6 @@ from .buttons import ButtonAnimate
 
 
 class StartingMenu:
-    title_surf: pg.Surface
-    title_rect: pg.Rect
-    title_bg_rect: pg.Rect
-    copyright_surf: pg.Surface
-    copyright_rect: pg.Rect
-    copyright_bg_rect: pg.Rect
-
-    pg_logo_surf: pg.Surface
-    pg_logo_rect: pg.Rect
-
     def __init__(self, font_data: FontData) -> None:
         # Setup.
         self.buttons: List[ButtonAnimate] = []
