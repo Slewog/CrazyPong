@@ -35,8 +35,6 @@ class Pong:
 
         self.display_surf = pg.display.set_mode((self.SCREEN_RECT.size))
         pg.display.set_caption(GAME['name'])
-
-        self.debug = DebugTool(self.display_surf)
         self.state = str('menu')
 
     def load(self) -> None:
