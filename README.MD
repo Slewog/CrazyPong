@@ -16,10 +16,10 @@ Cathodic ray screen effect.</br>
 
 # Screenshots:
 <p align="center"><img src="assets/screenshots/menu.png"></p>
+<p align="center"><img src="assets/screenshots/oneplayer.png"></p>
+<p align="center"><img src="assets/screenshots/twoplayer.png"></p>
 </br>
 
 # Todo:
-- Starting countdown.
-- Create score system (add score to a player when ball collide a horizontal wall)
-- Render score for every players.
+- Try improve ball collisions with paddles.
 - Add sounds effects.
