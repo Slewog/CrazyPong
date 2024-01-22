@@ -1,6 +1,9 @@
 from .custom_typing import GameData, BallData, PaddleData, ColorValue, HUDData
 from .custom_typing import CRSData, FontData, ButtonData, MenuTitleData
 from typing import Dict
+from pygame import Rect
+
+SCREEN_RECT = Rect(0, 0, 1280, 960)
 
 GAME: GameData = {
     'name': "Py Pong",
@@ -14,6 +17,7 @@ HUD: HUDData = {
     'score_offset_y': 20,
     'counter_bg_offset': 2,
     'counter_offset_y': 10,
+    'winner_msg_offset': 50
 }
 
 FONT: FontData = {
@@ -54,6 +58,7 @@ BALL: BallData = {
     'velocity': 450,
     'min_coll_tol': 2,
     'max_coll_tol': 10,
+    'starting_pos': (SCREEN_RECT.centerx, SCREEN_RECT.centery)
 }
 
 PADDLE: PaddleData = {
