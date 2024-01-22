@@ -1,9 +1,12 @@
 import pygame as pg
 
+from .const.settings import HUD
 from .objects.paddle import Paddle
 from .objects.ball import Ball
 
 class Level:
+    COUNTER_OFFSET_Y = HUD['counter_offset_y']
+    COUNT_BG_OFFSET = HUD['counter_bg_offset']
     FONT: pg.font.Font
     FONT_COLOR: pg.Color
     BG_COLOR: pg.Color
@@ -11,13 +14,6 @@ class Level:
     SCREEN_MW: int
     SCREEN_MH: int
     SCREEN_W_QUART: int
-
-    SCORE_OFFSET_Y: int
-    COUNT_BG_OFFSET: int
-    COUNTER_OFFSET_Y: int
-
-    # RESTART_TXT: pg.Surface
-    # RESTART_TXT_RECT: pg.Rect
 
     def __init__(self, level_type: str, debug) -> None:
         self.ball_group = pg.sprite.GroupSingle()
@@ -31,27 +27,16 @@ class Level:
         self.ball = Ball(self.ball_group)
         self.paddles = [
             Paddle('left', 'player', self.SCREEN_W_QUART, self.paddles_group),
-            Paddle('right', level_type == 'oneplayer' and 'ai' or 'player', self.SCREEN_W_QUART, self.paddles_group)
+            Paddle('right', level_type == 'oneplayer' and 'ai' or 'player', self.SCREEN_W_QUART * 3, self.paddles_group)
         ]
-
-        for paddle in self.paddles:
-            score_txt = self.FONT.render(str(paddle.score), True, self.FONT_COLOR)
-            paddle.score_txt = score_txt
-            paddle.score_pos = (paddle.hud_pos_x - (score_txt.get_rect().width // 2), self.SCORE_OFFSET_Y)
 
     def reset(self):
         for paddle in self.paddles:
             paddle.reset()
-            self.update_paddle_hud(paddle)
         
         self.winned = bool(False)
         self.reset_time = pg.time.get_ticks()
 
-    def update_paddle_hud(self, paddle: Paddle):
-        score_txt = self.FONT.render(str(paddle.score), True, self.FONT_COLOR)
-        paddle.score_txt = score_txt
-        paddle.score_pos = (paddle.hud_pos_x - (score_txt.get_rect().width // 2), self.SCORE_OFFSET_Y)
-    
     def start(self):
         self.started = not self.started
         self.reset_time = pg.time.get_ticks()
@@ -60,7 +45,7 @@ class Level:
         self.ball.kill()
 
         for paddle in self.paddles:
-            paddle.kill()
+            paddle.destroy()
     
     def counter_active(self):
         return self.reset_time != 0
@@ -72,16 +57,17 @@ class Level:
 
         for paddle in self.paddles:
             if paddle.side == target:
-                paddle.add_point()
-                self.update_paddle_hud(paddle)
+                paddle.score.add_point()
                 winned = paddle.winned()
-                if paddle.score < paddle.MAX_SCORE:
+
+                if not winned:
                     self.reset_time = pg.time.get_ticks()
 
                 if winned:
                     self.winned = winned
                 
                 self.ball.reset(self.winned)
+                break
     
     def update_counter(self, value: int) -> None:
         self.counter = value
@@ -118,9 +104,6 @@ class Level:
     def render_frame(self, display_surf: pg.Surface) -> None:
         self.paddles_group.draw(display_surf)
         self.ball_group.draw(display_surf)
-
-        for paddle in self.paddles:
-            display_surf.blit(paddle.score_txt, paddle.score_pos)
 
         if self.winned:
             # Render text to said who win.

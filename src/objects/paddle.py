@@ -7,6 +7,7 @@ if TYPE_CHECKING:
 import pygame as pg
 
 from src.const.settings import PADDLE
+from src.ui.components.score import Score
 
 
 class Paddle(pg.sprite.Sprite):
@@ -26,38 +27,33 @@ class Paddle(pg.sprite.Sprite):
     def __init__(self, side: str, paddle_type: str, hud_pos_x: int, group: pg.sprite.Group) -> None:
         pg.sprite.Sprite.__init__(self, group)
 
-        self.score = int(4)
         self.type = paddle_type
         self.cur_vel = int(0)
-
-        self.score_txt = None
-        self.score_pos = (0, 0)
+        self.score = Score(hud_pos_x, group)
 
         self.side = side
         if side == 'left':
-            self.hud_pos_x = hud_pos_x
             self.default_pos = (self.OFFSET_X, self.SCREEN_CENTERY)
         else:
-            self.hud_pos_x = hud_pos_x * 3
             self.default_pos = (
                 self.SCREEN_RECT.width - self.WIDTH - self.OFFSET_X,
                 self.SCREEN_CENTERY
             )
-
         self.image = pg.Surface((self.WIDTH, self.HEIGHT))
         self.image.fill(self.COLOR)
         self.rect = self.image.get_rect(midleft=self.default_pos)
 
-    def add_point(self):
-        self.score += 1
-
     def winned(self):
-        return self.score >= self.MAX_SCORE
+        return self.score.current >= self.MAX_SCORE
     
     def reset(self):
         self.cur_vel = int(0)
         self.rect.midleft = self.default_pos
-        self.score = int(0)
+        self.score.reset()
+
+    def destroy(self):
+        self.score.kill()
+        self.kill()
     
     def check_wall_collision(self, dir_y: float) -> int | float:
         if self.rect.top + dir_y < self.OFFSET_Y:
