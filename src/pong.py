@@ -10,13 +10,13 @@ from .utils import load_color, load_img, load_sound, load_font, Text, RectBackgr
 
 from .debug import DebugTool
 
-from .ui.screen_effect import CRS
-from .ui.buttons import ButtonAnimate
+from .ui.components.screen_effect import CRS
+from .ui.components.buttons import ButtonAnimate
+from .ui.components.score import Score
 from .ui.starting_menu import StartingMenu
 from .level import Level
 from .objects.paddle import Paddle
 from .objects.ball import Ball
-
 
 class Pong:
     FPS = GAME['fps']
@@ -73,15 +73,16 @@ class Pong:
         pg.display.flip()
 
         # level and objects.
-        Level.FONT = load_font(FONT['family'], FONT['hud_size'])
+        hud_font = load_font(FONT['family'], FONT['hud_size'])
+        Level.FONT = hud_font
         Level.FONT_COLOR = self.colors['font']
         Level.BG_COLOR = self.colors['background']
         Level.SCREEN_MW = self.SCREEN_MW
         Level.SCREEN_MH = self.SCREEN_MH
         Level.SCREEN_W_QUART = self.SCREEN_MW // 2
-        Level.COUNT_BG_OFFSET = GAME['hud']['counter_bg_offset']
-        Level.COUNTER_OFFSET_Y = GAME['hud']['counter_offset_y']
-        Level.SCORE_OFFSET_Y = GAME['hud']['score_offset_y']
+
+        Score.FONT = hud_font
+        Score.FONT_COLOR = self.colors['font']
 
         ball_sound_data:SoundData = SOUNDS['ball']
         Ball.SCREEN_RECT = self.SCREEN_RECT

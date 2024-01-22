@@ -7,19 +7,18 @@ if TYPE_CHECKING:
 ColorValue = Union[str, Tuple[int, int, int], List[int]]
 
 
-class HUDData(TypedDict):
-    counter_bg_offset: int
-    counter_offset_y: int
-    score_offset_y: int
-
-
 class GameData(TypedDict):
     name: str
     fps: int
     width: int
     height: int
     middle_rect_w: int
-    hud: HUDData
+
+
+class HUDData(TypedDict):
+    counter_bg_offset: int
+    counter_offset_y: int
+    score_offset_y: int
 
 
 class BallData(TypedDict):

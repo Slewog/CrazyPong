@@ -1,4 +1,4 @@
-from .custom_typing import GameData, BallData, PaddleData, ColorValue
+from .custom_typing import GameData, BallData, PaddleData, ColorValue, HUDData
 from .custom_typing import CRSData, FontData, ButtonData, MenuTitleData
 from typing import Dict
 
@@ -8,13 +8,13 @@ GAME: GameData = {
     'width': 1280,
     'height': 960,
     'middle_rect_w': 6,
-    'hud': {
-        'counter_bg_offset': 2,
-        'counter_offset_y': 10,
-        'score_offset_y': 20
-    }
 }
 
+HUD: HUDData = {
+    'score_offset_y': 20,
+    'counter_bg_offset': 2,
+    'counter_offset_y': 10,
+}
 
 FONT: FontData = {
     'family': "freesansbold.ttf",
@@ -63,7 +63,7 @@ PADDLE: PaddleData = {
     'ai_vel_debuff': 100,
     'offset_x': 20,
     'offset_y': 10,
-    'max_score': 5
+    'max_score': 5,
 }
 
 BUTTON_ANIMATE: ButtonData = {
