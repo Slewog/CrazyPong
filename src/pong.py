@@ -80,9 +80,9 @@ class Pong:
         Score.FONT = font
         Score.FONT_COLOR = self.colors['font']
         
-        ball_sound_data:SoundData = SOUNDS['ball']
+        ball_sound:SoundData = SOUNDS['ball']
         Ball.COLOR = self.colors['objects']
-        Ball.HIT_SOUND = load_sound(ball_sound_data['file'], vol=ball_sound_data['vol'])
+        Ball.HIT_SOUND = load_sound(ball_sound['file'], vol=ball_sound['vol'])
 
         Level.FONT = font
         Level.FONT_COLOR = self.colors['font']
@@ -90,6 +90,9 @@ class Pong:
         Level.SCREEN_MW = self.SCREEN_MW
         Level.SCREEN_W_QUART = self.SCREEN_MW // 2
         Level.WIN_TXT_POS = (self.SCREEN_MW, self.SCREEN_MH - HUD['winner_msg_offset'])
+        Level.BUTTONS = [ButtonAnimate(button[0], button[1]) for button in HUD['buttons']]
+        score_sound:SoundData = SOUNDS['score']
+        Level.SCORE_SOUND = load_sound(score_sound['file'], vol=score_sound['vol'])
 
     def set_state(self, new_state: str) -> None:
         if self.state == new_state or type(new_state) != str:
@@ -105,8 +108,9 @@ class Pong:
         self.set_state('play')
         self.level.start()
 
-    def quit_current_game(self) -> None:
-        self.starting_menu.buttons[0].CLICK_SOUND.play()
+    def quit_current_game(self, play_sound: bool) -> None:
+        if play_sound:
+            self.starting_menu.buttons[0].CLICK_SOUND.play()
 
         self.level.destroy()
         self.set_state('menu')
@@ -131,10 +135,13 @@ class Pong:
                 if self.level is not None:
                     if e.type == CE_BALL_OUT_SCREEN:
                         self.level.add_point_to_paddle(e.target)
+                    
+                    if self.level.winned and e.type == pg.MOUSEBUTTONDOWN and e.button == 1:
+                        self.level.handle_btn_click()
 
                     if e.type == pg.KEYDOWN:
                         if e.key == pg.K_ESCAPE or e.key == pg.K_BACKSPACE:
-                            self.quit_current_game()
+                            self.quit_current_game(True)
                             break
 
                         if self.level.winned and e.key == pg.K_SPACE:
@@ -148,6 +155,11 @@ class Pong:
                         self.set_state('quit')
                     elif e.action == 'play' and self.level is None:
                         self.select_game_type(e.target_level)
+                    elif e.action == 'restart':
+                        self.level.reset()
+                    elif e.action == 'backmenu':
+                        self.quit_current_game(False)
+                    
 
             current_time = time()
             dt = current_time - prev_dt

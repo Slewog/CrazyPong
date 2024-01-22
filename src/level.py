@@ -1,9 +1,11 @@
 import pygame as pg
+from typing import List
 
 from .const.settings import HUD
 from .objects.paddle import Paddle
 from .objects.ball import Ball
 from .utils import Text
+from .ui.components.buttons import ButtonAnimate
 
 class Level:
     COUNTER_OFFSET_Y = HUD['counter_offset_y']
@@ -12,10 +14,12 @@ class Level:
     FONT: pg.font.Font
     FONT_COLOR: pg.Color
     BG_COLOR: pg.Color
+    BUTTONS: List[ButtonAnimate]
 
     SCREEN_MW: int
     SCREEN_W_QUART: int
     WIN_TXT_POS: int
+    SCORE_SOUND: pg.mixer.Sound
 
     def __init__(self, level_type: str, debug) -> None:
         self.hud_group = pg.sprite.Group()
@@ -91,6 +95,7 @@ class Level:
                         paddle.reset_velocity()
                 
                 self.ball.reset(self.winned)
+                self.SCORE_SOUND.play()
                 break
     
     def counter_active(self):
@@ -125,11 +130,23 @@ class Level:
             self.ball.set_active(True)
             self.reset_time = int(0)
             self.update_counter(-1)
+    
+    def handle_btn_click(self):
+        for button in self.BUTTONS:
+            if button.hovered:
+                button.click()
 
     def render_frame(self, display_surf: pg.Surface) -> None:
         self.paddles_group.draw(display_surf)
         self.ball_group.draw(display_surf)
         self.hud_group.draw(display_surf)
+
+        if self.winned:
+            mouse_pos = pg.mouse.get_pos()
+            for button in self.BUTTONS:
+                button.check_hover(mouse_pos)
+                button.check_click()
+                button.draw(display_surf)
 
         if not self.winned and self.counter_active():
             pg.draw.rect(display_surf, self.BG_COLOR, self.counter_bg)

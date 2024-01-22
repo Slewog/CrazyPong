@@ -17,7 +17,17 @@ HUD: HUDData = {
     'score_offset_y': 20,
     'counter_bg_offset': 2,
     'counter_offset_y': 10,
-    'winner_msg_offset': 50
+    'winner_msg_offset': 50,
+    'buttons': [
+        [
+            {'text': "RESTART", 'action': "restart"},
+            (GAME['width'] // 2 - 130, GAME['height'] // 2 + 60)
+        ],
+        [
+            {'text': "Back MENU", 'action': "backmenu"},
+            (GAME['width'] // 2 + 145, GAME['height'] // 2 + 60)
+        ]
+    ]
 }
 
 FONT: FontData = {
@@ -37,11 +47,11 @@ COLORS: Dict[str, ColorValue] = {
 SOUNDS: Dict[str, Dict[str, str | float]] = {
     'ball': {
         'file': "ball_hit.wav",
-        'vol': 0.1
+        'vol': 0.06
     },
     'score': {
         'file': "add_score.wav",
-        'vol': 0.1
+        'vol': 0.07
     }
 }
 

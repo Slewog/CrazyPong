@@ -20,6 +20,7 @@ class HUDData(TypedDict):
     counter_offset_y: int
     score_offset_y: int
     winner_msg_offset: int
+    buttons: List[List]
 
 
 class BallData(TypedDict):
