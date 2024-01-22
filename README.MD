@@ -4,6 +4,10 @@ This a Pong like create with python and pygame.</br>
 Use Pygame Surface to render the ball and the paddles.</br>
 Cathodic ray screen effect.</br>
 
+# Requirements
+- pygame 2.5 or more recent
+- python 3.10 or more recent
+
 # Game type
 - Player vs Player.
 - Player vs AI.
