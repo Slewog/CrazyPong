@@ -92,6 +92,10 @@ class Text(pg.sprite.Sprite):
     COLOR: pg.Color
 
     def __init__(self, font: pg.font.Font, text: str, pos: Tuple[int, int], center_by: str, group: pg.sprite.Group, bg: bool = False, bg_offset_y: int = 0, bg_offset_x: int = 0) -> None:
+        """
+        center_by: 'midtop' or 'midbottom'
+        bg: True if you want a bg behind the text.
+        """
         self.image = font.render(text, True, self.COLOR)
 
         if center_by == 'midtop':
