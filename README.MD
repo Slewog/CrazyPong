@@ -22,4 +22,3 @@ Cathodic ray screen effect.</br>
 
 # Todo:
 - Try improve ball collisions with paddles.
-- Add sounds effects.

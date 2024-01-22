@@ -92,7 +92,9 @@ class Pong:
         Level.WIN_TXT_POS = (self.SCREEN_MW, self.SCREEN_MH - HUD['winner_msg_offset'])
         Level.BUTTONS = [ButtonAnimate(button[0], button[1]) for button in HUD['buttons']]
         score_sound:SoundData = SOUNDS['score']
+        win_sound:SoundData = SOUNDS['win']
         Level.SCORE_SOUND = load_sound(score_sound['file'], vol=score_sound['vol'])
+        Level.WIN_SOUND = load_sound(win_sound['file'], vol=win_sound['vol'])
 
     def set_state(self, new_state: str) -> None:
         if self.state == new_state or type(new_state) != str:

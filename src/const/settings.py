@@ -52,6 +52,10 @@ SOUNDS: Dict[str, Dict[str, str | float]] = {
     'score': {
         'file': "add_score.wav",
         'vol': 0.07
+    },
+    'win': {
+        'file': "game_win.wav",
+        'vol': 0.1
     }
 }
 

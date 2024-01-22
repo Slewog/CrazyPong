@@ -20,7 +20,8 @@ class Level:
     SCREEN_W_QUART: int
     WIN_TXT_POS: int
     SCORE_SOUND: pg.mixer.Sound
-
+    WIN_SOUND: pg.mixer.Sound
+    
     def __init__(self, level_type: str, debug) -> None:
         self.hud_group = pg.sprite.Group()
         self.ball_group = pg.sprite.GroupSingle()
@@ -73,6 +74,7 @@ class Level:
 
                 if not winned:
                     self.reset_time = pg.time.get_ticks()
+                    self.SCORE_SOUND.play()
 
                 if winned:
                     if paddle.type == 'ai':
@@ -93,9 +95,10 @@ class Level:
 
                     for paddle in self.paddles:
                         paddle.reset_velocity()
+                    
+                    self.WIN_SOUND.play()
                 
                 self.ball.reset(self.winned)
-                self.SCORE_SOUND.play()
                 break
     
     def counter_active(self):
