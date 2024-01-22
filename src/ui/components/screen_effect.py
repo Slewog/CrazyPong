@@ -1,4 +1,4 @@
-from ..const.custom_typing import CRSData
+from src.const.custom_typing import CRSData
 
 from random import randint
 import pygame as pg
