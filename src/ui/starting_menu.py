@@ -1,10 +1,10 @@
-from typing import List
 import pygame as pg
+from typing import List
 
 from src.const.custom_typing import FontData
-from src.const.settings import STARTING_MENU, BUTTON
-from src.utils import load_font, load_sound, Text, TextBackground, Image
-from .buttons import AnimateButton
+from src.const.settings import STARTING_MENU
+from src.utils import load_font, Text, Image
+from .buttons import ButtonAnimate
 
 
 class StartingMenu:
@@ -18,48 +18,38 @@ class StartingMenu:
     pg_logo_surf: pg.Surface
     pg_logo_rect: pg.Rect
 
-    def __init__(self, font_data: FontData, font_color: pg.Color, bg_color: pg.Color) -> None:
-        self.buttons: List[AnimateButton] = []
+    def __init__(self, font_data: FontData) -> None:
+        # Setup.
+        self.buttons: List[ButtonAnimate] = []
 
         self.all_text = pg.sprite.Group()
-        self.all_bg = pg.sprite.Group()
         self.all_img = pg.sprite.Group()
         
-        self.font = load_font(font_data['family'], font_data['size'])
-        self.font_data = font_data
-        self.font_color = font_color
-        self.bg_color = bg_color
+        font = load_font(font_data['family'], font_data['default_size'])
 
-        Text.COLOR = font_color
-        TextBackground.COLOR = bg_color
-
-        AnimateButton.FONT = self.font
-        AnimateButton.FONT_COLOR = font_color
-        AnimateButton.CLICK_SOUND = load_sound(BUTTON['sound_file'], BUTTON['sound_vol'])
-
-        self.create_menu()
-    
-    def create_menu(self):
+        # Creation of the menu.
         for button in STARTING_MENU['buttons']:
-            self.buttons.append(AnimateButton(button[0], button[1]))
-        
+            self.buttons.append(ButtonAnimate(button[0], button[1]))
+
         title = STARTING_MENU['title']
-        self.title = Text(
-            load_font(self.font_data['family'], title['font_size']),
+        Text(
+            load_font(font_data['family'], font_data['title_size']),
             title['text'],
             title['pos'],
             title['center_by'],
-            self.all_text
+            self.all_text,
+            bg=True,
+            bg_offset_y=-10
         )
-        TextBackground(self.title.rect, self.all_bg, offset_y=-10)
+        
 
         copyright = STARTING_MENU['copyright']
-        self.copyright = Text(self.font, copyright['text'], copyright['pos'], copyright['center_by'], self.all_text)
-        TextBackground(self.copyright.rect, self.all_bg)
+        Text(font, copyright['text'], copyright['pos'], copyright['center_by'], self.all_text, bg=True)
+
 
         pg_logo = STARTING_MENU['pg_logo']
         Image(pg_logo['file'], pg_logo['pos'], self.all_img)
-
+    
     def handle_btn_click(self):
         for button in self.buttons:
             if button.hovered:
@@ -72,6 +62,5 @@ class StartingMenu:
             button.check_click()
             button.draw(display_surf)
         
-        self.all_bg.draw(display_surf)
         self.all_text.draw(display_surf)
         self.all_img.draw(display_surf)
