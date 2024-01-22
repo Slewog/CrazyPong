@@ -16,22 +16,29 @@ class Paddle(pg.sprite.Sprite):
     AI_VELOCITY = VELOCITY - PADDLE['ai_vel_debuff']
     OFFSET_X = PADDLE['offset_x']
     OFFSET_Y = PADDLE['offset_y']
+    MAX_SCORE = PADDLE['max_score']
 
     COLOR: pg.Color
     SCREEN_RECT: pg.Rect
     SCREEN_CENTERY: int
     SCREEN_BOTTOM: int
 
-    def __init__(self, side: str, paddle_type: str, group: pg.sprite.Group) -> None:
+    def __init__(self, side: str, paddle_type: str, hud_pos_x: int, group: pg.sprite.Group) -> None:
         pg.sprite.Sprite.__init__(self, group)
 
+        self.score = int(4)
         self.type = paddle_type
         self.cur_vel = int(0)
 
+        self.score_txt = None
+        self.score_pos = (0, 0)
+
         self.side = side
         if side == 'left':
+            self.hud_pos_x = hud_pos_x
             self.default_pos = (self.OFFSET_X, self.SCREEN_CENTERY)
         else:
+            self.hud_pos_x = hud_pos_x * 3
             self.default_pos = (
                 self.SCREEN_RECT.width - self.WIDTH - self.OFFSET_X,
                 self.SCREEN_CENTERY
@@ -40,7 +47,17 @@ class Paddle(pg.sprite.Sprite):
         self.image = pg.Surface((self.WIDTH, self.HEIGHT))
         self.image.fill(self.COLOR)
         self.rect = self.image.get_rect(midleft=self.default_pos)
-        self.pos = pg.math.Vector2(self.rect.topleft)
+
+    def add_point(self):
+        self.score += 1
+
+    def winned(self):
+        return self.score >= self.MAX_SCORE
+    
+    def reset(self):
+        self.cur_vel = int(0)
+        self.rect.midleft = self.default_pos
+        self.score = int(0)
     
     def check_wall_collision(self, dir_y: float) -> int | float:
         if self.rect.top + dir_y < self.OFFSET_Y:
