@@ -85,6 +85,9 @@ class RectBackground(pg.sprite.Sprite):
 
         self.rect = rect.copy()
         self.rect.move_ip(offset_x, offset_y)
+    
+    def destroy(self):
+        self.kill()
 
 
 class Text(pg.sprite.Sprite):
@@ -98,15 +101,22 @@ class Text(pg.sprite.Sprite):
         """
         self.image = font.render(text, True, self.COLOR)
 
-        if center_by == 'midtop':
+        if center_by == 'center':
+            self.rect = self.image.get_rect(center=pos)
+        elif center_by == 'midtop':
             self.rect = self.image.get_rect(midtop=pos)
         elif center_by == 'midbottom':
             self.rect = self.image.get_rect(midbottom=pos)
 
-        if bg:
-            RectBackground(self.rect, group, bg_offset_y, bg_offset_x)
+        self.bg = bg and RectBackground(self.rect, group, bg_offset_y, bg_offset_x) or False
 
         pg.sprite.Sprite.__init__(self, group)
+
+    def destroy(self):
+        self.kill()
+
+        if self.bg:
+            self.bg.kill()
 
 
 class Image(pg.sprite.Sprite):
@@ -116,6 +126,9 @@ class Image(pg.sprite.Sprite):
 
         self.image = load_img(file, convert_a=True)
         self.rect = self.image.get_rect(bottomright=pos)
+    
+    def destroy(self):
+        self.kill()
 
 
 class NoneSound:

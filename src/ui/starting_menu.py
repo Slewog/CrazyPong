@@ -32,10 +32,8 @@ class StartingMenu:
             bg_offset_y=-10
         )
         
-
         copyright = STARTING_MENU['copyright']
         Text(font, copyright['text'], copyright['pos'], copyright['center_by'], self.all_text, bg=True)
-
 
         pg_logo = STARTING_MENU['pg_logo']
         Image(pg_logo['file'], pg_logo['pos'], self.all_img)

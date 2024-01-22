@@ -7,7 +7,7 @@ if TYPE_CHECKING:
 import pygame as pg
 from random import choice
 
-from src.const.settings import BALL
+from src.const.settings import BALL, SCREEN_RECT
 from src.const.custom_event import CE_BALL_OUT_SCREEN
 
 
@@ -17,11 +17,9 @@ class Ball(pg.sprite.Sprite):
     VELOCITY = BALL['velocity']
     RADIUS = BALL['radius']
     SIZE = (RADIUS * 2, RADIUS * 2)
+    SCREEN_RECT = SCREEN_RECT
 
-
-    START_POS: Tuple[int, int]
     COLOR: pg.Color
-    SCREEN_RECT: pg.Rect
     HIT_SOUND: pg.mixer.Sound
 
     def __init__(self, group: pg.sprite.GroupSingle) -> None:
@@ -49,7 +47,7 @@ class Ball(pg.sprite.Sprite):
         self.image.blit(rect_image, (0, 0), None, pg.BLEND_RGBA_MIN)
 
         # Ball rect.
-        self.rect = self.image.get_rect(center=self.START_POS)
+        self.rect = self.image.get_rect(center=BALL['starting_pos'])
     
     def set_active(self, state: bool) -> None:
         if state == self.active or type(state) != bool:
@@ -57,7 +55,7 @@ class Ball(pg.sprite.Sprite):
         self.active = state
 
     def reset(self, full: bool = False):
-        self.rect.center = self.START_POS
+        self.rect.center = BALL['starting_pos']
         self.set_active(False)
         
         if not full:

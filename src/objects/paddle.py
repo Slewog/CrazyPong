@@ -6,11 +6,15 @@ if TYPE_CHECKING:
 
 import pygame as pg
 
-from src.const.settings import PADDLE
+from src.const.settings import PADDLE, SCREEN_RECT
 from src.ui.components.score import Score
 
 
 class Paddle(pg.sprite.Sprite):
+    SCREEN_RECT =  SCREEN_RECT
+    SCREEN_CENTERY = SCREEN_RECT.centery
+    SCREEN_BOTTOM = SCREEN_RECT.height - PADDLE['offset_y']
+    
     WIDTH = PADDLE['width']
     HEIGHT = PADDLE['height']
     VELOCITY = PADDLE['velocity']
@@ -20,9 +24,6 @@ class Paddle(pg.sprite.Sprite):
     MAX_SCORE = PADDLE['max_score']
 
     COLOR: pg.Color
-    SCREEN_RECT: pg.Rect
-    SCREEN_CENTERY: int
-    SCREEN_BOTTOM: int
 
     def __init__(self, side: str, paddle_type: str, hud_pos_x: int, group: pg.sprite.Group) -> None:
         pg.sprite.Sprite.__init__(self, group)
@@ -47,9 +48,12 @@ class Paddle(pg.sprite.Sprite):
         return self.score.current >= self.MAX_SCORE
     
     def reset(self):
-        self.cur_vel = int(0)
+        self.reset_velocity()
         self.rect.midleft = self.default_pos
         self.score.reset()
+
+    def reset_velocity(self):
+        self.cur_vel = int(0)
 
     def destroy(self):
         self.score.kill()

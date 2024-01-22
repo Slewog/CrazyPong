@@ -5,7 +5,7 @@ from typing import Dict
 
 from .const.custom_typing import SoundData
 from .const.custom_event import CE_BTN_CLICKED, CE_BALL_OUT_SCREEN
-from .const.settings import GAME, FONT, COLORS, CRS_EFFECT, SOUNDS, BUTTON_ANIMATE
+from .const.settings import SCREEN_RECT, GAME, FONT, COLORS, CRS_EFFECT, SOUNDS, BUTTON_ANIMATE, HUD
 from .utils import load_color, load_img, load_sound, load_font, Text, RectBackground
 
 from .debug import DebugTool
@@ -20,7 +20,7 @@ from .objects.ball import Ball
 
 class Pong:
     FPS = GAME['fps']
-    SCREEN_RECT = pg.Rect(0, 0, GAME['width'], GAME['height'])
+    SCREEN_RECT = SCREEN_RECT
     SCREEN_MW = SCREEN_RECT.width // 2
     SCREEN_MH = SCREEN_RECT.height // 2
 
@@ -73,28 +73,24 @@ class Pong:
         pg.display.flip()
 
         # level and objects.
-        hud_font = load_font(FONT['family'], FONT['hud_size'])
-        Level.FONT = hud_font
-        Level.FONT_COLOR = self.colors['font']
-        Level.BG_COLOR = self.colors['background']
-        Level.SCREEN_MW = self.SCREEN_MW
-        Level.SCREEN_MH = self.SCREEN_MH
-        Level.SCREEN_W_QUART = self.SCREEN_MW // 2
+        font = load_font(FONT['family'], FONT['hud_size'])
 
-        Score.FONT = hud_font
+        Paddle.COLOR = self.colors['objects']
+        
+        Score.FONT = font
         Score.FONT_COLOR = self.colors['font']
-
+        
         ball_sound_data:SoundData = SOUNDS['ball']
-        Ball.SCREEN_RECT = self.SCREEN_RECT
-        Ball.START_POS = (self.SCREEN_MW, self.SCREEN_MH)
         Ball.COLOR = self.colors['objects']
         Ball.HIT_SOUND = load_sound(ball_sound_data['file'], vol=ball_sound_data['vol'])
 
-        Paddle.SCREEN_RECT = self.SCREEN_RECT
-        Paddle.SCREEN_CENTERY = self.SCREEN_MH
-        Paddle.SCREEN_BOTTOM = self.SCREEN_RECT.height - Paddle.OFFSET_Y
-        Paddle.COLOR = self.colors['objects']
-    
+        Level.FONT = font
+        Level.FONT_COLOR = self.colors['font']
+        Level.BG_COLOR = self.colors['background']
+        Level.SCREEN_MW = self.SCREEN_MW
+        Level.SCREEN_W_QUART = self.SCREEN_MW // 2
+        Level.WIN_TXT_POS = (self.SCREEN_MW, self.SCREEN_MH - HUD['winner_msg_offset'])
+
     def set_state(self, new_state: str) -> None:
         if self.state == new_state or type(new_state) != str:
             return
