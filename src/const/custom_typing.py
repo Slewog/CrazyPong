@@ -19,6 +19,7 @@ class HUDData(TypedDict):
     counter_bg_offset: int
     counter_offset_y: int
     score_offset_y: int
+    winner_msg_offset: int
 
 
 class BallData(TypedDict):
@@ -26,6 +27,7 @@ class BallData(TypedDict):
     velocity: int
     min_coll_tol: int
     max_coll_tol: int
+    starting_pos: Tuple[int, int]
 
 
 class PaddleData(TypedDict):
