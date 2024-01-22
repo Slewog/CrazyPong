@@ -4,7 +4,7 @@ from typing import List
 from src.const.custom_typing import FontData
 from src.const.settings import STARTING_MENU
 from src.utils import load_font, Text, Image
-from .buttons import ButtonAnimate
+from .components.buttons import ButtonAnimate
 
 
 class StartingMenu:
