@@ -27,7 +27,7 @@ class Ball(pg.sprite.Sprite):
     def __init__(self, group: pg.sprite.GroupSingle) -> None:
         pg.sprite.Sprite.__init__(self, group)
 
-        self.active = bool(True)
+        self.active = bool(False)
 
         self.direction = pg.math.Vector2(
             choice((self.VELOCITY, -self.VELOCITY)),
@@ -50,12 +50,24 @@ class Ball(pg.sprite.Sprite):
 
         # Ball rect.
         self.rect = self.image.get_rect(center=self.START_POS)
-        self.pos = pg.math.Vector2(self.rect.topleft)
     
     def set_active(self, state: bool) -> None:
         if state == self.active or type(state) != bool:
             return
         self.active = state
+
+    def reset(self, full: bool = False):
+        self.rect.center = self.START_POS
+        self.set_active(False)
+        
+        if not full:
+            self.direction.x *= -1
+            self.direction.y = int(choice((self.VELOCITY, -self.VELOCITY)))
+        else:
+            self.direction = pg.math.Vector2(
+                choice((self.VELOCITY, -self.VELOCITY)),
+                choice((self.VELOCITY, -self.VELOCITY))
+            )
 
     def check_display_collisions(self, direction: str, new_pos: float) -> int | float:
         if direction == 'vertical':
@@ -70,15 +82,14 @@ class Ball(pg.sprite.Sprite):
                 self.direction.y *= -1
 
         if direction == 'horizontal':
+            target = None
             if self.rect.left + new_pos < 0:
-                new_pos = -self.rect.left
-                self.direction.x *= -1
-                pg.event.post(pg.event.Event(CE_BALL_OUT_SCREEN, {'target_player': 'right'}))
+                target = 'right'
 
             if self.rect.right + new_pos > self.SCREEN_RECT.width:
-                new_pos = self.rect.right - self.rect.right
-                self.direction.x *= -1
-                pg.event.post(pg.event.Event(CE_BALL_OUT_SCREEN, {'target_player': 'left'}))
+                target = 'left'
+            
+            pg.event.post(pg.event.Event(CE_BALL_OUT_SCREEN, {'target': target}))
         return new_pos
 
     def check_collisions(self, direction: str, paddles: List[Paddle], new_pos: float) -> int | float:
