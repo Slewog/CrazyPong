@@ -8,8 +8,6 @@ from .const.custom_event import CE_BTN_CLICKED, CE_BALL_OUT_SCREEN
 from .const.settings import SCREEN_RECT, GAME, FONT, COLORS, CRS_EFFECT, SOUNDS, BUTTON_ANIMATE, HUD
 from .utils import load_color, load_img, load_sound, load_font, Text, RectBackground
 
-from .debug import DebugTool
-
 from .ui.components.screen_effect import CRS
 from .ui.components.buttons import ButtonAnimate
 from .ui.components.score import Score
@@ -106,7 +104,7 @@ class Pong:
         self.state = new_state
 
     def select_game_type(self, type_target: str) -> None:
-        self.level = Level(type_target, self.debug.add_data)
+        self.level = Level(type_target)
         self.set_state('play')
         self.level.start()
 

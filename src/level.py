@@ -22,7 +22,7 @@ class Level:
     SCORE_SOUND: pg.mixer.Sound
     WIN_SOUND: pg.mixer.Sound
     
-    def __init__(self, level_type: str, debug) -> None:
+    def __init__(self, level_type: str) -> None:
         self.hud_group = pg.sprite.Group()
         self.ball_group = pg.sprite.GroupSingle()
         self.paddles_group = pg.sprite.Group()
