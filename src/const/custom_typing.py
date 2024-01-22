@@ -7,12 +7,19 @@ if TYPE_CHECKING:
 ColorValue = Union[str, Tuple[int, int, int], List[int]]
 
 
+class HUDData(TypedDict):
+    counter_bg_offset: int
+    counter_offset_y: int
+    score_offset_y: int
+
+
 class GameData(TypedDict):
     name: str
     fps: int
     width: int
     height: int
     middle_rect_w: int
+    hud: HUDData
 
 
 class BallData(TypedDict):
@@ -29,6 +36,7 @@ class PaddleData(TypedDict):
     offset_y: int
     velocity: int
     ai_vel_debuff: int
+    max_score: int
 
 
 class SoundData(TypedDict):
@@ -38,8 +46,10 @@ class SoundData(TypedDict):
 
 class FontData(TypedDict):
     family: str
-    size: int
+    default_size: int
     from_system: bool
+    title_size: int
+    hud_size: int
 
 
 class ButtonData(TypedDict):
@@ -65,7 +75,6 @@ class CRSData(TypedDict):
 
 class TextData(TypedDict):
     text: str
-    font_size: int
     pos: Tuple[int, int]
     center_by: str
 
