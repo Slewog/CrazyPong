@@ -1,8 +1,12 @@
-<h1 align='center'>PyPong</a></h1><p align='center'><b>
+<h1 align='center'>PyPong V2</a></h1><p align='center'><b>
 
 This a Pong like create with python and pygame.</br>
 Use Pygame Surface to render the ball and the paddles.</br>
-Play with two players or players vs AI.</br>
+Cathodic ray screen effect.</br>
+
+# Game type
+- Player vs Player.
+- Player vs AI.
 
 # Controls:
 - Player 1: Z and S (based on an AZERTY KEYBOARD)
