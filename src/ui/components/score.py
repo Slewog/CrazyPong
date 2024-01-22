@@ -10,7 +10,7 @@ class Score(pg.sprite.Sprite):
         pg.sprite.Sprite.__init__(self, group)
         
         self.pos_x = pos_x
-        self.current = 4
+        self.current = int(0)
         self.update_surf()
 
     def update_surf(self):
@@ -18,7 +18,7 @@ class Score(pg.sprite.Sprite):
         self.rect = self.image.get_rect(midtop=(self.pos_x, self.OFFSET_Y))
 
     def reset(self):
-        self.current = 0
+        self.current = int(0)
         self.update_surf()
 
     def add_point(self):
