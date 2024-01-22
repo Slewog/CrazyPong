@@ -2,22 +2,22 @@ from typing import Tuple, Dict
 import pygame as pg
 
 from src.const.custom_event import CE_BTN_CLICKED
-from src.const.settings import BUTTON
+from src.const.settings import BUTTON_ANIMATE
 from src.utils import load_color
 
 
-class AnimateButton:
+class ButtonAnimate:
     FONT: pg.font.Font
     FONT_COLOR: pg.Color
-    TXT_OFFSET = BUTTON['text_offset']
+    TXT_OFFSET = BUTTON_ANIMATE['text_offset']
     
-    BORDER_RADIUS = BUTTON['border_radius']
-    BORDER_SIZE = BUTTON['border_size']
+    BORDER_RADIUS = BUTTON_ANIMATE['border_radius']
+    BORDER_SIZE = BUTTON_ANIMATE['border_size']
 
     CLICK_SOUND: pg.mixer.Sound
 
     COLORS: Dict[str, pg.Color] = {}
-    for color_name, color in BUTTON['colors'].items():
+    for color_name, color in BUTTON_ANIMATE['colors'].items():
         COLORS[color_name] = load_color(color)
 
     def __init__(self, event_data: Dict[str, str], pos: Tuple[int, int], elevation: int = 5) -> None:
@@ -35,7 +35,12 @@ class AnimateButton:
         self.text_surf = self.FONT.render(event_data['text'], True, self.FONT_COLOR)
         self.text_rect = self.text_surf.get_rect(center=(pos[0], (pos[1] - elevation) + self.TXT_OFFSET))
 
-        self.top_rect = pg.Rect(pos[0], pos[1], self.text_rect.width + BUTTON['width_gap'], self.text_rect.height + BUTTON['height_gap'])
+        self.top_rect = pg.Rect(
+            pos[0],
+            pos[1],
+            self.text_rect.width + BUTTON_ANIMATE['width_gap'],
+            self.text_rect.height + BUTTON_ANIMATE['height_gap']
+        )
         self.top_rect.center = (pos[0], self.original_y_pos - elevation)
         self.top_rect_color = self.COLORS['top_color']
 
