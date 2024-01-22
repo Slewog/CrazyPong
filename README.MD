@@ -11,6 +11,7 @@ Cathodic ray screen effect.</br>
 # Controls:
 - Player 1: Z and S (based on an AZERTY KEYBOARD)
 - Player 2: KEY UP and KEY DOWN.
+- Leave current game: ESCAPE or BACKSPACE.
 </br>
 
 # Screenshots:
