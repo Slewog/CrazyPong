@@ -46,6 +46,12 @@ class SoundData(TypedDict):
     vol: float | int
 
 
+class SoundDict(TypedDict):
+    ball: SoundData
+    win: SoundData
+    score: SoundData
+
+
 class FontData(TypedDict):
     family: str
     default_size: int
@@ -67,7 +73,7 @@ class ButtonData(TypedDict):
 
 class CRSData(TypedDict):
     file: str
-    vignette:Surface
+    vignette: Surface
     line_gap: int
     line_color: Color
     min_alpha: int

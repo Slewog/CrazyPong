@@ -3,7 +3,7 @@ from sys import exit
 from time import time
 from typing import Dict
 
-from .const.custom_typing import SoundData
+
 from .const.custom_event import CE_BTN_CLICKED, CE_BALL_OUT_SCREEN
 from .const.settings import SCREEN_RECT, GAME, FONT, COLORS, CRS_EFFECT, SOUNDS, BUTTON_ANIMATE, HUD
 from .utils import load_color, load_img, load_sound, load_font, Text, RectBackground
@@ -20,7 +20,6 @@ class Pong:
     FPS = GAME['fps']
     SCREEN_RECT = SCREEN_RECT
     SCREEN_MW = SCREEN_RECT.width // 2
-    SCREEN_MH = SCREEN_RECT.height // 2
 
     crs_effect: CRS
     level:Level = None
@@ -70,13 +69,15 @@ class Pong:
 
         # level and objects.
         font = load_font(FONT['family'], FONT['hud_size'])
+        ball_sound = SOUNDS['ball']
+        score_sound = SOUNDS['score']
+        win_sound = SOUNDS['win']
 
         Paddle.COLOR = self.colors['objects']
         
         Score.FONT = font
         Score.FONT_COLOR = self.colors['font']
         
-        ball_sound:SoundData = SOUNDS['ball']
         Ball.COLOR = self.colors['objects']
         Ball.HIT_SOUND = load_sound(ball_sound['file'], vol=ball_sound['vol'])
 
@@ -85,10 +86,9 @@ class Pong:
         Level.BG_COLOR = self.colors['background']
         Level.SCREEN_MW = self.SCREEN_MW
         Level.SCREEN_W_QUART = self.SCREEN_MW // 2
-        Level.WIN_TXT_POS = (self.SCREEN_MW, self.SCREEN_MH - HUD['winner_msg_offset'])
+        Level.WIN_TXT_POS = (self.SCREEN_MW, SCREEN_RECT.height // 2 - HUD['winner_msg_offset'])
         Level.BUTTONS = [ButtonAnimate(button[0], button[1]) for button in HUD['buttons']]
-        score_sound:SoundData = SOUNDS['score']
-        win_sound:SoundData = SOUNDS['win']
+        
         Level.SCORE_SOUND = load_sound(score_sound['file'], vol=score_sound['vol'])
         Level.WIN_SOUND = load_sound(win_sound['file'], vol=win_sound['vol'])
 
@@ -96,10 +96,10 @@ class Pong:
         if self.state == new_state or type(new_state) != str:
             return
         
+        self.state = new_state
+        
         if new_state == 'quit':
             self.quit()
-        
-        self.state = new_state
 
     def select_game_type(self, type_target: str) -> None:
         self.level = Level(type_target)
@@ -137,27 +137,23 @@ class Pong:
                     if self.level.winned and e.type == pg.MOUSEBUTTONDOWN and e.button == 1:
                         self.level.handle_btn_click()
 
-                    if e.type == pg.KEYDOWN:
-                        if e.key == pg.K_ESCAPE or e.key == pg.K_BACKSPACE:
-                            self.quit_current_game(True)
-                            break
-
-                        if self.level.winned and e.key == pg.K_SPACE:
-                            self.level.reset()
+                    if e.type == pg.KEYDOWN and (e.key == pg.K_ESCAPE or e.key == pg.K_BACKSPACE):
+                        self.quit_current_game(True)
+                        break
                         
                 if self.state == 'menu' and e.type == pg.MOUSEBUTTONDOWN and e.button == 1:
                     self.starting_menu.handle_btn_click()
 
                 if e.type == CE_BTN_CLICKED:
-                    if e.action == 'quit':
-                        self.set_state('quit')
-                    elif e.action == 'play' and self.level is None:
-                        self.select_game_type(e.target_level)
-                    elif e.action == 'restart':
-                        self.level.reset()
-                    elif e.action == 'backmenu':
-                        self.quit_current_game(False)
-                    
+                    match e.action:
+                        case 'quit':
+                            self.set_state('quit')
+                        case 'play':
+                            self.select_game_type(e.target_level)
+                        case 'restart':
+                            self.level.reset()
+                        case 'backmenu':
+                            self.quit_current_game(False)
 
             current_time = time()
             dt = current_time - prev_dt
@@ -168,8 +164,7 @@ class Pong:
 
             if self.state == 'menu':
                 self.starting_menu.render(self.display_surf)
-
-            if self.state == 'play' and self.level is not None:
+            elif self.state == 'play':
                 self.level.run(self.display_surf, dt)
 
             self.crs_effect.render(self.display_surf)

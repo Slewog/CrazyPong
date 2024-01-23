@@ -96,17 +96,18 @@ class Text(pg.sprite.Sprite):
 
     def __init__(self, font: pg.font.Font, text: str, pos: Tuple[int, int], center_by: str, group: pg.sprite.Group, bg: bool = False, bg_offset_y: int = 0, bg_offset_x: int = 0) -> None:
         """
-        center_by: 'midtop' or 'midbottom'
+        center_by: 'midtop' | 'midbottom' | center
         bg: True if you want a bg behind the text.
         """
         self.image = font.render(text, True, self.COLOR)
 
-        if center_by == 'center':
-            self.rect = self.image.get_rect(center=pos)
-        elif center_by == 'midtop':
-            self.rect = self.image.get_rect(midtop=pos)
-        elif center_by == 'midbottom':
-            self.rect = self.image.get_rect(midbottom=pos)
+        match center_by:
+            case 'center':
+                self.rect = self.image.get_rect(center=pos)
+            case 'midtop':
+                self.rect = self.image.get_rect(midtop=pos)
+            case 'midbottom':
+                self.rect = self.image.get_rect(midbottom=pos)
 
         self.bg = bg and RectBackground(self.rect, group, bg_offset_y, bg_offset_x) or False
 

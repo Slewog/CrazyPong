@@ -44,18 +44,18 @@ class Paddle(pg.sprite.Sprite):
         self.image.fill(self.COLOR)
         self.rect = self.image.get_rect(midleft=self.default_pos)
 
-    def winned(self):
+    def winned(self) -> bool:
         return self.score.current >= self.MAX_SCORE
     
-    def reset(self):
+    def reset(self) -> None:
         self.reset_velocity()
         self.rect.midleft = self.default_pos
         self.score.reset()
 
-    def reset_velocity(self):
+    def reset_velocity(self) -> None:
         self.cur_vel = int(0)
 
-    def destroy(self):
+    def destroy(self) -> None:
         self.score.kill()
         self.kill()
     
@@ -72,9 +72,9 @@ class Paddle(pg.sprite.Sprite):
         self.cur_vel = int(0)
 
         if self.side == 'left':
-            if keys[pg.K_z]:
+            if keys[pg.K_r]:
                 self.cur_vel = -self.VELOCITY
-            elif keys[pg.K_s]:
+            elif keys[pg.K_f]:
                 self.cur_vel = self.VELOCITY
 
         if self.side == 'right':

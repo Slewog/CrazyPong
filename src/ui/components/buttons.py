@@ -46,18 +46,8 @@ class ButtonAnimate:
 
         self.bottom_rect = pg.Rect(pos[0], pos[1], self.top_rect.width, self.top_rect.height)
         self.bottom_rect.center = pos
-    
-    def draw(self, display_surf:pg.Surface):
-        # Background.
-        pg.draw.rect(display_surf, self.COLORS['bg_color'], self.bottom_rect, border_radius=self.BORDER_RADIUS)
-        # Top.
-        pg.draw.rect(display_surf, self.top_rect_color, self.top_rect, border_radius=self.BORDER_RADIUS)
-        # Border.
-        pg.draw.rect(display_surf, self.COLORS['bg_color'], self.top_rect, border_radius=self.BORDER_RADIUS, width=self.BORDER_SIZE)
 
-        display_surf.blit(self.text_surf, self.text_rect)
-
-    def change_elevation(self, elevation: int):
+    def change_elevation(self, elevation: int) -> None:
         self.dynamic_elevation = elevation
 
         self.top_rect.center = (self.top_rect.centerx, (self.original_y_pos - self.dynamic_elevation) + self.elevation)
@@ -66,11 +56,10 @@ class ButtonAnimate:
         self.bottom_rect.midtop = self.top_rect.midtop
         self.bottom_rect.height = self.top_rect.height + elevation
     
-    def click(self):
-        if self.pressed: 
-            return
+    def click(self) -> None:
+        if self.pressed: return
         
-        self.pressed = bool(True)
+        self.pressed = not self.pressed
         self.change_elevation(0)
         self.click_time = pg.time.get_ticks()
         self.CLICK_SOUND.play()
@@ -80,7 +69,7 @@ class ButtonAnimate:
             if not self.cursor_changed:
                 pg.mouse.set_cursor(pg.SYSTEM_CURSOR_HAND)
                 self.top_rect_color = self.COLORS['top_color_hover']
-                self.cursor_changed = bool(True)
+                self.cursor_changed = not self.cursor_changed
                 self.hovered = bool(True)
             return 
         
@@ -91,16 +80,30 @@ class ButtonAnimate:
         
         if self.cursor_changed:
             pg.mouse.set_cursor(pg.SYSTEM_CURSOR_ARROW)
-            self.cursor_changed = bool(False)
+            self.cursor_changed = not self.cursor_changed
 
-    def check_click(self):
-        if self.click_time is not None:
-            current_time = pg.time.get_ticks()
+    def check_click(self) -> None:
+        if self.click_time is None: return
+        
+        clicked_time = pg.time.get_ticks() - self.click_time
 
-            if current_time - self.click_time >= 125 and self.dynamic_elevation == 0:
-                self.change_elevation(self.elevation)
+        if clicked_time >= 125 and self.dynamic_elevation == 0:
+            self.change_elevation(self.elevation)
 
-            if current_time - self.click_time >= 200:
-                pg.event.post(pg.event.Event(CE_BTN_CLICKED, self.event_data))
-                self.pressed = bool(False)
-                self.click_time = None
+        if clicked_time >= 200:
+            pg.event.post(pg.event.Event(CE_BTN_CLICKED, self.event_data))
+            self.pressed = bool(False)
+            self.click_time = None
+    
+    def render(self, display_surf: pg.Surface, mouse_pos: Tuple[int, int]) -> None:
+        self.check_hover(mouse_pos)
+        self.check_click()
+
+        # Background.
+        pg.draw.rect(display_surf, self.COLORS['bg_color'], self.bottom_rect, border_radius=self.BORDER_RADIUS)
+        # Top.
+        pg.draw.rect(display_surf, self.top_rect_color, self.top_rect, border_radius=self.BORDER_RADIUS)
+        # Border.
+        pg.draw.rect(display_surf, self.COLORS['bg_color'], self.top_rect, border_radius=self.BORDER_RADIUS, width=self.BORDER_SIZE)
+
+        display_surf.blit(self.text_surf, self.text_rect)

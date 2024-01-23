@@ -35,10 +35,10 @@ class Level:
         self.ball = Ball(self.ball_group)
         self.paddles = [
             Paddle('left', 'player', self.SCREEN_W_QUART, self.paddles_group),
-            Paddle('right', level_type == 'oneplayer' and 'ai' or 'player', self.SCREEN_W_QUART * 3, self.paddles_group)
+            Paddle('right', 'ai' if level_type == 'oneplayer' else 'player', self.SCREEN_W_QUART * 3, self.paddles_group)
         ]
 
-    def reset(self):
+    def reset(self) -> None:
         for paddle in self.paddles:
             paddle.reset()
         
@@ -49,7 +49,7 @@ class Level:
 
         self.reset_time = pg.time.get_ticks()
 
-    def start(self):
+    def start(self) -> None:
         self.started = not self.started
         self.reset_time = pg.time.get_ticks()
 
@@ -64,8 +64,7 @@ class Level:
         
     def add_point_to_paddle(self, target: str) -> None:
         """target is the side of the paddle targetted"""
-        if type(target) != str:
-            return
+        if type(target) != str: return
 
         for paddle in self.paddles:
             if paddle.side == target:
@@ -77,15 +76,10 @@ class Level:
                     self.SCORE_SOUND.play()
 
                 if winned:
-                    if paddle.type == 'ai':
-                        winner = "The AI is the winner"
-                    else:
-                        winner = f"The player {paddle.side} is the winner"
-
                     self.winned = winned
                     self.win_text = Text(
                         self.FONT,
-                        winner,
+                        "The AI is the winner" if paddle.type == 'ai' else f"The player {paddle.side} is the winner",
                         self.WIN_TXT_POS,
                         'center',
                         self.hud_group,
@@ -101,7 +95,7 @@ class Level:
                 self.ball.reset(self.winned)
                 break
     
-    def counter_active(self):
+    def counter_active(self) -> bool:
         return self.reset_time != 0
     
     def update_counter(self, value: int) -> None:
@@ -112,32 +106,28 @@ class Level:
             midbottom = (self.SCREEN_MW, self.ball.rect.top - self.COUNTER_OFFSET_Y)
         )
 
-        self.counter_bg = pg.Rect(
-            self.counter_rect.x,
-            self.counter_rect.y - self.COUNT_BG_OFFSET,
-            self.counter_rect.width,
-            self.counter_rect.height
-        )
+        self.counter_bg = self.counter_rect.copy()
+        self.counter_bg.move_ip(0, -self.COUNT_BG_OFFSET)
 
-    def check_counter(self):
-        current_time = pg.time.get_ticks()
-        reset_time = current_time - self.reset_time
+    def check_counter(self) -> None:
+        reset_time = pg.time.get_ticks() - self.reset_time
 
         if reset_time <= 700 and self.counter != 3:
             self.update_counter(3)
-        if 700 < reset_time <= 1400 and self.counter != 2:
+        elif 700 < reset_time <= 1400 and self.counter != 2:
             self.update_counter(2)
-        if 1400 < reset_time <= 2100 and self.counter != 1:
+        elif 1400 < reset_time <= 2100 and self.counter != 1:
             self.update_counter(1)
-        if reset_time >= 2100:
+        elif reset_time >= 2100:
             self.ball.set_active(True)
             self.reset_time = int(0)
             self.update_counter(-1)
     
-    def handle_btn_click(self):
+    def handle_btn_click(self) -> None:
         for button in self.BUTTONS:
             if button.hovered:
                 button.click()
+                break
 
     def render_frame(self, display_surf: pg.Surface) -> None:
         self.paddles_group.draw(display_surf)
@@ -147,9 +137,7 @@ class Level:
         if self.winned:
             mouse_pos = pg.mouse.get_pos()
             for button in self.BUTTONS:
-                button.check_hover(mouse_pos)
-                button.check_click()
-                button.draw(display_surf)
+                button.render(display_surf, mouse_pos)
 
         if not self.winned and self.counter_active():
             pg.draw.rect(display_surf, self.BG_COLOR, self.counter_bg)

@@ -1,4 +1,4 @@
-from .custom_typing import GameData, BallData, PaddleData, ColorValue, HUDData
+from .custom_typing import GameData, BallData, PaddleData, ColorValue, HUDData, SoundDict
 from .custom_typing import CRSData, FontData, ButtonData, MenuTitleData
 from typing import Dict
 from pygame import Rect
@@ -44,7 +44,7 @@ COLORS: Dict[str, ColorValue] = {
     'background': "#46505A",
 }
 
-SOUNDS: Dict[str, Dict[str, str | float]] = {
+SOUNDS: SoundDict = {
     'ball': {
         'file': "ball_hit.wav",
         'vol': 0.06

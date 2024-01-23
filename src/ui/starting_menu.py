@@ -34,16 +34,15 @@ class StartingMenu:
         pg_logo = STARTING_MENU['pg_logo']
         Image(pg_logo['file'], pg_logo['pos'], self.all)
     
-    def handle_btn_click(self):
+    def handle_btn_click(self) -> None:
         for button in self.buttons:
             if button.hovered:
                 button.click()
+                break
 
-    def render(self, display_surf: pg.Surface):
+    def render(self, display_surf: pg.Surface) -> None:
         mouse_pos = pg.mouse.get_pos()
         for button in self.buttons:
-            button.check_hover(mouse_pos)
-            button.check_click()
-            button.draw(display_surf)
+            button.render(display_surf, mouse_pos)
         
         self.all.draw(display_surf)
