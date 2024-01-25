@@ -90,7 +90,7 @@ BUTTON_ANIMATE: ButtonData = {
     'width_gap': 50,
     'height_gap': 25,
     'border_radius': 12,
-    'border_size': 5,
+    'border_size': 3,
     'sound_vol': 0.05,
     'sound_file': "btn_click.wav",
     'colors': {

@@ -21,7 +21,6 @@ class ButtonAnimate:
         COLORS[color_name] = load_color(color)
 
     def __init__(self, event_data: Dict[str, str], pos: Tuple[int, int], elevation: int = 5) -> None:
-        self.cursor_changed = bool(False)
         self.pressed = bool(False)
         self.hovered = bool(False)
         self.click_time = None
@@ -44,7 +43,7 @@ class ButtonAnimate:
         self.top_rect.center = (pos[0], self.original_y_pos - elevation)
         self.top_rect_color = self.COLORS['top_color']
 
-        self.bottom_rect = pg.Rect(pos[0], pos[1], self.top_rect.width, self.top_rect.height)
+        self.bottom_rect = pg.Rect(pos[0], pos[1], self.top_rect.width, self.top_rect.height + elevation)
         self.bottom_rect.center = pos
 
     def change_elevation(self, elevation: int) -> None:
@@ -65,22 +64,17 @@ class ButtonAnimate:
         self.CLICK_SOUND.play()
 
     def check_hover(self, mouse_pos: Tuple[int, int]) -> None:
-        if self.top_rect.collidepoint(mouse_pos) or self.bottom_rect.collidepoint(mouse_pos):
-            if not self.cursor_changed:
-                pg.mouse.set_cursor(pg.SYSTEM_CURSOR_HAND)
-                self.top_rect_color = self.COLORS['top_color_hover']
-                self.cursor_changed = not self.cursor_changed
-                self.hovered = bool(True)
-            return 
+        collide = self.top_rect.collidepoint(mouse_pos)
         
-        self.hovered = bool(False)
-
-        if self.top_rect_color != self.COLORS['top_color']:
-            self.top_rect_color = self.COLORS['top_color']
-        
-        if self.cursor_changed:
+        if not self.hovered and collide:
+            pg.mouse.set_cursor(pg.SYSTEM_CURSOR_HAND)
+            self.top_rect_color = self.COLORS['top_color_hover']
+            self.hovered = not self.hovered
+                    
+        if self.hovered and not collide:
             pg.mouse.set_cursor(pg.SYSTEM_CURSOR_ARROW)
-            self.cursor_changed = not self.cursor_changed
+            self.top_rect_color = self.COLORS['top_color']
+            self.hovered = not self.hovered
 
     def check_click(self) -> None:
         if self.click_time is None: return
