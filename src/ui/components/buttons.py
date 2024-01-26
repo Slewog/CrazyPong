@@ -19,18 +19,18 @@ class ButtonAnimate:
     for color_name, color in BUTTON_ANIMATE['colors'].items():
         COLORS[color_name] = load_color(color)
 
-    def __init__(self, event_data: Dict[str, str], pos: Tuple[int, int], elevation: int = 5) -> None:
+    def __init__(self, data: Dict[str, str], pos: Tuple[int, int], elevation: int = 5) -> None:
         self.pressed = bool(False)
         self.hovered = bool(False)
         self.click_time = None
 
-        self.event_data = event_data
+        self.data = data
 
         self.elevation = elevation
         self.dynamic_elevation = elevation
         self.original_y_pos = pos[1]
 
-        self.text_surf = self.FONT.render(event_data['text'], True, self.FONT_COLOR)
+        self.text_surf = self.FONT.render(data['text'], True, self.FONT_COLOR)
         self.text_rect = self.text_surf.get_rect(center=(pos[0], (pos[1] - elevation) + self.TXT_OFFSET))
 
         self.top_rect = pg.Rect(
@@ -84,7 +84,7 @@ class ButtonAnimate:
             self.change_elevation(self.elevation)
 
         if clicked_time >= 200:
-            pg.event.post(pg.event.Event(CE_BTN_CLICKED, self.event_data))
+            pg.event.post(pg.event.Event(CE_BTN_CLICKED, self.data))
             self.pressed = bool(False)
             self.click_time = None
     
