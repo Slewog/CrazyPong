@@ -4,8 +4,7 @@ from time import time
 from typing import Dict
 
 
-from .const.custom_event import CE_BTN_CLICKED, CE_BALL_OUT_SCREEN
-from .const.settings import SCREEN_RECT, GAME, FONT, COLORS, CRS_EFFECT, SOUNDS, BUTTON_ANIMATE, HUD
+from .const.settings import SCREEN_RECT, GAME, FONT, COLORS, CRS_EFFECT, SOUNDS, BUTTON_ANIMATE, HUD, CE_BTN_CLICKED, CE_BALL_OUT_SCREEN
 from .utils import load_color, load_img, load_sound, load_font, Text, RectBackground
 
 from .ui.components.screen_effect import CRS

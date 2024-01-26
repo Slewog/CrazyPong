@@ -7,8 +7,7 @@ if TYPE_CHECKING:
 import pygame as pg
 from random import choice
 
-from src.const.settings import BALL, SCREEN_RECT
-from src.const.custom_event import CE_BALL_OUT_SCREEN
+from src.const.settings import BALL, SCREEN_RECT, CE_BALL_OUT_SCREEN
 
 
 class Ball(pg.sprite.Sprite):

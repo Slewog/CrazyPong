@@ -1,9 +1,10 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, TypedDict, Dict, Union, Tuple, List
+from typing import TYPE_CHECKING, TypedDict, NewType, Dict, Union, Tuple, List
 
 if TYPE_CHECKING:
     from pygame import Surface, Color, Rect
 
+UserEvent = NewType('UserEvent', int)
 ColorValue = Union[str, Tuple[int, int, int], List[int]]
 
 

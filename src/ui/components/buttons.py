@@ -1,8 +1,7 @@
 from typing import Tuple, Dict
 import pygame as pg
 
-from src.const.custom_event import CE_BTN_CLICKED
-from src.const.settings import BUTTON_ANIMATE
+from src.const.settings import BUTTON_ANIMATE, CE_BTN_CLICKED
 from src.utils import load_color
 
 

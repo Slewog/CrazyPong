@@ -1,9 +1,13 @@
 from .custom_typing import GameData, BallData, PaddleData, ColorValue, HUDData, SoundDict
-from .custom_typing import CRSData, FontData, ButtonData, MenuTitleData
+from .custom_typing import CRSData, FontData, ButtonData, MenuTitleData, UserEvent
+
 from typing import Dict
 from pygame import Rect
+from pygame.locals import USEREVENT
 
 SCREEN_RECT = Rect(0, 0, 1280, 960)
+CE_BTN_CLICKED = UserEvent(USEREVENT + 1)
+CE_BALL_OUT_SCREEN = UserEvent(USEREVENT + 2)
 
 GAME: GameData = {
     'name': "Py Pong",
