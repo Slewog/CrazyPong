@@ -7,7 +7,12 @@ import pygame as pg
 from .const.custom_typing import ColorValue
 
 # Get absolute path to resource, works for dev and for PyInstaller.
-MAIN_PATH = getattr(sys, '_MEIPASS', path.dirname(path.abspath(__file__))).split("\\src")[0]
+def get_path(tmp_path: str):
+    for exception in ['\\src', '\\_internal']:
+        if exception in tmp_path:
+            tmp_path = tmp_path.split(exception)[0]
+    return tmp_path
+MAIN_PATH = get_path(getattr(sys, '_MEIPASS', path.dirname(path.abspath(__file__))))
 del sys # Delete sys from memory.
 
 # Create all dir path
