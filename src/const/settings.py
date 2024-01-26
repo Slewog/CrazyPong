@@ -18,7 +18,7 @@ GAME: GameData = {
 HUD: HUDData = {
     'score_offset_y': 20,
     'counter_bg_offset': 2,
-    'counter_offset_y': 10,
+    'counter_pos_y': SCREEN_RECT.centery - 30,
     'winner_msg_offset': 50,
     'buttons': [
         [
@@ -37,7 +37,8 @@ FONT: FontData = {
     'from_system': False,
     'default_size': 30,
     'title_size': 100,
-    'hud_size': 40
+    'hud_size': 40,
+    'score_size': 55,
 }
 
 COLORS: Dict[str, ColorValue] = {

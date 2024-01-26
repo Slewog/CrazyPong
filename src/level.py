@@ -12,9 +12,9 @@ class Level:
         SCREEN_RECT.centerx,
         SCREEN_RECT.height // 2 - HUD['winner_msg_offset']
     )
-    COUNTER_OFFSET_Y = HUD['counter_offset_y']
+
+    COUNTER_POS = (SCREEN_RECT.centerx, HUD['counter_pos_y'])
     COUNT_BG_OFFSET = HUD['counter_bg_offset']
-    SCREEN_MW = SCREEN_RECT.centerx
     SCREEN_W_QUART = SCREEN_RECT.centerx // 2
     
     FONT: pg.font.Font
@@ -105,9 +105,7 @@ class Level:
         self.counter = value
 
         self.counter_txt = self.FONT.render(str(self.counter), True, self.FONT_COLOR)
-        self.counter_rect = self.counter_txt.get_rect(
-            midbottom = (self.SCREEN_MW, self.ball.rect.top - self.COUNTER_OFFSET_Y)
-        )
+        self.counter_rect = self.counter_txt.get_rect(midbottom=self.COUNTER_POS)
 
         self.counter_bg = self.counter_rect.copy()
         self.counter_bg.move_ip(0, -self.COUNT_BG_OFFSET)
@@ -133,18 +131,18 @@ class Level:
                 break
 
     def render_frame(self, display_surf: pg.Surface) -> None:
+        if not self.winned and self.counter_active():
+            pg.draw.rect(display_surf, self.BG_COLOR, self.counter_bg)
+            display_surf.blit(self.counter_txt, self.counter_rect)
+        
         self.paddles_group.draw(display_surf)
-        self.ball_group.draw(display_surf)
         self.hud_group.draw(display_surf)
+        self.ball_group.draw(display_surf)
 
         if self.winned:
             mouse_pos = pg.mouse.get_pos()
             for button in self.BUTTONS:
                 button.render(display_surf, mouse_pos)
-
-        if not self.winned and self.counter_active():
-            pg.draw.rect(display_surf, self.BG_COLOR, self.counter_bg)
-            display_surf.blit(self.counter_txt, self.counter_rect)
 
     def run(self, display_surf: pg.Surface, dt: float) -> None:
         if not self.winned:

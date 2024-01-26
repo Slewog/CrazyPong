@@ -72,7 +72,7 @@ class Pong:
 
         Paddle.COLOR = self.colors['objects']
         
-        Score.FONT = font
+        Score.FONT = font = load_font(FONT['family'], FONT['score_size'])
         Score.FONT_COLOR = self.colors['font']
         
         Ball.COLOR = self.colors['objects']
