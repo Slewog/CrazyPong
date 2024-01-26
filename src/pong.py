@@ -17,8 +17,6 @@ from .objects.ball import Ball
 
 class Pong:
     FPS = GAME['fps']
-    SCREEN_RECT = SCREEN_RECT
-    SCREEN_MW = SCREEN_RECT.width // 2
 
     crs_effect: CRS
     level:Level = None
@@ -31,7 +29,7 @@ class Pong:
 
         self.clock = pg.time.Clock()
 
-        self.display_surf = pg.display.set_mode((self.SCREEN_RECT.size))
+        self.display_surf = pg.display.set_mode((SCREEN_RECT.size))
         pg.display.set_caption(GAME['name'])
         self.state = str('menu')
 
@@ -42,7 +40,7 @@ class Pong:
 
         CRS_EFFECT['vignette'] = load_img(CRS_EFFECT['file'], convert_a=True)
         CRS_EFFECT['line_color'] = load_color(CRS_EFFECT['line_color'])
-        CRS_EFFECT['screen_rect'] = self.SCREEN_RECT
+        CRS_EFFECT['screen_rect'] = SCREEN_RECT
 
         self.crs_effect = CRS(CRS_EFFECT)
 
@@ -55,10 +53,10 @@ class Pong:
 
         self.starting_menu = StartingMenu(FONT)
         self.middle_rect = pg.Rect(
-            self.SCREEN_MW - GAME['middle_rect_w'] // 2,
+            SCREEN_RECT.centerx - GAME['middle_rect_w'] // 2,
             0,
             GAME['middle_rect_w'],
-            self.SCREEN_RECT.height
+            SCREEN_RECT.height
         )
 
         self.display_surf.fill(self.colors['background'])
@@ -83,11 +81,7 @@ class Pong:
         Level.FONT = font
         Level.FONT_COLOR = self.colors['font']
         Level.BG_COLOR = self.colors['background']
-        Level.SCREEN_MW = self.SCREEN_MW
-        Level.SCREEN_W_QUART = self.SCREEN_MW // 2
-        Level.WIN_TXT_POS = (self.SCREEN_MW, SCREEN_RECT.height // 2 - HUD['winner_msg_offset'])
         Level.BUTTONS = [ButtonAnimate(button[0], button[1]) for button in HUD['buttons']]
-        
         Level.SCORE_SOUND = load_sound(score_sound['file'], vol=score_sound['vol'])
         Level.WIN_SOUND = load_sound(win_sound['file'], vol=win_sound['vol'])
 

@@ -1,24 +1,27 @@
 import pygame as pg
 from typing import List
 
-from .const.settings import HUD
+from .const.settings import HUD, SCREEN_RECT
 from .objects.paddle import Paddle
 from .objects.ball import Ball
 from .utils import Text
 from .ui.components.buttons import ButtonAnimate
 
 class Level:
+    WIN_TXT_POS = (
+        SCREEN_RECT.centerx,
+        SCREEN_RECT.height // 2 - HUD['winner_msg_offset']
+    )
     COUNTER_OFFSET_Y = HUD['counter_offset_y']
     COUNT_BG_OFFSET = HUD['counter_bg_offset']
+    SCREEN_MW = SCREEN_RECT.centerx
+    SCREEN_W_QUART = SCREEN_RECT.centerx // 2
     
     FONT: pg.font.Font
     FONT_COLOR: pg.Color
     BG_COLOR: pg.Color
     BUTTONS: List[ButtonAnimate]
-
-    SCREEN_MW: int
-    SCREEN_W_QUART: int
-    WIN_TXT_POS: int
+    
     SCORE_SOUND: pg.mixer.Sound
     WIN_SOUND: pg.mixer.Sound
     

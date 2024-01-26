@@ -11,8 +11,6 @@ ColorValue = Union[str, Tuple[int, int, int], List[int]]
 class GameData(TypedDict):
     name: str
     fps: int
-    width: int
-    height: int
     middle_rect_w: int
 
 

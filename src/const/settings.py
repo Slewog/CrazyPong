@@ -12,8 +12,6 @@ CE_BALL_OUT_SCREEN = UserEvent(USEREVENT + 2)
 GAME: GameData = {
     'name': "Py Pong",
     'fps': 120,
-    'width': 1280,
-    'height': 960,
     'middle_rect_w': 6,
 }
 
@@ -25,11 +23,11 @@ HUD: HUDData = {
     'buttons': [
         [
             {'text': "RESTART", 'action': "restart"},
-            (GAME['width'] // 2 - 130, GAME['height'] // 2 + 60)
+            (SCREEN_RECT.centerx - 130, SCREEN_RECT.centery + 60)
         ],
         [
             {'text': "Back MENU", 'action': "backmenu"},
-            (GAME['width'] // 2 + 145, GAME['height'] // 2 + 60)
+            (SCREEN_RECT.centerx + 145, SCREEN_RECT.centery + 60)
         ]
     ]
 }
@@ -68,7 +66,7 @@ CRS_EFFECT: CRSData = {
     'line_gap': 4,
     'line_color': (20, 20, 20),
     'min_alpha': 50,
-    'max_alpha': 70
+    'max_alpha': 70,
 }
 
 BALL: BallData = {
@@ -107,30 +105,30 @@ BUTTON_ANIMATE: ButtonData = {
 STARTING_MENU: MenuTitleData = {
     'title': {
         'text': GAME['name'],
-        'pos': (GAME['width'] // 2, (GAME['height'] // 3) - 50),
+        'pos': (SCREEN_RECT.centerx, (SCREEN_RECT.height // 3) - 50),
         'center_by': "midtop"
     },
     'copyright': {
         'text': "Create by Slewog - © 2024",
-        'pos': (GAME['width'] // 2, GAME['height'] - 20),
+        'pos': (SCREEN_RECT.centerx, SCREEN_RECT.height - 20),
         'center_by': "midbottom"
     },
     'pg_logo': {
         'file': "pygame_logo.png",
-        'pos': (GAME['width'] - 10, GAME['height'] - 9)
+        'pos': (SCREEN_RECT.width - 10, SCREEN_RECT.height - 9)
     },
     'buttons': [
         [
             {'text': "1 PLAYER", 'action': "play", 'target_level': "oneplayer"},
-            (GAME['width'] // 2 - 175, GAME['height'] // 2)
+            (SCREEN_RECT.centerx - 175, SCREEN_RECT.centery)
         ],
         [
             {'text': "2 PLAYER", 'action': "play", 'target_level': "twoplayer"},
-            (GAME['width'] // 2 + 175, GAME['height'] // 2)
+            (SCREEN_RECT.centerx + 175, SCREEN_RECT.centery)
         ],
         [
             {'text': "QUIT", 'action': "quit"},
-            (GAME['width'] // 2, GAME['height'] // 2 + 100)
+            (SCREEN_RECT.centerx, SCREEN_RECT.centery + 100)
         ]
     ]
 }
