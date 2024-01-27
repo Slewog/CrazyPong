@@ -38,7 +38,6 @@ class PaddleData(TypedDict):
     offset_x: int
     offset_y: int
     velocity: int
-    ai_vel_debuff: int | float
     max_score: int
 
 

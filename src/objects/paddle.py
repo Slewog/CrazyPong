@@ -18,7 +18,6 @@ class Paddle(pg.sprite.Sprite):
     WIDTH = PADDLE['width']
     HEIGHT = PADDLE['height']
     VELOCITY = PADDLE['velocity']
-    AI_VELOCITY = VELOCITY - PADDLE['ai_vel_debuff']
     OFFSET_X = PADDLE['offset_x']
     OFFSET_Y = PADDLE['offset_y']
     MAX_SCORE = PADDLE['max_score']

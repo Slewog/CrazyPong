@@ -73,8 +73,8 @@ CRS_EFFECT: CRSData = {
 BALL: BallData = {
     'radius': 14,
     'boost': 5,
-    'velocity': 500,
-    'max_vel': 625,
+    'velocity': 490,
+    'max_vel': 620,
     'min_coll_tol': 2,
     'max_coll_tol': 10,
     'start_pos_offset': 100
@@ -84,7 +84,6 @@ PADDLE: PaddleData = {
     'width': 36,
     'height': 160,
     'velocity': 500,
-    'ai_vel_debuff': 28.5,
     'offset_x': 25,
     'offset_y': 10,
     'max_score': 5,
