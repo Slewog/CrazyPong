@@ -72,6 +72,13 @@ class Ball(pg.sprite.Sprite):
     def can_speed_up(self):
         return abs(self.direction.x) < self.MAX_VELOCITY and abs(self.direction.y) < self.MAX_VELOCITY
     
+    def speed_up(self):
+        if not self.can_speed_up():
+            return
+        
+        self.direction.x += self.get_boost(self.direction.x)
+        self.direction.y += self.get_boost(self.direction.y)
+    
     def reset(self, full: bool = False) -> None:
         self.rect.center = self.get_random_start_pos()
         self.set_active(False)
@@ -119,10 +126,7 @@ class Ball(pg.sprite.Sprite):
                         self.HIT_SOUND.play()
                         new_pos = distance_left
                         self.direction.x *= -1
-                        
-                        if self.can_speed_up():
-                            self.direction.x += self.get_boost(self.direction.x)
-                            self.direction.y += self.get_boost(self.direction.y)
+                        self.speed_up()
 
                 if self.direction.x > 0:
                     distance_right = abs(self.rect.right - paddle.rect.left)
@@ -131,10 +135,7 @@ class Ball(pg.sprite.Sprite):
                         self.HIT_SOUND.play()
                         new_pos = -distance_right
                         self.direction.x *= -1
-
-                        if self.can_speed_up():
-                            self.direction.x += self.get_boost(self.direction.x)
-                            self.direction.y += self.get_boost(self.direction.y)
+                        self.speed_up()
         
         if direction == 'vertical':
             for paddle in overlap_paddles:
