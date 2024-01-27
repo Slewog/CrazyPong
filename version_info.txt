@@ -32,10 +32,10 @@ StringFileInfo(
     [StringStruct(u'CompanyName', u'Slewog Software'),
     StringStruct(u'FileDescription', u'Simple Pong like'),
     StringStruct(u'FileVersion', u'0.0.0.1'),
-    StringStruct(u'InternalName', u'Pypong'),
+    StringStruct(u'InternalName', u'Crazypong'),
     StringStruct(u'LegalCopyright', u'Copyright (c) Slewog Software'),
     StringStruct(u'OriginalFilename', u'Pypong.exe'),
-    StringStruct(u'ProductName', u'Pypong'),
+    StringStruct(u'ProductName', u'Crazy Pong'),
     StringStruct(u'ProductVersion', u'0.0.0.1')])
   ]), 
 VarFileInfo([VarStruct(u'Translation', [0x0409, 1200])])
