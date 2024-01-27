@@ -10,9 +10,9 @@ CE_BTN_CLICKED = UserEvent(USEREVENT + 1)
 CE_BALL_OUT_SCREEN = UserEvent(USEREVENT + 2)
 
 GAME: GameData = {
-    'name': "Py Pong",
+    'name': "Crazy Pong",
     'fps': 120,
-    'middle_rect_w': 6,
+    'middle_rect_w': 10,
 }
 
 HUD: HUDData = {
@@ -67,7 +67,7 @@ CRS_EFFECT: CRSData = {
     'line_gap': 4,
     'line_color': (20, 20, 20),
     'min_alpha': 50,
-    'max_alpha': 70,
+    'max_alpha': 75,
 }
 
 BALL: BallData = {
@@ -85,7 +85,7 @@ PADDLE: PaddleData = {
     'height': 160,
     'velocity': 500,
     'ai_vel_debuff': 28.5,
-    'offset_x': 30,
+    'offset_x': 25,
     'offset_y': 10,
     'max_score': 5,
 }
@@ -115,10 +115,6 @@ STARTING_MENU: MenuTitleData = {
         'text': "Create by Slewog - © 2024",
         'pos': (SCREEN_RECT.centerx, SCREEN_RECT.height - 20),
         'center_by': "midbottom"
-    },
-    'pg_logo': {
-        'file': "pygame_logo.png",
-        'pos': (SCREEN_RECT.width - 10, SCREEN_RECT.height - 9)
     },
     'buttons': [
         [

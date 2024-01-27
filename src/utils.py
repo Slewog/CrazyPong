@@ -125,18 +125,6 @@ class Text(pg.sprite.Sprite):
             self.bg.kill()
 
 
-class Image(pg.sprite.Sprite):
-    """Create a img as sprite to render in a group"""
-    def __init__(self, file: str, pos: Tuple[int, int], group: pg.sprite.Group) -> None:
-        pg.sprite.Sprite.__init__(self, group)
-
-        self.image = load_img(file, convert_a=True)
-        self.rect = self.image.get_rect(bottomright=pos)
-    
-    def destroy(self):
-        self.kill()
-
-
 class NoneSound:
     """Fake sound class to avoid errors"""
 

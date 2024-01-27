@@ -89,13 +89,7 @@ class TextData(TypedDict):
     center_by: str
 
 
-class ImageData(TypedDict):
-    file: str
-    pos: Tuple[int, int]
-
-
 class MenuTitleData(TypedDict):
     title: TextData
     copyright: TextData
-    pg_logo: ImageData
     buttons: List[List]

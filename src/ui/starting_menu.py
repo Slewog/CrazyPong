@@ -2,7 +2,7 @@ import pygame as pg
 
 from src.const.custom_typing import FontData
 from src.const.settings import STARTING_MENU
-from src.utils import load_font, Text, Image
+from src.utils import load_font, Text
 from .components.buttons import ButtonAnimate
 
 
@@ -23,15 +23,11 @@ class StartingMenu:
             title['pos'],
             title['center_by'],
             self.all,
-            bg=True,
-            bg_offset_y=-10
+            bg=True
         )
         
         copyright = STARTING_MENU['copyright']
         Text(font, copyright['text'], copyright['pos'], copyright['center_by'], self.all, bg=True)
-
-        pg_logo = STARTING_MENU['pg_logo']
-        Image(pg_logo['file'], pg_logo['pos'], self.all)
     
     def handle_btn_click(self) -> None:
         for button in self.buttons:
