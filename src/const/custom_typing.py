@@ -24,10 +24,12 @@ class HUDData(TypedDict):
 
 class BallData(TypedDict):
     radius: int
+    boost: int
     velocity: int
+    max_vel : int
     min_coll_tol: int
     max_coll_tol: int
-    starting_pos: Tuple[int, int]
+    start_pos_offset: int
 
 
 class PaddleData(TypedDict):
@@ -36,7 +38,7 @@ class PaddleData(TypedDict):
     offset_x: int
     offset_y: int
     velocity: int
-    ai_vel_debuff: int
+    ai_vel_debuff: int | float
     max_score: int
 
 

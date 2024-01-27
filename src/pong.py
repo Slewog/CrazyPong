@@ -77,6 +77,8 @@ class Pong:
         
         Ball.COLOR = self.colors['objects']
         Ball.HIT_SOUND = load_sound(ball_sound['file'], vol=ball_sound['vol'])
+        self.ball_group = pg.sprite.GroupSingle()
+        self.ball = Ball(self.ball_group)
 
         Level.FONT = font
         Level.FONT_COLOR = self.colors['font']
@@ -95,7 +97,7 @@ class Pong:
             self.quit()
 
     def select_game_type(self, type_target: str) -> None:
-        self.level = Level(type_target)
+        self.level = Level(type_target, self.ball, self.ball_group)
         self.set_state('play')
         self.level.start()
 

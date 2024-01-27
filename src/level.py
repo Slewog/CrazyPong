@@ -1,9 +1,13 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING, List
+
+if TYPE_CHECKING:
+    from .objects.ball import Ball
+
 import pygame as pg
-from typing import List
 
 from .const.settings import HUD, SCREEN_RECT
 from .objects.paddle import Paddle
-from .objects.ball import Ball
 from .utils import Text
 from .ui.components.buttons import ButtonAnimate
 
@@ -25,9 +29,9 @@ class Level:
     SCORE_SOUND: pg.mixer.Sound
     WIN_SOUND: pg.mixer.Sound
     
-    def __init__(self, level_type: str) -> None:
+    def __init__(self, level_type: str, ball: Ball, ball_group: pg.sprite.GroupSingle) -> None:
         self.hud_group = pg.sprite.Group()
-        self.ball_group = pg.sprite.GroupSingle()
+        self.ball_group = ball_group
         self.paddles_group = pg.sprite.Group()
 
         self.winned = bool(False)
@@ -35,7 +39,7 @@ class Level:
         self.counter = int(-1)
         self.reset_time = int(0)
 
-        self.ball = Ball(self.ball_group)
+        self.ball = ball
         self.paddles = [
             Paddle('left', 'player', self.SCREEN_W_QUART, self.paddles_group),
             Paddle('right', 'ai' if level_type == 'oneplayer' else 'player', self.SCREEN_W_QUART * 3, self.paddles_group)
@@ -52,12 +56,14 @@ class Level:
 
         self.reset_time = pg.time.get_ticks()
 
+        self.ball.reset(True)
+
     def start(self) -> None:
         self.started = not self.started
         self.reset_time = pg.time.get_ticks()
 
     def destroy(self) -> None:
-        self.ball.kill()
+        self.ball.reset(True)
 
         if getattr(self, 'win_text', None):
             self.win_text.destroy()
@@ -131,18 +137,23 @@ class Level:
                 break
 
     def render_frame(self, display_surf: pg.Surface) -> None:
-        if not self.winned and self.counter_active():
-            pg.draw.rect(display_surf, self.BG_COLOR, self.counter_bg)
-            display_surf.blit(self.counter_txt, self.counter_rect)
-        
         self.paddles_group.draw(display_surf)
         self.hud_group.draw(display_surf)
-        self.ball_group.draw(display_surf)
-
+        
         if self.winned:
             mouse_pos = pg.mouse.get_pos()
             for button in self.BUTTONS:
                 button.render(display_surf, mouse_pos)
+            
+            return
+
+        if self.counter_active():
+            pg.draw.rect(display_surf, self.BG_COLOR, self.counter_bg)
+            self.ball_group.draw(display_surf)
+            display_surf.blit(self.counter_txt, self.counter_rect)
+            return
+        
+        self.ball_group.draw(display_surf)
 
     def run(self, display_surf: pg.Surface, dt: float) -> None:
         if not self.winned:
@@ -154,6 +165,8 @@ class Level:
                 self.check_counter()
 
         self.paddles_group.update(dt, self.ball)
-        self.ball_group.update(dt, self.paddles)
+        
+        if self.ball.active:
+            self.ball_group.update(dt, self.paddles)
 
         self.render_frame(display_surf)

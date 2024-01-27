@@ -5,7 +5,7 @@ if TYPE_CHECKING:
     from .paddle import Paddle
 
 import pygame as pg
-from random import choice
+from random import choice, randint
 
 from src.const.settings import BALL, SCREEN_RECT, CE_BALL_OUT_SCREEN
 
@@ -13,11 +13,13 @@ from src.const.settings import BALL, SCREEN_RECT, CE_BALL_OUT_SCREEN
 class Ball(pg.sprite.Sprite):
     MIN_COLL_TOL = BALL['min_coll_tol']
     MAX_COLL_TOL = BALL['max_coll_tol']
+    BOOST = BALL['boost']
     VELOCITY = BALL['velocity']
+    MAX_VELOCITY = BALL['max_vel']
     RADIUS = BALL['radius']
     SIZE = (RADIUS * 2, RADIUS * 2)
     SCREEN_RECT = SCREEN_RECT
-    START_POS = BALL['starting_pos']
+    START_POS_Y_OFF = BALL['start_pos_offset']
 
     COLOR: pg.Color
     HIT_SOUND: pg.mixer.Sound
@@ -27,10 +29,7 @@ class Ball(pg.sprite.Sprite):
 
         self.active = bool(False)
 
-        self.direction = pg.math.Vector2(
-            choice((self.VELOCITY, -self.VELOCITY)),
-            choice((self.VELOCITY, -self.VELOCITY))
-        )
+        self.direction = pg.math.Vector2(self.get_starting_vel(), self.get_starting_vel())
 
         # Ball surface.
         rect_image = pg.Surface(self.SIZE, pg.SRCALPHA)
@@ -47,25 +46,42 @@ class Ball(pg.sprite.Sprite):
         self.image.blit(rect_image, (0, 0), None, pg.BLEND_RGBA_MIN)
 
         # Ball rect.
-        self.rect = self.image.get_rect(center=self.START_POS)
+        self.rect = self.image.get_rect(center=self.get_random_start_pos())
     
     def set_active(self, state: bool) -> None:
         if state == self.active or type(state) != bool:
             return
         self.active = state
 
+    def get_random_start_pos(self):
+        return (
+            self.SCREEN_RECT.centerx,
+            randint(self.START_POS_Y_OFF, self.SCREEN_RECT.height - self.START_POS_Y_OFF)
+        )
+
+    def get_starting_vel(self, cur_vel: int = None):
+        if cur_vel is not None:
+            cur_vel = abs(cur_vel)
+            return choice((cur_vel, -cur_vel))
+    
+        return choice((self.VELOCITY, -self.VELOCITY))
+    
+    def get_boost(self, vel):
+        return self.BOOST if vel > 0 else -self.BOOST
+    
+    def can_speed_up(self):
+        return abs(self.direction.x) < self.MAX_VELOCITY and abs(self.direction.y) < self.MAX_VELOCITY
+    
     def reset(self, full: bool = False) -> None:
-        self.rect.center = self.START_POS
+        self.rect.center = self.get_random_start_pos()
         self.set_active(False)
         
         if not full:
             self.direction.x *= -1
-            self.direction.y = int(choice((self.VELOCITY, -self.VELOCITY)))
+            self.direction.y = self.get_starting_vel(self.direction.y)
         else:
-            self.direction = pg.math.Vector2(
-                choice((self.VELOCITY, -self.VELOCITY)),
-                choice((self.VELOCITY, -self.VELOCITY))
-            )
+            self.direction.x = self.get_starting_vel()
+            self.direction.y = self.get_starting_vel()
 
     def check_display_collisions(self, direction: str, new_pos: float) -> int | float:
         if direction == 'vertical':
@@ -103,6 +119,10 @@ class Ball(pg.sprite.Sprite):
                         self.HIT_SOUND.play()
                         new_pos = distance_left
                         self.direction.x *= -1
+                        
+                        if self.can_speed_up():
+                            self.direction.x += self.get_boost(self.direction.x)
+                            self.direction.y += self.get_boost(self.direction.y)
 
                 if self.direction.x > 0:
                     distance_right = abs(self.rect.right - paddle.rect.left)
@@ -111,6 +131,10 @@ class Ball(pg.sprite.Sprite):
                         self.HIT_SOUND.play()
                         new_pos = -distance_right
                         self.direction.x *= -1
+
+                        if self.can_speed_up():
+                            self.direction.x += self.get_boost(self.direction.x)
+                            self.direction.y += self.get_boost(self.direction.y)
         
         if direction == 'vertical':
             for paddle in overlap_paddles:
@@ -133,9 +157,6 @@ class Ball(pg.sprite.Sprite):
         return self.check_display_collisions(direction, new_pos)
 
     def update(self, dt: float, paddles: List[Paddle]) -> None:
-        if not self.active:
-            return
-
         dir_x, dir_y = int(0), int(0)
 
         dir_x = self.check_collisions('horizontal', paddles, self.direction.x * dt)

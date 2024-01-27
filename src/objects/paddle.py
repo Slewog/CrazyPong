@@ -84,17 +84,16 @@ class Paddle(pg.sprite.Sprite):
                 self.cur_vel = self.VELOCITY
     
     def update(self, dt: float, ball: Ball) -> None:
-        dir_y = int(0)
+        if self.type == 'ai':
+            dist = self.rect.centery - ball.rect.centery
+            ai_speed = self.VELOCITY * dt
+            if abs(dist) > ai_speed:
+                self.rect.move_ip(
+                    0,
+                    self.check_wall_collision(
+                        -1 * (ai_speed * (dist / abs(dist)))
+                    )
+                )
 
-        if self.type == 'ai' and ball.active:
-            if self.rect.centery < ball.rect.top:
-                dir_y = self.AI_VELOCITY
-            
-            if self.rect.centery > ball.rect.bottom:
-                dir_y = -self.AI_VELOCITY
-                
-        if self.type == 'player':
-            dir_y = self.cur_vel
-        
-        if dir_y != 0:
-            self.rect.move_ip(0, self.check_wall_collision(dir_y * dt))
+        if self.type == 'player' and self.cur_vel != 0:
+            self.rect.move_ip(0, self.check_wall_collision(self.cur_vel * dt))
