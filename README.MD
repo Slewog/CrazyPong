@@ -1,8 +1,9 @@
-<h1 align='center'>PyPong V2</a></h1><p align='center'><b>
+<h1 align='center'>Crazy Pong</a></h1><p align='center'><b>
 
 This a Pong like create with python and pygame.</br>
-Use Pygame Surface to render the ball and the paddles.</br>
 Cathodic ray screen effect.</br>
+The ball speed increase every lateral collision with a paddle and back to default speed after player win the game.</br>
+Use Pygame Surface to render the ball and the paddles.</br>
 
 # Requirements
 - pygame 2.5 or more recent
