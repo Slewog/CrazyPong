@@ -3,7 +3,7 @@ import pygame as pg
 from src.const.custom_typing import FontData
 from src.const.settings import STARTING_MENU
 from src.utils import load_font, Text
-from .components.buttons import ButtonAnimate
+from .buttons import ButtonAnimate
 
 
 class StartingMenu:
