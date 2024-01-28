@@ -47,6 +47,9 @@ class Ball(pg.sprite.Sprite):
 
         # Ball rect.
         self.rect = self.image.get_rect(center=self.get_random_start_pos())
+        self.pos = pg.math.Vector2(self.rect.topleft)
+        self.old_rect = self.rect.copy()
+        self.lock_y = False
     
     def set_active(self, state: bool) -> None:
         if state == self.active or type(state) != bool:
@@ -59,11 +62,7 @@ class Ball(pg.sprite.Sprite):
             randint(self.START_POS_Y_OFF, self.SCREEN_RECT.height - self.START_POS_Y_OFF)
         )
 
-    def get_starting_vel(self, cur_vel: int = None):
-        if cur_vel is not None:
-            cur_vel = abs(cur_vel)
-            return choice((cur_vel, -cur_vel))
-    
+    def get_starting_vel(self):
         return choice((self.VELOCITY, -self.VELOCITY))
     
     def get_boost(self, vel):
@@ -81,87 +80,99 @@ class Ball(pg.sprite.Sprite):
     
     def reset(self, full: bool = False) -> None:
         self.rect.center = self.get_random_start_pos()
+        self.pos.x = self.rect.x
+        self.pos.y = self.rect.y
         self.set_active(False)
         
         if not full:
             self.direction.x *= -1
-            self.direction.y = self.get_starting_vel() # self.direction.y)
+            self.direction.y = self.get_starting_vel()
         else:
             self.direction.x = self.get_starting_vel()
             self.direction.y = self.get_starting_vel()
 
-    def check_display_collisions(self, direction: str, new_pos: float) -> int | float:
+    def check_display_collisions(self, direction: str) -> None:
         if direction == 'vertical':
-            if self.direction.y < 0 and self.rect.top + new_pos < 0:
+            if self.direction.y < 0 and self.rect.top < 0:
                 self.HIT_SOUND.play()
-                new_pos = -self.rect.top
+                self.rect.top = 0
+                self.pos.y = self.rect.y
                 self.direction.y *= -1
 
-            if self.direction.y > 0 and self.rect.bottom + new_pos > self.SCREEN_RECT.height:
+            if self.direction.y > 0 and self.rect.bottom > self.SCREEN_RECT.height:
                 self.HIT_SOUND.play()
-                new_pos = self.SCREEN_RECT.height - self.rect.bottom
+                self.rect.bottom = self.SCREEN_RECT.height
+                self.pos.y = self.rect.y
                 self.direction.y *= -1
 
         if direction == 'horizontal':
-            if self.direction.x < 0 and self.rect.left + new_pos < 0:
+            if self.direction.x < 0 and self.rect.left < -100:
                 pg.event.post(pg.event.Event(CE_BALL_OUT_SCREEN, {'target': 'right'}))
 
-            if self.direction.x > 0 and self.rect.right + new_pos > self.SCREEN_RECT.width:
+            if self.direction.x > 0 and self.rect.right > self.SCREEN_RECT.width + 100:
                 pg.event.post(pg.event.Event(CE_BALL_OUT_SCREEN, {'target': 'left'}))
 
-        return new_pos
-
-    def check_collisions(self, direction: str, paddles: List[Paddle], new_pos: float) -> int | float:
+    def check_collisions(self, direction: str, paddles: List[Paddle]) -> None:
         overlap_paddles = [paddle for paddle in paddles if self.rect.colliderect(paddle.rect)]
-    
+
         if not overlap_paddles:
-            return self.check_display_collisions(direction, new_pos)
-        
-        if direction == 'horizontal':
+            self.lock_y = False
+            self.check_display_collisions(direction)
+            return 
+
+        if overlap_paddles:
             for paddle in overlap_paddles:
-                if self.direction.x < 0:
-                    distance_left = abs(self.rect.left - paddle.rect.right)
+                # Top collision.
+                if self.rect.bottom >= paddle.rect.top and self.old_rect.bottom <= paddle.old_rect.top:
+                    if self.rect.top <= 0 and self.rect.left < paddle.rect.right and self.rect.right > paddle.rect.left:
+                        self.rect.top = 0
+                        self.pos.y = self.rect.y
 
-                    if self.MIN_COLL_TOL < distance_left < self.MAX_COLL_TOL:
-                        self.HIT_SOUND.play()
-                        new_pos = distance_left
-                        self.direction.x *= -1
-                        self.speed_up()
-
-                if self.direction.x > 0:
-                    distance_right = abs(self.rect.right - paddle.rect.left)
-                    
-                    if self.MIN_COLL_TOL < distance_right < self.MAX_COLL_TOL:
-                        self.HIT_SOUND.play()
-                        new_pos = -distance_right
-                        self.direction.x *= -1
-                        self.speed_up()
-        
-        if direction == 'vertical':
-            for paddle in overlap_paddles:
-                if self.direction.y > 0:
-                    distance_top = abs(self.rect.bottom - paddle.rect.top)
-
-                    if self.MIN_COLL_TOL < distance_top < self.MAX_COLL_TOL:
-                        self.HIT_SOUND.play()
-                        new_pos = -distance_top
+                        paddle.rect.top =  self.rect.height
+                        self.lock_y = True
+                    else:
+                        self.rect.bottom = paddle.rect.top - 1
+                        self.pos.y = self.rect.y
                         self.direction.y *= -1
 
-                if self.direction.y < 0:
-                    distance_bottom = abs((self.rect.top) - paddle.rect.bottom)
-                    
-                    if self.MIN_COLL_TOL < distance_bottom < self.MAX_COLL_TOL:
-                        self.HIT_SOUND.play()
-                        new_pos = distance_bottom
+                # Bottom collision.
+                if self.rect.top <= paddle.rect.bottom and self.old_rect.top >= paddle.old_rect.bottom:
+                    if self.rect.bottom >= self.SCREEN_RECT.height and self.rect.left < paddle.rect.right and self.rect.right > paddle.rect.left:
+                        self.rect.bottom = self.SCREEN_RECT.height
+                        self.pos.y = self.rect.y
+
+                        paddle.rect.bottom = self.SCREEN_RECT.height - self.rect.height
+                        self.lock_y = True
+                    else:
+                        self.rect.top = paddle.rect.bottom + 1
+                        self.pos.y = self.rect.y
                         self.direction.y *= -1
 
-        return self.check_display_collisions(direction, new_pos)
+                # Right collision.
+                if self.rect.left <= paddle.rect.right and self.old_rect.left >= paddle.old_rect.right:
+                    self.HIT_SOUND.play()
+                    self.rect.left = paddle.rect.right
+                    self.pos.x = self.rect.x
+                    self.direction.x *= -1
+                    self.speed_up()
+                
+                # Left collision.
+                if self.rect.right >= paddle.rect.left and self.old_rect.right <= paddle.old_rect.left:
+                    self.HIT_SOUND.play()
+                    self.rect.right = paddle.rect.left - 1
+                    self.pos.x = self.rect.x
+                    self.direction.x *= -1
+                    self.speed_up()
 
     def update(self, dt: float, paddles: List[Paddle]) -> None:
-        dir_x, dir_y = int(0), int(0)
+        self.old_rect = self.rect.copy()
 
-        dir_x = self.check_collisions('horizontal', paddles, self.direction.x * dt)
-        dir_y = self.check_collisions('vertical', paddles, self.direction.y * dt)
+        if not self.lock_x:
+            self.pos.x += self.direction.x * dt
+            self.rect.x = round(self.pos.x) 
+        self.check_collisions('horizontal', paddles)
 
-        if dir_x != 0 or dir_y != 0:
-            self.rect.move_ip(dir_x, dir_y)
+        if not self.lock_y:
+            self.pos.y += self.direction.y * dt
+            self.rect.y = round(self.pos.y) 
+        self.check_collisions('vertical', paddles)
