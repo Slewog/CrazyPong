@@ -5,7 +5,7 @@ from typing import Dict
 from pygame import Rect
 from pygame.locals import USEREVENT
 
-SCREEN_RECT = Rect(0, 0, 1200, 900)
+SCREEN_RECT = Rect(0, 0, 1300, 900)
 CE_BTN_CLICKED = UserEvent(USEREVENT + 1)
 CE_BALL_OUT_SCREEN = UserEvent(USEREVENT + 2)
 
@@ -71,17 +71,17 @@ CRS_EFFECT: CRSData = {
 }
 
 BALL: BallData = {
-    'radius': 14,
+    'radius': 12,
     'boost': 5,
-    'velocity': 490,
-    'max_vel': 620,
+    'velocity': 500,
+    'max_vel': 650,
     'min_coll_tol': 2,
     'max_coll_tol': 10,
     'start_pos_offset': 100
 }
 
 PADDLE: PaddleData = {
-    'width': 36,
+    'width': 24,
     'height': 160,
     'velocity': 500,
     'offset_x': 25,
