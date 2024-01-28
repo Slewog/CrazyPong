@@ -27,8 +27,7 @@ class BallData(TypedDict):
     boost: int
     velocity: int
     max_vel : int
-    min_coll_tol: int
-    max_coll_tol: int
+    max_out: int
     start_pos_offset: int
 
 

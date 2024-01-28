@@ -5,6 +5,7 @@ if TYPE_CHECKING:
     from .ball import Ball
 
 import pygame as pg
+from pygame.locals import K_r, K_f, K_UP, K_DOWN
 
 from src.const.settings import PADDLE, SCREEN_RECT,  HUD
 
@@ -93,15 +94,15 @@ class Paddle(pg.sprite.Sprite):
         self.cur_vel = int(0)
 
         if self.side == 'left':
-            if keys[pg.K_r]:
+            if keys[K_r]:
                 self.cur_vel = -self.VELOCITY
-            elif keys[pg.K_f]:
+            elif keys[K_f]:
                 self.cur_vel = self.VELOCITY
 
         if self.side == 'right':
-            if keys[pg.K_UP]:
+            if keys[K_UP]:
                 self.cur_vel = -self.VELOCITY
-            elif keys[pg.K_DOWN]:
+            elif keys[K_DOWN]:
                 self.cur_vel = self.VELOCITY
     
     def update(self, dt: float, ball: Ball) -> None:

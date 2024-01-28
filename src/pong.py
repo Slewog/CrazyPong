@@ -3,6 +3,8 @@ from sys import exit
 from time import time
 from typing import Dict
 
+from pygame.locals import *
+
 
 from .const.settings import SCREEN_RECT, GAME, FONT, COLORS, CRS_EFFECT, SOUNDS, BUTTON_ANIMATE, HUD, CE_BTN_CLICKED, CE_BALL_OUT_SCREEN
 from .utils import load_color, load_img, load_sound, load_font, Text
@@ -128,14 +130,14 @@ class Pong:
                     if e.type == CE_BALL_OUT_SCREEN:
                         self.level.add_point_to_paddle(e.target)
                     
-                    if self.level.winned and e.type == pg.MOUSEBUTTONDOWN and e.button == 1:
+                    if self.level.winned and e.type == MOUSEBUTTONDOWN and e.button == 1:
                         self.level.handle_btn_click()
 
-                    if e.type == pg.KEYDOWN and (e.key == pg.K_ESCAPE or e.key == pg.K_BACKSPACE):
+                    if e.type == pg.KEYDOWN and (e.key == K_ESCAPE or e.key == K_BACKSPACE):
                         self.quit_current_game(True)
                         break
                         
-                if self.state == 'menu' and e.type == pg.MOUSEBUTTONDOWN and e.button == 1:
+                if self.state == 'menu' and e.type == MOUSEBUTTONDOWN and e.button == 1:
                     self.starting_menu.handle_btn_click()
 
                 if e.type == CE_BTN_CLICKED:

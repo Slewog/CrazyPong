@@ -75,8 +75,7 @@ BALL: BallData = {
     'boost': 5,
     'velocity': 500,
     'max_vel': 650,
-    'min_coll_tol': 2,
-    'max_coll_tol': 10,
+    'max_out': 100,
     'start_pos_offset': 100
 }
 

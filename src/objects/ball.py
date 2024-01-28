@@ -6,13 +6,12 @@ if TYPE_CHECKING:
 
 import pygame as pg
 from random import choice, randint
+from pygame.locals import SRCALPHA, BLEND_RGBA_MIN
 
 from src.const.settings import BALL, SCREEN_RECT, CE_BALL_OUT_SCREEN
 
 
 class Ball(pg.sprite.Sprite):
-    MIN_COLL_TOL = BALL['min_coll_tol']
-    MAX_COLL_TOL = BALL['max_coll_tol']
     BOOST = BALL['boost']
     VELOCITY = BALL['velocity']
     MAX_VELOCITY = BALL['max_vel']
@@ -20,6 +19,7 @@ class Ball(pg.sprite.Sprite):
     SIZE = (RADIUS * 2, RADIUS * 2)
     SCREEN_RECT = SCREEN_RECT
     START_POS_Y_OFF = BALL['start_pos_offset']
+    MAX_OUT = BALL['max_out']
 
     COLOR: pg.Color
     HIT_SOUND: pg.mixer.Sound
@@ -32,7 +32,7 @@ class Ball(pg.sprite.Sprite):
         self.direction = pg.math.Vector2(self.get_starting_vel(), self.get_starting_vel())
 
         # Ball surface.
-        rect_image = pg.Surface(self.SIZE, pg.SRCALPHA)
+        rect_image = pg.Surface(self.SIZE, SRCALPHA)
         pg.draw.rect(
             rect_image,
             (255, 255, 255),
@@ -43,13 +43,13 @@ class Ball(pg.sprite.Sprite):
         self.image = pg.Surface(self.SIZE)
         self.image.fill(self.COLOR)
         self.image = self.image.convert_alpha()
-        self.image.blit(rect_image, (0, 0), None, pg.BLEND_RGBA_MIN)
+        self.image.blit(rect_image, (0, 0), None, BLEND_RGBA_MIN)
 
         # Ball rect.
         self.rect = self.image.get_rect(center=self.get_random_start_pos())
         self.pos = pg.math.Vector2(self.rect.topleft)
         self.old_rect = self.rect.copy()
-        self.lock_y = False
+        self.lock_y = bool(False)
     
     def set_active(self, state: bool) -> None:
         if state == self.active or type(state) != bool:
@@ -68,15 +68,12 @@ class Ball(pg.sprite.Sprite):
     def get_boost(self, vel):
         return self.BOOST if vel > 0 else -self.BOOST
     
-    def can_speed_up(self):
-        return abs(self.direction.x) < self.MAX_VELOCITY and abs(self.direction.y) < self.MAX_VELOCITY
-    
     def speed_up(self):
-        if not self.can_speed_up():
-            return
+        if abs(self.direction.x) < self.MAX_VELOCITY:
+            self.direction.x += self.get_boost(self.direction.x)
         
-        self.direction.x += self.get_boost(self.direction.x)
-        self.direction.y += self.get_boost(self.direction.y)
+        if abs(self.direction.y) < self.MAX_VELOCITY:
+            self.direction.y += self.get_boost(self.direction.y)
     
     def reset(self, full: bool = False) -> None:
         self.rect.center = self.get_random_start_pos()
@@ -106,48 +103,22 @@ class Ball(pg.sprite.Sprite):
                 self.direction.y *= -1
 
         if direction == 'horizontal':
-            if self.direction.x < 0 and self.rect.left < -100:
+            if self.direction.x < 0 and self.rect.left < -self.MAX_OUT:
                 pg.event.post(pg.event.Event(CE_BALL_OUT_SCREEN, {'target': 'right'}))
 
-            if self.direction.x > 0 and self.rect.right > self.SCREEN_RECT.width + 100:
+            if self.direction.x > 0 and self.rect.right > self.SCREEN_RECT.width + self.MAX_OUT:
                 pg.event.post(pg.event.Event(CE_BALL_OUT_SCREEN, {'target': 'left'}))
 
     def check_collisions(self, direction: str, paddles: List[Paddle]) -> None:
         overlap_paddles = [paddle for paddle in paddles if self.rect.colliderect(paddle.rect)]
 
         if not overlap_paddles:
-            self.lock_y = False
+            self.lock_y = bool(False)
             self.check_display_collisions(direction)
             return 
 
         if overlap_paddles:
             for paddle in overlap_paddles:
-                # Top collision.
-                if self.rect.bottom >= paddle.rect.top and self.old_rect.bottom <= paddle.old_rect.top:
-                    if self.rect.top <= 0 and self.rect.left < paddle.rect.right and self.rect.right > paddle.rect.left:
-                        self.rect.top = 0
-                        self.pos.y = self.rect.y
-
-                        paddle.rect.top =  self.rect.height
-                        self.lock_y = True
-                    else:
-                        self.rect.bottom = paddle.rect.top - 1
-                        self.pos.y = self.rect.y
-                        self.direction.y *= -1
-
-                # Bottom collision.
-                if self.rect.top <= paddle.rect.bottom and self.old_rect.top >= paddle.old_rect.bottom:
-                    if self.rect.bottom >= self.SCREEN_RECT.height and self.rect.left < paddle.rect.right and self.rect.right > paddle.rect.left:
-                        self.rect.bottom = self.SCREEN_RECT.height
-                        self.pos.y = self.rect.y
-
-                        paddle.rect.bottom = self.SCREEN_RECT.height - self.rect.height
-                        self.lock_y = True
-                    else:
-                        self.rect.top = paddle.rect.bottom + 1
-                        self.pos.y = self.rect.y
-                        self.direction.y *= -1
-
                 # Right collision.
                 if self.rect.left <= paddle.rect.right and self.old_rect.left >= paddle.old_rect.right:
                     self.HIT_SOUND.play()
@@ -164,12 +135,37 @@ class Ball(pg.sprite.Sprite):
                     self.direction.x *= -1
                     self.speed_up()
 
+                # Top collision.
+                if self.rect.bottom >= paddle.rect.top and self.old_rect.bottom <= paddle.old_rect.top:
+                    if self.rect.top <= 0 and self.rect.left < paddle.rect.right and self.rect.right > paddle.rect.left:
+                        self.rect.top = 0
+                        self.pos.y = self.rect.y
+
+                        paddle.rect.top =  self.rect.height
+                        self.lock_y = bool(True)
+                    else:
+                        self.rect.bottom = paddle.rect.top - 1
+                        self.pos.y = self.rect.y
+                        self.direction.y *= -1
+
+                # Bottom collision.
+                if self.rect.top <= paddle.rect.bottom and self.old_rect.top >= paddle.old_rect.bottom:
+                    if self.rect.bottom >= self.SCREEN_RECT.height and self.rect.left < paddle.rect.right and self.rect.right > paddle.rect.left:
+                        self.rect.bottom = self.SCREEN_RECT.height
+                        self.pos.y = self.rect.y
+
+                        paddle.rect.bottom = self.SCREEN_RECT.height - self.rect.height
+                        self.lock_y = bool(True)
+                    else:
+                        self.rect.top = paddle.rect.bottom + 1
+                        self.pos.y = self.rect.y
+                        self.direction.y *= -1
+
     def update(self, dt: float, paddles: List[Paddle]) -> None:
         self.old_rect = self.rect.copy()
 
-        if not self.lock_x:
-            self.pos.x += self.direction.x * dt
-            self.rect.x = round(self.pos.x) 
+        self.pos.x += self.direction.x * dt
+        self.rect.x = round(self.pos.x) 
         self.check_collisions('horizontal', paddles)
 
         if not self.lock_y:
