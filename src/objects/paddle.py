@@ -6,8 +6,31 @@ if TYPE_CHECKING:
 
 import pygame as pg
 
-from src.const.settings import PADDLE, SCREEN_RECT
-from src.ui.components.score import Score
+from src.const.settings import PADDLE, SCREEN_RECT,  HUD
+
+class Score(pg.sprite.Sprite):
+    FONT: pg.font.Font
+    FONT_COLOR: pg.Color
+    OFFSET_Y = HUD['score_offset_y']
+
+    def __init__(self, pos_x: int, group: pg.sprite.Group) -> None:
+        pg.sprite.Sprite.__init__(self, group)
+        
+        self.pos_x = pos_x
+        self.current = int(0)
+        self.update_surf()
+
+    def update_surf(self) -> None:
+        self.image = self.FONT.render(str(self.current), True, self.FONT_COLOR)
+        self.rect = self.image.get_rect(midtop=(self.pos_x, self.OFFSET_Y))
+
+    def reset(self) -> None:
+        self.current = int(0)
+        self.update_surf()
+
+    def add_point(self) -> None:
+        self.current += 1
+        self.update_surf()
 
 
 class Paddle(pg.sprite.Sprite):
@@ -42,6 +65,7 @@ class Paddle(pg.sprite.Sprite):
         self.image = pg.Surface((self.WIDTH, self.HEIGHT))
         self.image.fill(self.COLOR)
         self.rect = self.image.get_rect(midleft=self.default_pos)
+        self.old_rect = self.rect.copy()
 
     def winned(self) -> bool:
         return self.score.current >= self.MAX_SCORE
@@ -58,14 +82,12 @@ class Paddle(pg.sprite.Sprite):
         self.score.kill()
         self.kill()
     
-    def check_wall_collision(self, dir_y: float) -> int | float:
-        if self.rect.top + dir_y < self.OFFSET_Y:
-            dir_y = -self.rect.top + self.OFFSET_Y
+    def clamp_in_screen(self) -> None:
+        if self.rect.top < self.OFFSET_Y:
+            self.rect.top = self.OFFSET_Y
         
-        if self.rect.bottom + dir_y > self.SCREEN_BOTTOM:
-            dir_y = self.SCREEN_BOTTOM - self.rect.bottom
-
-        return dir_y
+        if self.rect.bottom > self.SCREEN_BOTTOM:
+            self.rect.bottom = self.SCREEN_BOTTOM
     
     def check_input(self, keys: pg.key.ScancodeWrapper) -> None:
         self.cur_vel = int(0)
@@ -83,16 +105,15 @@ class Paddle(pg.sprite.Sprite):
                 self.cur_vel = self.VELOCITY
     
     def update(self, dt: float, ball: Ball) -> None:
+        self.old_rect = self.rect.copy()
+        
         if self.type == 'ai':
             dist = self.rect.centery - ball.rect.centery
             ai_speed = self.VELOCITY * dt
             if abs(dist) > ai_speed:
-                self.rect.move_ip(
-                    0,
-                    self.check_wall_collision(
-                        -1 * (ai_speed * (dist / abs(dist)))
-                    )
-                )
+                self.rect.y += -1 * (ai_speed * (dist / abs(dist)))
+                self.clamp_in_screen()
 
         if self.type == 'player' and self.cur_vel != 0:
-            self.rect.move_ip(0, self.check_wall_collision(self.cur_vel * dt))
+            self.rect.y += self.cur_vel * dt
+            self.clamp_in_screen()
