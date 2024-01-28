@@ -9,7 +9,7 @@ import pygame as pg
 from .const.settings import HUD, SCREEN_RECT
 from .objects.paddle import Paddle
 from .utils import Text
-from .ui.components.buttons import ButtonAnimate
+from .ui.buttons import ButtonAnimate
 
 class Level:
     WIN_TXT_POS = (
@@ -93,7 +93,7 @@ class Level:
                         'center',
                         self.hud_group,
                         bg=True,
-                        bg_offset_y= -2
+                        bg_offset_y= 2
                     )
 
                     for paddle in self.paddles:
