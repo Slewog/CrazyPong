@@ -85,7 +85,7 @@ class Ball(pg.sprite.Sprite):
         
         if not full:
             self.direction.x *= -1
-            self.direction.y = self.get_starting_vel(self.direction.y)
+            self.direction.y = self.get_starting_vel() # self.direction.y)
         else:
             self.direction.x = self.get_starting_vel()
             self.direction.y = self.get_starting_vel()
