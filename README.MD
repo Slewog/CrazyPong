@@ -25,5 +25,8 @@ Use Pygame Surface to render the ball and the paddles.</br>
 <p align="center"><img src="assets/screenshots/twoplayer.png"></p>
 </br>
 
-# Todo:
-- Try improve ball collisions with paddles.
+
+# Last Update:
+- Switch to pygame-ce.
+- Improve ball physics (movement and collisions with paddles.)
+- Improve Starting menu rendering.
