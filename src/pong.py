@@ -5,14 +5,13 @@ from typing import Dict
 
 
 from .const.settings import SCREEN_RECT, GAME, FONT, COLORS, CRS_EFFECT, SOUNDS, BUTTON_ANIMATE, HUD, CE_BTN_CLICKED, CE_BALL_OUT_SCREEN
-from .utils import load_color, load_img, load_sound, load_font, Text, RectBackground
+from .utils import load_color, load_img, load_sound, load_font, Text
 
-from .ui.components.screen_effect import CRS
-from .ui.components.buttons import ButtonAnimate
-from .ui.components.score import Score
+from .ui.screen_effect import CRS
+from .ui.buttons import ButtonAnimate
 from .ui.starting_menu import StartingMenu
 from .level import Level
-from .objects.paddle import Paddle
+from .objects.paddle import Paddle, Score
 from .objects.ball import Ball
 
 class Pong:
@@ -45,7 +44,7 @@ class Pong:
         self.crs_effect = CRS(CRS_EFFECT)
 
         Text.COLOR = self.colors['font']
-        RectBackground.COLOR = self.colors['background']
+        Text.BG_COLOR = self.colors['background']
 
         ButtonAnimate.FONT = load_font(FONT['family'], FONT['default_size'])
         ButtonAnimate.FONT_COLOR = self.colors['font']
