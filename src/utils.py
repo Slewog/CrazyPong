@@ -78,33 +78,25 @@ def load_img(file: str, sub_dir: str = "", convert_a: bool = False, convert: boo
     return img
 
 
-class RectBackground(pg.sprite.Sprite):
-    """Create a background from a rect as sprite to render in a group"""
-    COLOR: pg.Color
-
-    def __init__(self, rect: pg.Rect, group: pg.sprite.Group, offset_y: int = 0, offset_x: int = 0) -> None:
-        pg.sprite.Sprite.__init__(self, group)
-
-        self.image = pg.Surface(rect.size)
-        self.image.fill(self.COLOR)
-
-        self.rect = rect.copy()
-        self.rect.move_ip(offset_x, offset_y)
-    
-    def destroy(self):
-        self.kill()
-
-
 class Text(pg.sprite.Sprite):
     """Create a text as sprite to render in a group"""
     COLOR: pg.Color
+    BG_COLOR: pg.Color
 
     def __init__(self, font: pg.font.Font, text: str, pos: Tuple[int, int], center_by: str, group: pg.sprite.Group, bg: bool = False, bg_offset_y: int = 0, bg_offset_x: int = 0) -> None:
         """
         center_by: 'midtop' | 'midbottom' | center
         bg: True if you want a bg behind the text.
         """
-        self.image = font.render(text, True, self.COLOR)
+        pg.sprite.Sprite.__init__(self, group)
+
+        txt = font.render(text, True, self.COLOR)
+        self.image = pg.Surface(txt.get_size())
+
+        if bg:
+            self.image.fill(self.BG_COLOR)
+
+        self.image.blit(txt, (0 + bg_offset_x, 0 + bg_offset_y))
 
         match center_by:
             case 'center':
@@ -114,15 +106,9 @@ class Text(pg.sprite.Sprite):
             case 'midbottom':
                 self.rect = self.image.get_rect(midbottom=pos)
 
-        self.bg = bg and RectBackground(self.rect, group, bg_offset_y, bg_offset_x) or False
-
-        pg.sprite.Sprite.__init__(self, group)
 
     def destroy(self):
         self.kill()
-
-        if self.bg:
-            self.bg.kill()
 
 
 class NoneSound:
