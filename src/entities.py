@@ -19,7 +19,7 @@ class Score(sprite.Sprite):
         sprite.Sprite.__init__(self, group)
         
         self.pos_x = pos_x
-        self.current = int(4)
+        self.current = int(0)
         self.update_surf()
 
     def update_surf(self) -> None:
