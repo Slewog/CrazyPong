@@ -6,7 +6,7 @@ The ball speed increase every lateral collision with a paddle and back to defaul
 Use Pygame Surface to render the ball and the paddles.</br>
 
 # Requirements
-- pygame 2.5 or more recent
+- pygame-ce 2.4 or more recent
 - python 3.10 or more recent
 
 # Game type
