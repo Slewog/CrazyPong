@@ -1,4 +1,4 @@
-<h1 align='center'>Crazy Pong</a></h1><p align='center'><b>
+<h1 align='center'>Crazy Pong V2.1</a></h1><p align='center'><b>
 
 This a Pong like create with python and pygame.</br>
 Cathodic ray screen effect.</br>
@@ -27,6 +27,8 @@ Use Pygame Surface to render the ball and the paddles.</br>
 
 
 # Last Update:
-- Switch to pygame-ce.
-- Improve ball physics (movement and collisions with paddles.)
+- Improve ball physics (new collision is really more precised and maybe use less performance).
 - Improve Starting menu rendering.
+
+# Todo:
+- Ball velocity depend of the angle collision.

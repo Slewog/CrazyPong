@@ -1,4 +1,4 @@
-from src.pong import Pong
+from src.game import CrazyPong
 
 if __name__ == '__main__':
-    Pong().run()
+    CrazyPong().run()
